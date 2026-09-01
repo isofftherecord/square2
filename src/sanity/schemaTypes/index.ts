@@ -1,6 +1,6 @@
 import type { SchemaTypeDefinition } from "sanity";
 
-import { categoria } from "./categoria";
-import { proyecto } from "./proyecto";
+import { category } from "./category";
+import { project } from "./project";
 
-export const schemaTypes: SchemaTypeDefinition[] = [proyecto, categoria];
+export const schemaTypes: SchemaTypeDefinition[] = [project, category];

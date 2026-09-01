@@ -8,26 +8,26 @@ import { PortableText } from "next-sanity";
 import { isSanityConfigured } from "@/sanity/env";
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
-import { proyectoPorSlugQuery } from "@/sanity/lib/queries";
+import { projectBySlugQuery } from "@/sanity/lib/queries";
 
 export const revalidate = 60;
 
-type ImagenConAlt = { alt?: string } & Record<string, unknown>;
+type ImageWithAlt = { alt?: string } & Record<string, unknown>;
 
-type Proyecto = {
+type Project = {
   _id: string;
-  titulo: string;
+  title: string;
   slug: string;
-  resumen?: string;
-  imagenPrincipal?: ImagenConAlt;
-  galeria?: (ImagenConAlt & { _key: string })[];
-  fecha?: string;
-  cliente?: string;
-  contenido?: PortableTextBlock[];
-  categoria?: { titulo: string; slug: string };
+  summary?: string;
+  mainImage?: ImageWithAlt;
+  gallery?: (ImageWithAlt & { _key: string })[];
+  date?: string;
+  client?: string;
+  content?: PortableTextBlock[];
+  category?: { title: string; slug: string };
 };
 
-export default async function ProyectoPage({
+export default async function ProjectPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
@@ -35,42 +35,42 @@ export default async function ProyectoPage({
   if (!isSanityConfigured) notFound();
 
   const { slug } = await params;
-  const proyecto = await client.fetch<Proyecto | null>(proyectoPorSlugQuery, {
+  const project = await client.fetch<Project | null>(projectBySlugQuery, {
     slug,
   });
 
-  if (!proyecto) notFound();
+  if (!project) notFound();
 
   return (
-    <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-16">
+    <main className="col-span-12 py-16">
       <Link
         href="/"
         className="text-sm text-neutral-400 hover:text-neutral-200"
       >
-        ← Volver a proyectos
+        ← Back to projects
       </Link>
 
       <header className="mt-6">
-        {proyecto.categoria && (
+        {project.category && (
           <p className="text-xs uppercase tracking-wide text-neutral-500">
-            {proyecto.categoria.titulo}
+            {project.category.title}
           </p>
         )}
         <h1 className="mt-1 text-3xl font-bold tracking-tight sm:text-4xl">
-          {proyecto.titulo}
+          {project.title}
         </h1>
         <dl className="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm text-neutral-400">
-          {proyecto.cliente && (
+          {project.client && (
             <div>
-              <dt className="inline font-medium text-neutral-300">Cliente: </dt>
-              <dd className="inline">{proyecto.cliente}</dd>
+              <dt className="inline font-medium text-neutral-300">Client: </dt>
+              <dd className="inline">{project.client}</dd>
             </div>
           )}
-          {proyecto.fecha && (
+          {project.date && (
             <div>
-              <dt className="inline font-medium text-neutral-300">Fecha: </dt>
+              <dt className="inline font-medium text-neutral-300">Date: </dt>
               <dd className="inline">
-                {new Date(proyecto.fecha).toLocaleDateString("es", {
+                {new Date(project.date).toLocaleDateString("en", {
                   year: "numeric",
                   month: "long",
                 })}
@@ -80,11 +80,11 @@ export default async function ProyectoPage({
         </dl>
       </header>
 
-      {proyecto.imagenPrincipal && (
+      {project.mainImage && (
         <div className="relative mt-8 aspect-video overflow-hidden rounded-xl bg-neutral-900">
           <Image
-            src={urlFor(proyecto.imagenPrincipal).width(1600).url()}
-            alt={proyecto.imagenPrincipal.alt ?? proyecto.titulo}
+            src={urlFor(project.mainImage).width(1600).url()}
+            alt={project.mainImage.alt ?? project.title}
             fill
             className="object-cover"
             sizes="(max-width: 768px) 100vw, 768px"
@@ -93,13 +93,13 @@ export default async function ProyectoPage({
         </div>
       )}
 
-      {proyecto.contenido && proyecto.contenido.length > 0 && (
+      {project.content && project.content.length > 0 && (
         <article className="prose prose-invert mt-10 max-w-none">
           <PortableText
-            value={proyecto.contenido}
+            value={project.content}
             components={{
               types: {
-                image: ({ value }: { value: ImagenConAlt }) => (
+                image: ({ value }: { value: ImageWithAlt }) => (
                   <Image
                     src={urlFor(value).width(1200).url()}
                     alt={value.alt ?? ""}
@@ -114,18 +114,18 @@ export default async function ProyectoPage({
         </article>
       )}
 
-      {proyecto.galeria && proyecto.galeria.length > 0 && (
+      {project.gallery && project.gallery.length > 0 && (
         <section className="mt-12">
-          <h2 className="text-xl font-semibold">Galería</h2>
+          <h2 className="text-xl font-semibold">Gallery</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            {proyecto.galeria.map((foto) => (
+            {project.gallery.map((photo) => (
               <div
-                key={foto._key}
+                key={photo._key}
                 className="relative aspect-[4/3] overflow-hidden rounded-lg bg-neutral-900"
               >
                 <Image
-                  src={urlFor(foto).width(800).height(600).url()}
-                  alt={foto.alt ?? proyecto.titulo}
+                  src={urlFor(photo).width(800).height(600).url()}
+                  alt={photo.alt ?? project.title}
                   fill
                   className="object-cover"
                   sizes="(max-width: 640px) 100vw, 50vw"

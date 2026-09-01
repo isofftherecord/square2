@@ -1,0 +1,33 @@
+---
+description: Código y archivos en inglés; comentarios en español
+alwaysApply: true
+---
+
+# Idioma del código
+
+Código, identificadores y nombres de archivos/carpetas van en **inglés**.
+Los comentarios (y JSDoc) van en **español**.
+
+El copy visible en la UI sigue el diseño (hoy inglés). No traduzcas textos
+de interfaz al español salvo que Figma lo pida. Docs internas para el equipo
+(`STYLEGUIDE.md`, `PENDIENTES.md`) pueden quedar en español.
+
+```tsx
+// ❌ MAL — identificadores o archivos en español
+// src/componentes/pie-de-pagina.tsx
+export function PieDePagina() {
+  const enlaces = [{ href: "/", label: "Firm" }];
+}
+
+// ✅ BIEN — código en inglés, comentario en español
+// src/components/footer.tsx
+export function Footer() {
+  // Mismos links que el sitemap del footer en Figma
+  const links = [{ href: "/", label: "Firm" }];
+}
+```
+
+- Archivos: `footer.tsx`, `projects/[slug]/page.tsx` — no `pie.tsx` ni `proyectos/`.
+- Componentes, props, types, variables, funciones, commits: English.
+- Comentarios: español, breves, solo cuando aportan contexto.
+- No mezcles idiomas en un mismo identificador (`getProyectos`, `NavBarPrincipal`).

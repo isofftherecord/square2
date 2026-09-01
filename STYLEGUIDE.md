@@ -18,6 +18,31 @@ import Image from "next/image";
 - Mantén la proporción: el ancho debe ser ~5.1 veces la altura.
 - Para usarlo sobre fondo oscuro se necesita exportar una variante clara desde Figma.
 
+## Grilla
+
+El sitio se diseña sobre un canvas de **1440px** con **12 columnas de 100px**.
+
+| Token | Valor | Variable CSS |
+|---|---|---|
+| Ancho de página | 1440px | `--s2-page` |
+| Columnas | 12 × 100px | `--s2-columns`, `--s2-col` |
+| Gutter | 20px | `--s2-gutter` |
+| Margen lateral | 10px | `--s2-margin` |
+
+`10 + 12×100 + 11×20 + 10 = 1440`. Por debajo de 1440px el margen pasa a 20px y el gutter a 16px; las columnas se comprimen.
+
+La clase `s2-page` centra ese canvas y activa la grilla CSS. Cada hijo directo usa `col-span-*` (1–12) para ocupar columnas. `s2-subgrid` anida secciones en las mismas 12 pistas. Navbar y contenido del sitio viven dentro de este wrapper.
+
+```tsx
+<div className="s2-page">
+  <header className="col-span-12">{/* ancho completo */}</header>
+  <main className="s2-subgrid">
+    <section className="col-span-8">{/* 8 columnas */}</section>
+    <aside className="col-span-4">{/* 4 columnas */}</aside>
+  </main>
+</div>
+```
+
 ## Fuentes
 
 Las tres familias están en `src/fonts/` y se cargan en `src/app/layout.tsx`.
@@ -57,7 +82,7 @@ peso, tamaño, interlineado y (en los estilos mono) mayúsculas automáticas.
 
 ```tsx
 // Título de página
-<h1 className="text-h1">Nuestros proyectos</h1>
+<h1 className="text-h1">Our projects</h1>
 
 // Título de sección con color de marca
 <h2 className="text-h2 text-s2-slate">Residencial</h2>
@@ -66,10 +91,10 @@ peso, tamaño, interlineado y (en los estilos mono) mayúsculas automáticas.
 <span className="text-tags text-s2-steel">Comercial</span>
 
 // Párrafo
-<p className="text-body">Descripción del proyecto…</p>
+<p className="text-body">Project description…</p>
 
 // Enlace de menú
-<a className="text-navigation" href="/proyectos">Proyectos</a>
+<a className="text-navigation" href="/projects">Projects</a>
 ```
 
 Las clases se combinan con cualquier otra utilidad de Tailwind (color,
@@ -109,7 +134,7 @@ a otros colores de marca.
 
 // Botón de marca
 <button className="text-navigation bg-s2-black text-s2-white px-6 py-3 rounded-full">
-  Ver proyecto
+  View project
 </button>
 ```
 
@@ -120,4 +145,6 @@ a otros colores de marca.
 2. **No uses colores fuera de la paleta** (`text-gray-500`, `#666`…).
    Usa las clases `s2-*`.
 3. **Un solo `text-h1` por página**, por jerarquía y SEO.
-4. Si el diseño cambia en Figma, actualiza `globals.css` y esta guía a la vez.
+4. **Layout sobre la grilla 1440 / 12**. Usa `s2-page`, `s2-subgrid` y `col-span-*`.
+   No uses `max-w-6xl`, `px-6` u otros anchos sueltos para el canvas.
+5. Si el diseño cambia en Figma, actualiza `globals.css` y esta guía a la vez.

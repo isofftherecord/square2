@@ -1,14 +1,14 @@
 import { icons } from "@sanity/icons";
 import { defineArrayMember, defineField, defineType } from "sanity";
 
-export const proyecto = defineType({
-  name: "proyecto",
+export const project = defineType({
+  name: "project",
   title: "Proyecto",
   type: "document",
   icon: icons.case,
   fields: [
     defineField({
-      name: "titulo",
+      name: "title",
       title: "Nombre del proyecto",
       type: "string",
       validation: (rule) => rule.required().error("El nombre es obligatorio"),
@@ -19,19 +19,20 @@ export const proyecto = defineType({
       description:
         "Se genera automáticamente con el botón «Generate». No necesitas editarlo.",
       type: "slug",
-      options: { source: "titulo" },
-      validation: (rule) => rule.required().error("Presiona «Generate» para crear la URL"),
+      options: { source: "title" },
+      validation: (rule) =>
+        rule.required().error("Presiona «Generate» para crear la URL"),
     }),
     defineField({
-      name: "categoria",
+      name: "category",
       title: "Categoría",
       description: "¿A qué tipo de proyecto pertenece?",
       type: "reference",
-      to: [{ type: "categoria" }],
+      to: [{ type: "category" }],
       validation: (rule) => rule.required().error("Elige una categoría"),
     }),
     defineField({
-      name: "resumen",
+      name: "summary",
       title: "Resumen corto",
       description: "Una o dos frases que se muestran en la lista de proyectos.",
       type: "text",
@@ -40,7 +41,7 @@ export const proyecto = defineType({
         rule.max(200).warning("Mejor si es breve (máx. 200 caracteres)"),
     }),
     defineField({
-      name: "imagenPrincipal",
+      name: "mainImage",
       title: "Imagen principal",
       type: "image",
       options: { hotspot: true },
@@ -48,14 +49,16 @@ export const proyecto = defineType({
         defineField({
           name: "alt",
           title: "Texto alternativo",
-          description: "Describe la imagen (ayuda a Google y a la accesibilidad).",
+          description:
+            "Describe la imagen (ayuda a Google y a la accesibilidad).",
           type: "string",
         }),
       ],
-      validation: (rule) => rule.required().error("Agrega una imagen principal"),
+      validation: (rule) =>
+        rule.required().error("Agrega una imagen principal"),
     }),
     defineField({
-      name: "galeria",
+      name: "gallery",
       title: "Galería de fotos (opcional)",
       type: "array",
       of: [
@@ -73,20 +76,21 @@ export const proyecto = defineType({
       ],
     }),
     defineField({
-      name: "fecha",
+      name: "date",
       title: "Fecha del proyecto",
       type: "date",
       options: { dateFormat: "DD-MM-YYYY" },
     }),
     defineField({
-      name: "cliente",
+      name: "client",
       title: "Cliente (opcional)",
       type: "string",
     }),
     defineField({
-      name: "contenido",
+      name: "content",
       title: "Descripción completa",
-      description: "El contenido detallado del proyecto. Puedes agregar texto e imágenes.",
+      description:
+        "El contenido detallado del proyecto. Puedes agregar texto e imágenes.",
       type: "array",
       of: [
         defineArrayMember({ type: "block" }),
@@ -104,9 +108,10 @@ export const proyecto = defineType({
       ],
     }),
     defineField({
-      name: "destacado",
+      name: "featured",
       title: "¿Proyecto destacado?",
-      description: "Los proyectos destacados aparecen primero en la página de inicio.",
+      description:
+        "Los proyectos destacados aparecen primero en la página de inicio.",
       type: "boolean",
       initialValue: false,
     }),
@@ -114,15 +119,15 @@ export const proyecto = defineType({
   orderings: [
     {
       title: "Fecha (más reciente primero)",
-      name: "fechaDesc",
-      by: [{ field: "fecha", direction: "desc" }],
+      name: "dateDesc",
+      by: [{ field: "date", direction: "desc" }],
     },
   ],
   preview: {
     select: {
-      title: "titulo",
-      subtitle: "categoria.titulo",
-      media: "imagenPrincipal",
+      title: "title",
+      subtitle: "category.title",
+      media: "mainImage",
     },
   },
 });

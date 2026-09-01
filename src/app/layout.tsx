@@ -29,14 +29,14 @@ const fragmentMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Square2 — Proyectos",
-  description: "Sitio corporativo con portafolio de proyectos.",
+  title: "Square2 — Projects",
+  description: "Corporate site with a project portfolio.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="es"
+      lang="en"
       className={`${signifier.variable} ${archivo.variable} ${fragmentMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">

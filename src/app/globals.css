@@ -9,6 +9,14 @@
   --S2-White: #FFF;
   --background: var(--S2-White, #FFF);
   --foreground: var(--S2-Black, #000);
+
+  /* Grilla 1440 / 12 × 100px
+     10 + 12×100 + 11×20 + 10 = 1440 */
+  --s2-page: 1440px;
+  --s2-columns: 12;
+  --s2-col: 100px;
+  --s2-gutter: 20px;
+  --s2-margin: 10px;
 }
 
 
@@ -24,12 +32,44 @@
   --font-sans: var(--font-archivo);
   --font-serif: var(--font-signifier);
   --font-mono: var(--font-mono-brand);
+  --max-width-s2-page: var(--s2-page);
+  --spacing-s2-col: var(--s2-col);
+  --spacing-s2-gutter: var(--s2-gutter);
+  --spacing-s2-margin: var(--s2-margin);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-archivo), Arial, Helvetica, sans-serif;
+}
+
+/* ---------------------------------------------------------------------------
+   Grilla de página: 1440px, 12 columnas de 100px, gutter 20px, margen 10px.
+   En viewports más estrechos las columnas se comprimen (1fr).
+--------------------------------------------------------------------------- */
+
+@utility s2-page {
+  width: 100%;
+  max-width: var(--s2-page);
+  margin-inline: auto;
+  padding-inline: var(--s2-margin);
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--s2-gutter);
+}
+
+@utility s2-subgrid {
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 1439px) {
+  :root {
+    --s2-margin: 20px;
+    --s2-gutter: 16px;
+  }
 }
 
 /* ---------------------------------------------------------------------------

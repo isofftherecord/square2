@@ -1,14 +1,14 @@
 import { icons } from "@sanity/icons";
 import { defineField, defineType } from "sanity";
 
-export const categoria = defineType({
-  name: "categoria",
+export const category = defineType({
+  name: "category",
   title: "Categoría",
   type: "document",
   icon: icons.tag,
   fields: [
     defineField({
-      name: "titulo",
+      name: "title",
       title: "Nombre de la categoría",
       description: "Ej.: Residencial, Comercial, Remodelación…",
       type: "string",
@@ -20,17 +20,18 @@ export const categoria = defineType({
       description:
         "Se genera automáticamente con el botón «Generate». No necesitas editarlo.",
       type: "slug",
-      options: { source: "titulo" },
-      validation: (rule) => rule.required().error("Presiona «Generate» para crear la URL"),
+      options: { source: "title" },
+      validation: (rule) =>
+        rule.required().error("Presiona «Generate» para crear la URL"),
     }),
     defineField({
-      name: "descripcion",
+      name: "description",
       title: "Descripción (opcional)",
       type: "text",
       rows: 3,
     }),
   ],
   preview: {
-    select: { title: "titulo", subtitle: "descripcion" },
+    select: { title: "title", subtitle: "description" },
   },
 });

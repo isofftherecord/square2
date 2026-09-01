@@ -58,12 +58,12 @@ Las **Categorías** (ej. Residencial, Comercial…) se administran en su propia 
 ```
 src/
   app/                  # Páginas del sitio (App Router)
-    page.tsx            # Inicio: lista de proyectos
-    proyectos/[slug]/   # Detalle de cada proyecto
+    (site)/page.tsx     # Home: lista de proyectos
+    (site)/projects/[slug]/  # Detalle de cada proyecto
     studio/             # Sanity Studio embebido
   sanity/
     env.ts              # Variables de entorno
     lib/                # Cliente, imágenes y consultas GROQ
-    schemaTypes/        # Esquemas: Proyecto y Categoría
+    schemaTypes/        # Esquemas: project y category
 sanity.config.ts        # Configuración del Studio
 ```

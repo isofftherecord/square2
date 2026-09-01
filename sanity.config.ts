@@ -20,8 +20,8 @@ export default defineConfig({
         S.list()
           .title("Contenido")
           .items([
-            S.documentTypeListItem("proyecto").title("Proyectos"),
-            S.documentTypeListItem("categoria").title("Categorías"),
+            S.documentTypeListItem("project").title("Proyectos"),
+            S.documentTypeListItem("category").title("Categorías"),
           ]),
     }),
     // Herramienta para probar consultas GROQ (útil solo para desarrolladores).
