@@ -43,8 +43,14 @@ export default async function Home() {
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-16">
       <header className="mb-12">
-        <h1 className="text-4xl font-bold tracking-tight">Square2</h1>
-        <p className="mt-2 max-w-2xl text-neutral-400">
+        <Image
+          src="/logo.png"
+          alt="Square2"
+          width={224}
+          height={44}
+          priority
+        />
+        <p className="text-body mt-4 max-w-2xl text-s2-slate">
           Portafolio de proyectos. Explora nuestro trabajo por categoría.
         </p>
       </header>
@@ -76,7 +82,7 @@ export default async function Home() {
               {categorias.map((cat) => (
                 <span
                   key={cat._id}
-                  className="rounded-full border border-neutral-700 px-4 py-1.5 text-sm text-neutral-300"
+                  className="text-tags rounded-full border border-neutral-300 px-4 py-2 text-s2-slate"
                 >
                   {cat.titulo}
                 </span>
@@ -85,7 +91,7 @@ export default async function Home() {
           )}
 
           {proyectos.length === 0 ? (
-            <p className="text-neutral-400">
+            <p className="text-body text-s2-slate">
               Aún no hay proyectos publicados. Agrega el primero desde{" "}
               <Link href="/studio" className="underline">
                 el panel de contenido
@@ -98,7 +104,7 @@ export default async function Home() {
                 <li key={proyecto._id} className="group">
                   <Link href={`/proyectos/${proyecto.slug}`} className="block">
                     {proyecto.imagenPrincipal && (
-                      <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-neutral-900">
+                      <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-neutral-100">
                         <Image
                           src={urlFor(proyecto.imagenPrincipal)
                             .width(800)
@@ -113,15 +119,15 @@ export default async function Home() {
                     )}
                     <div className="mt-3">
                       {proyecto.categoria && (
-                        <p className="text-xs uppercase tracking-wide text-neutral-500">
+                        <p className="text-tags text-s2-steel">
                           {proyecto.categoria.titulo}
                         </p>
                       )}
-                      <h2 className="mt-1 text-lg font-semibold group-hover:underline">
+                      <h2 className="text-h5 mt-1 group-hover:underline">
                         {proyecto.titulo}
                       </h2>
                       {proyecto.resumen && (
-                        <p className="mt-1 line-clamp-2 text-sm text-neutral-400">
+                        <p className="mt-1 line-clamp-2 text-sm text-s2-slate">
                           {proyecto.resumen}
                         </p>
                       )}

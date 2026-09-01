@@ -1,26 +1,121 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Colores de marca */
+  --S2-Black: #000;
+  --S2-Orange: #F94704;
+  --S2-SLATE: #333;
+  --S2-STEEL: #97999B;
+  --S2-White: #FFF;
+  --background: var(--S2-White, #FFF);
+  --foreground: var(--S2-Black, #000);
 }
+
+
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-s2-black: var(--S2-Black);
+  --color-s2-orange: var(--S2-Orange);
+  --color-s2-slate: var(--S2-SLATE);
+  --color-s2-steel: var(--S2-STEEL);
+  --color-s2-white: var(--S2-White);
+  --font-sans: var(--font-archivo);
+  --font-serif: var(--font-signifier);
+  --font-mono: var(--font-mono-brand);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-archivo), Arial, Helvetica, sans-serif;
+}
+
+/* ---------------------------------------------------------------------------
+   Styleguide tipográfico
+   Mismos nombres que la guía de diseño: H1–H5, Micro, Body, Tags,
+   Navigation, Metrics y Data. Se usan como clases: text-h1, text-tags, etc.
+--------------------------------------------------------------------------- */
+
+@utility text-h1 {
+  font-family: var(--font-signifier), serif;
+  font-weight: 200;
+  font-size: 64px;
+  line-height: 120%;
+}
+
+@utility text-h2 {
+  font-family: var(--font-signifier), serif;
+  font-weight: 300;
+  font-size: 48px;
+  line-height: 105%;
+}
+
+@utility text-h3 {
+  font-family: var(--font-signifier), serif;
+  font-weight: 500;
+  font-size: 32px;
+  line-height: 115%;
+}
+
+@utility text-h4 {
+  font-family: var(--font-archivo), sans-serif;
+  font-weight: 500;
+  font-size:28px; /* 28px */
+  line-height: 120%;
+}
+
+@utility text-h5 {
+  font-family: var(--font-archivo), sans-serif;
+  font-weight: 700;
+  font-size:18px; /* 18px */
+  line-height: 150%;
+}
+
+@utility text-micro {
+  font-family: var(--font-mono-brand), monospace;
+  font-weight: 400;
+  font-size: 10px;
+  line-height: 120%;
+  text-transform: uppercase;
+}
+
+@utility text-body {
+  font-family: var(--font-archivo), sans-serif;
+  font-weight: 400;
+  font-size:18px;
+  line-height: 150%;
+}
+
+@utility text-tags {
+  font-family: var(--font-mono-brand), monospace;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 100%;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+@utility text-navigation {
+  font-family: var(--font-mono-brand), monospace;
+  font-weight: 400;
+  font-size:12px;
+  line-height: 100%;
+  text-transform: uppercase;
+}
+
+@utility text-metrics {
+  font-family: var(--font-signifier), serif;
+  font-weight: 300;
+  font-size:20px;
+  line-height: 120%;
+}
+
+@utility text-data {
+  font-family: var(--font-mono-brand), monospace;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 130%;
+  text-transform: uppercase;
 }

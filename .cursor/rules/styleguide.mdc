@@ -1,0 +1,21 @@
+---
+description: Sistema de diseño de Square2 — siempre seguir STYLEGUIDE.md
+alwaysApply: true
+---
+
+# Sistema de diseño Square2
+
+`STYLEGUIDE.md` (raíz del proyecto) es la fuente de verdad del diseño.
+Léelo antes de escribir o modificar cualquier UI.
+
+- **Tipografía**: usa solo las clases del styleguide (`text-h1`…`text-h5`,
+  `text-micro`, `text-body`, `text-tags`, `text-navigation`, `text-metrics`,
+  `text-data`). No definas tamaños/fuentes a mano (`text-[17px]`, `font-serif`).
+- **Colores**: usa solo la paleta de marca (`s2-black`, `s2-orange`,
+  `s2-slate`, `s2-steel`, `s2-white`) y los alias `bg-background` /
+  `text-foreground`. No uses colores genéricos de Tailwind ni hex sueltos.
+- **Definiciones**: los estilos viven en `src/app/globals.css` (bloques
+  `@utility` y variables) y las fuentes en `src/app/layout.tsx`.
+- **Logo**: `public/logo.png`, pensado para fondos claros.
+- Si agregas un estilo o color nuevo, defínelo en `globals.css` **y**
+  documéntalo en `STYLEGUIDE.md` en el mismo cambio.

@@ -1,15 +1,31 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import localFont from "next/font/local";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+// Serif para títulos (H1, H2, H3, Metrics)
+const signifier = localFont({
+  variable: "--font-signifier",
+  src: [
+    { path: "../fonts/TestSignifier-Extralight.otf", weight: "200", style: "normal" },
+    { path: "../fonts/TestSignifier-Light.otf", weight: "300", style: "normal" },
+    { path: "../fonts/TestSignifier-LightItalic.otf", weight: "300", style: "italic" },
+  ],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+// Sans para textos (H4, H5, Body)
+const archivo = localFont({
+  variable: "--font-archivo",
+  src: [
+    { path: "../fonts/Archivo-Regular.ttf", weight: "400", style: "normal" },
+    { path: "../fonts/Archivo-Medium.ttf", weight: "500", style: "normal" },
+    { path: "../fonts/Archivo-Bold.ttf", weight: "700", style: "normal" },
+  ],
+});
+
+// Mono para etiquetas (Micro, Tags, Navigation, Data)
+const fragmentMono = localFont({
+  variable: "--font-mono-brand",
+  src: "../fonts/FragmentMono-Regular.ttf",
 });
 
 export const metadata: Metadata = {
@@ -21,9 +37,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="es"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${signifier.variable} ${archivo.variable} ${fragmentMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-neutral-950 text-neutral-100">
+      <body className="min-h-full flex flex-col bg-background text-foreground">
         {children}
       </body>
     </html>
