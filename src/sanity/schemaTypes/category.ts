@@ -3,30 +3,29 @@ import { defineField, defineType } from "sanity";
 
 export const category = defineType({
   name: "category",
-  title: "Categoría",
+  title: "Category",
   type: "document",
   icon: icons.tag,
   fields: [
     defineField({
       name: "title",
-      title: "Nombre de la categoría",
-      description: "Ej.: Residencial, Comercial, Remodelación…",
+      title: "Category name",
+      description: "Example: Residential, Commercial, Renovation…",
       type: "string",
-      validation: (rule) => rule.required().error("El nombre es obligatorio"),
+      validation: (rule) => rule.required().error("Name is required"),
     }),
     defineField({
       name: "slug",
       title: "URL (slug)",
-      description:
-        "Se genera automáticamente con el botón «Generate». No necesitas editarlo.",
+      description: "Generated with the Generate button. You usually don’t need to edit it.",
       type: "slug",
       options: { source: "title" },
       validation: (rule) =>
-        rule.required().error("Presiona «Generate» para crear la URL"),
+        rule.required().error("Press Generate to create the URL"),
     }),
     defineField({
       name: "description",
-      title: "Descripción (opcional)",
+      title: "Description (optional)",
       type: "text",
       rows: 3,
     }),

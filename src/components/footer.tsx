@@ -1,14 +1,8 @@
 import Link from "next/link";
 
-const SITEMAP = [
-  { href: "/", label: "Firm" },
-  { href: "/platform", label: "Platform" },
-  { href: "/", label: "Portfolio" },
-  { href: "/contact", label: "Contact" },
-] as const;
+import { SITE_NAV } from "@/lib/site-nav";
 
 const CONNECTIONS = [
-  { href: "#", label: "X/Twitter" },
   { href: "#", label: "LinkedIn" },
 ] as const;
 
@@ -71,7 +65,7 @@ export function Footer() {
         >
           <p className="text-navigation text-s2-orange">Sitemap</p>
           <ul className="flex flex-col gap-3">
-            {SITEMAP.map((item) => (
+            {SITE_NAV.map((item) => (
               <li key={item.label}>
                 <Link
                   href={item.href}

@@ -2,19 +2,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { Fragment } from "react";
 
-const NAV_ITEMS = [
-  { href: "/", label: "Firm" },
-  { href: "/platform", label: "Platform" },
-  { href: "/", label: "Portfolio" },
-  { href: "/contact", label: "Contact" },
-] as const;
+import { SITE_NAV } from "@/lib/site-nav";
 
 export function Navbar() {
   return (
-    <header className="col-span-12 " >
+    <header className="col-span-12 z-10" >
       <nav 
         className="bg-s2-white flex w-full items-center justify-between px-5 py-3.5 max-w-[600px] mx-auto mt-[44px] fixed left-0 right-0 "
-        aria-label="Principal"
+        aria-label="Main"
       >
         <Link
           href="/"
@@ -30,7 +25,7 @@ export function Navbar() {
           />
         </Link>
         <ul className="flex h-[18px] items-center gap-5">
-          {NAV_ITEMS.map((item, index) => (
+          {SITE_NAV.map((item, index) => (
             <Fragment key={item.label}>
               {index > 0 ? (
                 <li

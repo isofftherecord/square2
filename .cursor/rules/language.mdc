@@ -9,8 +9,10 @@ Código, identificadores y nombres de archivos/carpetas van en **inglés**.
 Los comentarios (y JSDoc) van en **español**.
 
 El copy visible en la UI sigue el diseño (hoy inglés). No traduzcas textos
-de interfaz al español salvo que Figma lo pida. Docs internas para el equipo
-(`STYLEGUIDE.md`, `PENDIENTES.md`) pueden quedar en español.
+de interfaz al español salvo que Figma lo pida. Títulos, descripciones,
+validaciones y menús de Sanity Studio también van en **inglés**. Docs
+internas para el equipo (`STYLEGUIDE.md`, `PENDIENTES.md`) pueden quedar
+en español.
 
 ```tsx
 // ❌ MAL — identificadores o archivos en español

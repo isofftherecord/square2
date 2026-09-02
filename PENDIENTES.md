@@ -4,7 +4,7 @@ Lista de lo que falta revisar o cerrar. No es un roadmap: son huecos concretos d
 
 ## Footer
 
-- [ ] URLs reales de **X/Twitter** y **LinkedIn** (`src/components/footer.tsx`, array `CONNECTIONS`; hoy apuntan a `#`).
+- [ ] URLs reales de **LinkedIn** (`src/components/footer.tsx`, array `CONNECTIONS`; hoy apuntan a `#`).
 - [ ] Destino del formulario **Subscribe**: a dónde se envía o guarda el email (Mailchimp, Sanity, API, etc.). El submit existe pero no hace nada.
 
 ## Páginas

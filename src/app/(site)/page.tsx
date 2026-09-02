@@ -1,138 +1,174 @@
-import Image from "next/image";
-import Link from "next/link";
+import type { Metadata } from "next";
 
+import { DoubleBlock } from "@/components/double-block";
+import { MainHero, type HeroSlide } from "@/components/main-hero";
+import { MetricsBar } from "@/components/metrics-bar";
+import { ProjectIndex, type ProjectSummary } from "@/components/project-index";
 import { isSanityConfigured } from "@/sanity/env";
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
-import { categoriesQuery, projectsQuery } from "@/sanity/lib/queries";
+import { homeHeroQuery, projectsQuery } from "@/sanity/lib/queries";
 
 export const revalidate = 60;
 
-type Category = {
-  _id: string;
-  title: string;
-  slug: string;
-  description?: string;
+export const metadata: Metadata = {
+  title: "Square2",
 };
 
-type ProjectSummary = {
-  _id: string;
-  title: string;
-  slug: string;
-  summary?: string;
-  mainImage?: { alt?: string } & Record<string, unknown>;
-  date?: string;
-  featured?: boolean;
-  category?: { title: string; slug: string };
+type HomeHeroDoc = {
+  slides?: {
+    _key: string;
+    property?: string;
+    year?: string;
+    image?: { alt?: string } & Record<string, unknown>;
+  }[];
 };
 
-async function getData() {
-  if (!isSanityConfigured) {
-    return { projects: [] as ProjectSummary[], categories: [] as Category[] };
-  }
-  const [projects, categories] = await Promise.all([
-    client.fetch<ProjectSummary[]>(projectsQuery),
-    client.fetch<Category[]>(categoriesQuery),
-  ]);
-  return { projects, categories };
+function toHeroSlides(doc: HomeHeroDoc | null): HeroSlide[] {
+  return (
+    doc?.slides
+      ?.filter((slide) => slide.image && slide.property && slide.year)
+      .map((slide) => ({
+        src: urlFor(slide.image!).width(2880).height(1800).url(),
+        property: slide.property!,
+        year: slide.year!,
+      })) ?? []
+  );
 }
 
 export default async function Home() {
-  const { projects, categories } = await getData();
+  const [heroDoc, projects] = isSanityConfigured
+    ? await Promise.all([
+        client.fetch<HomeHeroDoc | null>(homeHeroQuery),
+        client.fetch<ProjectSummary[]>(projectsQuery),
+      ])
+    : [null, [] as ProjectSummary[]];
+  const heroSlides = toHeroSlides(heroDoc);
 
   return (
-    <main className="s2-subgrid py-16">
-      <header className="col-span-8 mb-12">
-        <p className="text-body text-s2-slate">
-          Project portfolio. Explore our work by category.
-        </p>
-      </header>
+    <main className="s2-subgrid">
+      {heroSlides.length > 0 ? <MainHero slides={heroSlides} /> : null}
+      <DoubleBlock
+        heading={
+          <>
+            Underwrite like an <span className="italic">investor</span>. Operate
+            like an <span className="italic">owner</span>.
+          </>
+        }
+        body="Square2 acquires, repositions, and operates office and mixed-use real estate across Florida's core submarkets. Every asset is held to an owner's standard, whether we own it or run it for someone who does."
+      />
+      <section className="s2-subgrid items-center ">
+        <hr className="col-span-12 border-t border-s2-black lg:col-start-2 lg:col-span-10 " />
+      </section>
+      <section className="s2-subgrid items-center py-20 ">
 
-      {!isSanityConfigured ? (
-        <section className="col-span-12 rounded-xl border border-s2-orange/40 bg-s2-orange/10 p-6">
-          <h2 className="text-h5 text-s2-orange">Sanity is not connected</h2>
-          <p className="text-body mt-2 text-s2-slate">
-            Create a project on{" "}
-            <a
-              href="https://sanity.io/manage"
-              className="underline"
-              target="_blank"
-              rel="noreferrer"
-            >
-              sanity.io/manage
-            </a>{" "}
-            and copy your <code>Project ID</code> into{" "}
-            <code>.env.local</code> (see <code>.env.example</code>). Then open{" "}
-            <code>/studio</code> to add projects.
-          </p>
-        </section>
-      ) : (
-        <>
-          {categories.length > 0 && (
-            <nav className="col-span-12 mb-10 flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <span
-                  key={category._id}
-                  className="text-tags rounded-full border border-s2-steel px-4 py-2 text-s2-slate"
-                >
-                  {category.title}
-                </span>
-              ))}
-            </nav>
-          )}
+        <div className="col-span-12 lg:col-start-2 lg:col-span-5">
+          <p className="text-h2">The Investor’s Eye</p>
+          <p className="text-body pt-9">Granular submarket knowledge. Opportunities a pure buyer overlooks. An acquisition thesis built from the ground rather than from a spreadsheet.</p>
+        </div>
+        <div className="col-span-12 lg:col-span-5">
+          <p className="text-h2">The Owner’s Hand</p>
+          <p className="text-body pt-9">On-site presence. Managers who read the financials and not just the building. An owner's urgency on every asset, every day.</p>
+        </div>
+      </section>
 
-          {projects.length === 0 ? (
-            <p className="text-body col-span-12 text-s2-slate">
-              No published projects yet. Add the first one from{" "}
-              <Link href="/studio" className="underline">
-                the content studio
-              </Link>
-              .
+      {/* The Hold */}
+      <section className="bg-s2-orange text-s2-white s2-subgrid items-center ">
+        <div className="s2-page py-12 lg:col-start-2 lg:col-span-10 py-14">
+          <h2 className="col-span-12 text-h2 ">The Hold.</h2>
+
+          <div className="col-span-12 pt-7">
+            <p className="text-micro">Investment</p>
+
+            <div className="relative mt-5 h-28">
+              {/* base del bracket */}
+              <div className="absolute inset-x-0 bottom-0 h-px bg-s2-white" />
+
+              {/* Acquire */}
+              <div className="absolute inset-y-0 left-0 flex flex-col items-start">
+                <span className="text-data whitespace-nowrap">Acquire</span>
+                <span className="mt-2 size-2 shrink-0 bg-s2-white" />
+                <span className="w-px flex-1 bg-s2-white" />
+              </div>
+
+              {/* Reposition */}
+              <div
+                className="absolute inset-y-0 flex flex-col items-center"
+                style={{ left: "33.333%", transform: "translateX(-50%)" }}
+              >
+                <span className="text-data whitespace-nowrap">Reposition</span>
+                <span className="mt-2 size-2 shrink-0 bg-s2-white" />
+                <span className="w-px flex-1 bg-s2-white" />
+              </div>
+
+              {/* Re-tenant */}
+              <div
+                className="absolute inset-y-0 flex flex-col items-center"
+                style={{ left: "66.666%", transform: "translateX(-50%)" }}
+              >
+                <span className="text-data whitespace-nowrap">Re-tenant</span>
+                <span className="mt-2 size-2 shrink-0 bg-s2-white" />
+                <span className="w-px flex-1 bg-s2-white" />
+              </div>
+
+              {/* Exit */}
+              <div className="absolute inset-y-0 right-0 flex flex-col items-end">
+                <span className="text-data whitespace-nowrap">Exit</span>
+                <span className="mt-2 size-2 shrink-0 bg-s2-white" />
+                <span className="w-px flex-1 bg-s2-white" />
+              </div>
+            </div>
+          </div>
+
+          {/* barra de property management */}
+          <div className="col-span-12 mt-8 flex flex-wrap justify-center gap-x-4 gap-y-2 bg-s2-black px-6 py-6">
+            <span className="text-data">Leasing</span>
+            <span className="text-data" aria-hidden="true">·</span>
+            <span className="text-data">Accounting</span>
+            <span className="text-data" aria-hidden="true">·</span>
+            <span className="text-data">Maintenance</span>
+            <span className="text-data" aria-hidden="true">·</span>
+            <span className="text-data">Tenant experience</span>
+            <span className="text-data" aria-hidden="true">·</span>
+            <span className="text-data">Governance</span>
+          </div>
+
+          <div className="col-span-12 mt-5 flex justify-between gap-x-8">
+            <p className="text-micro">Property management</p>
+            <p className="text-micro text-right">
+              The investor acts at moments · The owner acts every day
             </p>
-          ) : (
-            <ul className="s2-subgrid gap-y-8">
-              {projects.map((project) => (
-                <li
-                  key={project._id}
-                  className="group col-span-12 sm:col-span-6 lg:col-span-4"
-                >
-                  <Link href={`/projects/${project.slug}`} className="block">
-                    {project.mainImage && (
-                      <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-s2-white">
-                        <Image
-                          src={urlFor(project.mainImage)
-                            .width(800)
-                            .height(600)
-                            .url()}
-                          alt={project.mainImage.alt ?? project.title}
-                          fill
-                          className="object-cover transition-transform duration-300 group-hover:scale-105"
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        />
-                      </div>
-                    )}
-                    <div className="mt-3">
-                      {project.category && (
-                        <p className="text-tags text-s2-steel">
-                          {project.category.title}
-                        </p>
-                      )}
-                      <h2 className="text-h5 mt-1 group-hover:underline">
-                        {project.title}
-                      </h2>
-                      {project.summary && (
-                        <p className="text-body mt-1 line-clamp-2 text-s2-slate">
-                          {project.summary}
-                        </p>
-                      )}
-                    </div>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
+          </div>
+        </div>
+      </section>
+      <DoubleBlock
+        heading={<>
+          The <span className="italic">proof</span> is the buildings we don't own.
         </>
-      )}
+        }
+        body={
+          <>
+            Square2 operates assets for other owners to the same standard it applies to its own. Not as a separate business line. It is the demonstration that the standard is real.
+            <br /><br />
+            A firm that runs someone else's building the way it runs its own is a firm whose incentives you can read.
+          </>
+        }
+
+      />
+      <section className="s2-subgrid items-center">
+        <hr className="col-span-12 border-t border-s2-black lg:col-span-10 lg:col-start-2" />
+      </section>
+      <MetricsBar
+        items={[
+          { value: "2008", label: "Founded" },
+          { value: "13", label: "Properties" },
+          { value: "0,000,000", label: "SF owned and managed", span: 4 },
+          { value: "Florida", label: "Core submarkets" },
+        ]}
+      />
+      {projects.length > 0 ? (
+        <ProjectIndex heading="Projects." projects={projects} />
+      ) : null}
     </main>
   );
 }

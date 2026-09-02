@@ -159,3 +159,9 @@ body {
   line-height: 130%;
   text-transform: uppercase;
 }
+@utility text-label-hero {
+  font-family: var(--font-mono-brand), monospace;
+  font-weight: 400;
+  font-size: 8px;
+  text-transform: uppercase;
+}

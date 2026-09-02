@@ -1,16 +1,40 @@
 import { defineQuery } from "next-sanity";
 
+export const homeHeroQuery = defineQuery(`
+  *[_id == "homeHero"][0] {
+    slides[] {
+      _key,
+      property,
+      year,
+      image
+    }
+  }
+`);
+
+export const firmHeroQuery = defineQuery(`
+  *[_id == "firmHero"][0] {
+    slides[] {
+      _key,
+      title,
+      image
+    }
+  }
+`);
+
 export const projectsQuery = defineQuery(`
   *[_type == "project" && defined(slug.current)]
-    | order(featured desc, date desc) {
+    | order(featured desc, title asc) {
       _id,
       title,
       "slug": slug.current,
+      market,
+      assetClass,
+      squareFootage,
+      years,
+      role,
       summary,
       mainImage,
-      date,
-      featured,
-      "category": category->{ title, "slug": slug.current }
+      featured
     }
 `);
 
@@ -19,13 +43,27 @@ export const projectBySlugQuery = defineQuery(`
     _id,
     title,
     "slug": slug.current,
+    market,
+    assetClass,
+    squareFootage,
+    years,
+    role,
     summary,
     mainImage,
     gallery,
-    date,
-    client,
-    content,
-    "category": category->{ title, "slug": slug.current }
+    content
+  }
+`);
+
+export const pageBySlugQuery = defineQuery(`
+  *[_type == "page" && slug.current == $slug][0] {
+    title,
+    "slug": slug.current,
+    slides[] {
+      _key,
+      title,
+      image
+    }
   }
 `);
 

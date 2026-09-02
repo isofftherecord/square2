@@ -18,13 +18,15 @@ type Project = {
   _id: string;
   title: string;
   slug: string;
+  market?: string;
+  assetClass?: string;
+  squareFootage?: number;
+  years?: string;
+  role?: string;
   summary?: string;
   mainImage?: ImageWithAlt;
   gallery?: (ImageWithAlt & { _key: string })[];
-  date?: string;
-  client?: string;
   content?: PortableTextBlock[];
-  category?: { title: string; slug: string };
 };
 
 export default async function ProjectPage({
@@ -51,29 +53,39 @@ export default async function ProjectPage({
       </Link>
 
       <header className="mt-6">
-        {project.category && (
-          <p className="text-xs uppercase tracking-wide text-neutral-500">
-            {project.category.title}
-          </p>
-        )}
-        <h1 className="mt-1 text-3xl font-bold tracking-tight sm:text-4xl">
-          {project.title}
-        </h1>
-        <dl className="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm text-neutral-400">
-          {project.client && (
+        <h1 className="text-h1">{project.title}</h1>
+        <dl className="text-body mt-3 flex flex-wrap gap-x-6 gap-y-1 text-s2-slate">
+          {project.market && (
             <div>
-              <dt className="inline font-medium text-neutral-300">Client: </dt>
-              <dd className="inline">{project.client}</dd>
+              <dt className="text-tags inline text-s2-steel">Market </dt>
+              <dd className="inline">{project.market}</dd>
             </div>
           )}
-          {project.date && (
+          {project.assetClass && (
             <div>
-              <dt className="inline font-medium text-neutral-300">Date: </dt>
+              <dt className="text-tags inline text-s2-steel">Class </dt>
+              <dd className="inline">{project.assetClass}</dd>
+            </div>
+          )}
+          {project.squareFootage != null && (
+            <div>
+              <dt className="text-tags inline text-s2-steel">SF </dt>
               <dd className="inline">
-                {new Date(project.date).toLocaleDateString("en", {
-                  year: "numeric",
-                  month: "long",
-                })}
+                {project.squareFootage.toLocaleString("en-US")}
+              </dd>
+            </div>
+          )}
+          {project.years && (
+            <div>
+              <dt className="text-tags inline text-s2-steel">Year </dt>
+              <dd className="inline">{project.years}</dd>
+            </div>
+          )}
+          {project.role && (
+            <div>
+              <dt className="text-tags inline text-s2-steel">Role </dt>
+              <dd className="text-tags inline bg-s2-orange px-2 py-1 text-s2-white">
+                {project.role}
               </dd>
             </div>
           )}

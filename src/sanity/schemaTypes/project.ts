@@ -1,65 +1,107 @@
 import { icons } from "@sanity/icons";
 import { defineArrayMember, defineField, defineType } from "sanity";
 
+export const PROJECT_CLASSES = [
+  { title: "Office", value: "Office" },
+  { title: "Mixed-use", value: "Mixed-use" },
+  { title: "Adaptive re-use", value: "Adaptive re-use" },
+] as const;
+
+export const PROJECT_ROLES = [
+  { title: "Owned", value: "Owned" },
+  { title: "Managed", value: "Managed" },
+] as const;
+
 export const project = defineType({
   name: "project",
-  title: "Proyecto",
+  title: "Project",
   type: "document",
   icon: icons.case,
   fields: [
     defineField({
       name: "title",
-      title: "Nombre del proyecto",
+      title: "Property",
+      description: "Property name shown in the projects table. Example: Las Olas Square.",
       type: "string",
-      validation: (rule) => rule.required().error("El nombre es obligatorio"),
+      validation: (rule) => rule.required().error("Property name is required"),
     }),
     defineField({
       name: "slug",
       title: "URL (slug)",
       description:
-        "Se genera automáticamente con el botón «Generate». No necesitas editarlo.",
+        "Generated with the Generate button. You usually don’t need to edit it.",
       type: "slug",
       options: { source: "title" },
       validation: (rule) =>
-        rule.required().error("Presiona «Generate» para crear la URL"),
+        rule.required().error("Press Generate to create the URL"),
     }),
     defineField({
-      name: "category",
-      title: "Categoría",
-      description: "¿A qué tipo de proyecto pertenece?",
-      type: "reference",
-      to: [{ type: "category" }],
-      validation: (rule) => rule.required().error("Elige una categoría"),
+      name: "market",
+      title: "Market",
+      description: "City or submarket. Example: Fort Lauderdale.",
+      type: "string",
+      validation: (rule) => rule.required().error("Market is required"),
+    }),
+    defineField({
+      name: "assetClass",
+      title: "Class",
+      type: "string",
+      options: { list: [...PROJECT_CLASSES], layout: "radio" },
+      validation: (rule) => rule.required().error("Class is required"),
+    }),
+    defineField({
+      name: "squareFootage",
+      title: "SF",
+      description: "Rentable square footage. Shown with commas, e.g. 267,955.",
+      type: "number",
+      validation: (rule) =>
+        rule
+          .required()
+          .integer()
+          .min(1)
+          .error("Enter square footage as a whole number"),
+    }),
+    defineField({
+      name: "years",
+      title: "Year",
+      description: "Year or range. Example: 2016–2022",
+      type: "string",
+      validation: (rule) => rule.required().error("Year is required"),
+    }),
+    defineField({
+      name: "role",
+      title: "Role",
+      type: "string",
+      options: { list: [...PROJECT_ROLES], layout: "radio" },
+      validation: (rule) => rule.required().error("Role is required"),
     }),
     defineField({
       name: "summary",
-      title: "Resumen corto",
-      description: "Una o dos frases que se muestran en la lista de proyectos.",
+      title: "Short summary",
+      description: "One or two sentences for the project page.",
       type: "text",
       rows: 3,
       validation: (rule) =>
-        rule.max(200).warning("Mejor si es breve (máx. 200 caracteres)"),
+        rule.max(200).warning("Keep it short (max 200 characters)"),
     }),
     defineField({
       name: "mainImage",
-      title: "Imagen principal",
+      title: "Main image",
       type: "image",
       options: { hotspot: true },
       fields: [
         defineField({
           name: "alt",
-          title: "Texto alternativo",
-          description:
-            "Describe la imagen (ayuda a Google y a la accesibilidad).",
+          title: "Alt text",
+          description: "Describe the image (helps SEO and accessibility).",
           type: "string",
         }),
       ],
-      validation: (rule) =>
-        rule.required().error("Agrega una imagen principal"),
+      validation: (rule) => rule.required().error("Add a main image"),
     }),
     defineField({
       name: "gallery",
-      title: "Galería de fotos (opcional)",
+      title: "Photo gallery (optional)",
       type: "array",
       of: [
         defineArrayMember({
@@ -68,7 +110,7 @@ export const project = defineType({
           fields: [
             defineField({
               name: "alt",
-              title: "Texto alternativo",
+              title: "Alt text",
               type: "string",
             }),
           ],
@@ -76,21 +118,9 @@ export const project = defineType({
       ],
     }),
     defineField({
-      name: "date",
-      title: "Fecha del proyecto",
-      type: "date",
-      options: { dateFormat: "DD-MM-YYYY" },
-    }),
-    defineField({
-      name: "client",
-      title: "Cliente (opcional)",
-      type: "string",
-    }),
-    defineField({
       name: "content",
-      title: "Descripción completa",
-      description:
-        "El contenido detallado del proyecto. Puedes agregar texto e imágenes.",
+      title: "Full description",
+      description: "Detailed project content. You can add text and images.",
       type: "array",
       of: [
         defineArrayMember({ type: "block" }),
@@ -100,7 +130,7 @@ export const project = defineType({
           fields: [
             defineField({
               name: "alt",
-              title: "Texto alternativo",
+              title: "Alt text",
               type: "string",
             }),
           ],
@@ -109,25 +139,35 @@ export const project = defineType({
     }),
     defineField({
       name: "featured",
-      title: "¿Proyecto destacado?",
-      description:
-        "Los proyectos destacados aparecen primero en la página de inicio.",
+      title: "Featured project?",
+      description: "Featured projects appear first on the home page.",
       type: "boolean",
       initialValue: false,
     }),
   ],
   orderings: [
     {
-      title: "Fecha (más reciente primero)",
-      name: "dateDesc",
-      by: [{ field: "date", direction: "desc" }],
+      title: "Featured first",
+      name: "featuredDesc",
+      by: [
+        { field: "featured", direction: "desc" },
+        { field: "title", direction: "asc" },
+      ],
     },
   ],
   preview: {
     select: {
       title: "title",
-      subtitle: "category.title",
+      market: "market",
+      role: "role",
       media: "mainImage",
+    },
+    prepare({ title, market, role, media }) {
+      return {
+        title,
+        subtitle: [market, role].filter(Boolean).join(" · "),
+        media,
+      };
     },
   },
 });
