@@ -1,23 +1,21 @@
 import type { Metadata } from "next";
 
-import { TitlePage } from "@/components/title-page";
-import { isSanityConfigured } from "@/sanity/env";
-import { client } from "@/sanity/lib/client";
-import { pageBySlugQuery } from "@/sanity/lib/queries";
-import { toTitleHeroSlides } from "@/sanity/lib/title-hero";
 
-export const revalidate = 60;
+import type { TitleHeroSlide } from "@/components/second-hero";
 
 export const metadata: Metadata = {
   title: "Contact — Square2",
 };
 
-export default async function ContactPage() {
-  const slides = isSanityConfigured
-    ? toTitleHeroSlides(
-        await client.fetch(pageBySlugQuery, { slug: "contact" }),
-      )
-    : [];
+// Slides del hero: se editan aquí, no vienen del CMS.
+const slides: TitleHeroSlide[] = [
+  {
+    title: "Contact",
+    src: "/heroes/contact-01.jpg",
+    alt: "Square2 offices",
+  },
+];
 
-  return <TitlePage slides={slides} fallbackTitle="Contact" />;
+export default function ContactPage() {
+  return "<TitlePage slides={slides} />";
 }

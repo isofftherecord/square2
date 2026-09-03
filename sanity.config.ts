@@ -47,9 +47,7 @@ export default defineConfig({
                 S.document().schemaType("firmHero").documentId("firmHero"),
               ),
             S.divider(),
-            S.documentTypeListItem("page").title("Pages"),
             S.documentTypeListItem("project").title("Projects"),
-            S.documentTypeListItem("category").title("Categories"),
           ]),
     }),
     // Herramienta para probar consultas GROQ (útil solo para desarrolladores).

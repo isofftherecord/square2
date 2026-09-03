@@ -55,18 +55,6 @@ export const projectBySlugQuery = defineQuery(`
   }
 `);
 
-export const pageBySlugQuery = defineQuery(`
-  *[_type == "page" && slug.current == $slug][0] {
-    title,
-    "slug": slug.current,
-    slides[] {
-      _key,
-      title,
-      image
-    }
-  }
-`);
-
 export const categoriesQuery = defineQuery(`
   *[_type == "category" && defined(slug.current)] | order(title asc) {
     _id,

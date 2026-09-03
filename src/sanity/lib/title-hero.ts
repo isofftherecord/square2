@@ -1,4 +1,4 @@
-import type { TitleHeroSlide } from "@/components/title-hero";
+import type { TitleHeroSlide } from "@/components/second-hero";
 
 import { urlFor } from "./image";
 

@@ -1,6 +1,6 @@
 import { defineArrayMember, defineField } from "sanity";
 
-// Campo de slides (H1 + imagen) reutilizado en Firm y Pages.
+// Campo de slides (H1 + imagen) del hero de Firm.
 export const titleSlidesField = defineField({
   name: "slides",
   title: "Hero slides",
