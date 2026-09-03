@@ -28,10 +28,14 @@ export function MainHero({ slides }: { slides: HeroSlide[] }) {
   const total = slides.length;
   const slide = slides[index] ?? slides[0];
 
+  // Reinicia el mosaico en cada slide para que la animación se repita.
   useEffect(() => {
-    const id = requestAnimationFrame(() => setRevealed(true));
-    return () => cancelAnimationFrame(id);
-  }, []);
+    setRevealed(false);
+    let frame = requestAnimationFrame(() => {
+      frame = requestAnimationFrame(() => setRevealed(true));
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [index]);
 
   useEffect(() => {
     if (index >= total) setIndex(0);
@@ -72,11 +76,13 @@ export function MainHero({ slides }: { slides: HeroSlide[] }) {
             row.map((cell, c) => (
               <span
                 key={`${r}-${c}`}
-                className="aspect-square transition-opacity duration-500 ease-out motion-reduce:transition-none"
+                className="aspect-square transition-opacity ease-out motion-reduce:transition-none"
                 style={{
                   backgroundColor: cell === 0 ? "transparent" : BRAND,
                   opacity: !revealed || cell === 0 ? 0 : cell === 2 ? 1 : 0.62,
-                  transitionDelay: `${(r + c) * 45}ms`,
+                  // El reset es instantáneo; solo la entrada se escalona.
+                  transitionDuration: revealed ? "500ms" : "0ms",
+                  transitionDelay: revealed ? `${(r + c) * 45}ms` : "0ms",
                 }}
               />
             ))
@@ -113,15 +119,15 @@ export function MainHero({ slides }: { slides: HeroSlide[] }) {
                 type="button"
                 onClick={() => go(-1)}
                 aria-label="Previous project"
-                className="text-s2-black transition-transform duration-200 hover:-translate-x-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-s2-orange)]"
+                className="cursor-pointer text-s2-black transition-transform duration-200 hover:-translate-x-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-s2-orange)]"
               >
-                <Arrow className="rotate-180" />
+                <Arrow className="rotate-180 " />
               </button>
               <button
                 type="button"
                 onClick={() => go(1)}
                 aria-label="Next project"
-                className="text-s2-orange transition-transform duration-200 hover:translate-x-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-s2-orange)]"
+                className="cursor-pointer text-s2-orange transition-transform duration-200 hover:translate-x-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-s2-orange)]"
               >
                 <Arrow />
               </button>

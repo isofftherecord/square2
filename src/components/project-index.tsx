@@ -26,7 +26,7 @@ export function ProjectIndex({
   heading?: string;
 }) {
   return (
-    <section className="s2-subgrid py-20">
+    <section className="s2-subgrid py-25">
       {heading ? (
         <h2 className="text-h2 col-span-12 mb-10 lg:col-span-10 lg:col-start-2">
           {heading}

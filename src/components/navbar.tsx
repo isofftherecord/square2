@@ -1,10 +1,15 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Fragment } from "react";
 
 import { SITE_NAV } from "@/lib/site-nav";
 
 export function Navbar() {
+  const pathname = usePathname();
+
   return (
     <header className="col-span-12 z-10" >
       <nav 
@@ -13,7 +18,7 @@ export function Navbar() {
       >
         <Link
           href="/"
-          className="relative h-[27px] w-[140px] shrink-0 overflow-clip"
+          className="relative h-[27px] w-[140px] shrink-0 overflow-clip "
         >
           <Image
             src="/logo.png"
@@ -25,24 +30,33 @@ export function Navbar() {
           />
         </Link>
         <ul className="flex h-[18px] items-center gap-5">
-          {SITE_NAV.map((item, index) => (
-            <Fragment key={item.label}>
-              {index > 0 ? (
-                <li
-                  className="size-1 shrink-0 bg-s2-orange"
-                  aria-hidden
-                />
-              ) : null}
-              <li className="shrink-0">
-                <Link
-                  href={item.href}
-                  className="text-navigation whitespace-nowrap text-s2-black"
-                >
-                  {item.label}
-                </Link>
-              </li>
-            </Fragment>
-          ))}
+          {SITE_NAV.map((item, index) => {
+            // Naranja también en rutas hijas (ej. /portfolio/detalle)
+            const isActive =
+              pathname === item.href || pathname.startsWith(`${item.href}/`);
+
+            return (
+              <Fragment key={item.label}>
+                {index > 0 ? (
+                  <li
+                    className="size-1 shrink-0 bg-s2-orange"
+                    aria-hidden
+                  />
+                ) : null}
+                <li className="shrink-0">
+                  <Link
+                    href={item.href}
+                    aria-current={isActive ? "page" : undefined}
+                    className={`text-navigation whitespace-nowrap hover:text-s2-orange ${
+                      isActive ? "text-s2-orange" : "text-s2-black"
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              </Fragment>
+            );
+          })}
         </ul>
       </nav>
     </header>

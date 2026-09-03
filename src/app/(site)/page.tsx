@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { Cta } from "@/components/cta";
 import { DoubleBlock } from "@/components/double-block";
 import { MainHero, type HeroSlide } from "@/components/main-hero";
 import { MetricsBar } from "@/components/metrics-bar";
@@ -8,6 +9,9 @@ import { isSanityConfigured } from "@/sanity/env";
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
 import { homeHeroQuery, projectsQuery } from "@/sanity/lib/queries";
+
+
+import { Button } from "@/components/button";
 
 export const revalidate = 60;
 
@@ -39,9 +43,9 @@ function toHeroSlides(doc: HomeHeroDoc | null): HeroSlide[] {
 export default async function Home() {
   const [heroDoc, projects] = isSanityConfigured
     ? await Promise.all([
-        client.fetch<HomeHeroDoc | null>(homeHeroQuery),
-        client.fetch<ProjectSummary[]>(projectsQuery),
-      ])
+      client.fetch<HomeHeroDoc | null>(homeHeroQuery),
+      client.fetch<ProjectSummary[]>(projectsQuery),
+    ])
     : [null, [] as ProjectSummary[]];
   const heroSlides = toHeroSlides(heroDoc);
 
@@ -60,9 +64,9 @@ export default async function Home() {
       <section className="s2-subgrid items-center ">
         <hr className="col-span-12 border-t border-s2-black lg:col-start-2 lg:col-span-10 " />
       </section>
-      <section className="s2-subgrid items-center py-20 ">
+      <section className="s2-subgrid items-start py-20 ">
 
-        <div className="col-span-12 lg:col-start-2 lg:col-span-5">
+        <div className="lg:col-start-2 lg:col-span-5 ">
           <p className="text-h2">The Investor’s Eye</p>
           <p className="text-body pt-9">Granular submarket knowledge. Opportunities a pure buyer overlooks. An acquisition thesis built from the ground rather than from a spreadsheet.</p>
         </div>
@@ -73,14 +77,15 @@ export default async function Home() {
       </section>
 
       {/* The Hold */}
-      <section className="bg-s2-orange text-s2-white s2-subgrid items-center ">
-        <div className="s2-page py-12 lg:col-start-2 lg:col-span-10 py-14">
-          <h2 className="col-span-12 text-h2 ">The Hold.</h2>
+      <section className="col-span-12 text-s2-white ml-[calc(50%-50vw)] w-screen max-w-[100vw] bg-s2-orange">
 
-          <div className="col-span-12 pt-7">
+        <div className="s2-page py-14">
+          <h2 className="text-h2 col-span-12 lg:col-span-10 lg:col-start-2">The Hold.</h2>
+
+          <div className="col-span-12 pt-7 lg:col-span-10 lg:col-start-2">
             <p className="text-micro">Investment</p>
 
-            <div className="relative mt-5 h-28">
+            <div className="relative mt-5 h-20">
               {/* base del bracket */}
               <div className="absolute inset-x-0 bottom-0 h-px bg-s2-white" />
 
@@ -93,7 +98,7 @@ export default async function Home() {
 
               {/* Reposition */}
               <div
-                className="absolute inset-y-0 flex flex-col items-center"
+                className="absolute inset-y-0 flex flex-col "
                 style={{ left: "33.333%", transform: "translateX(-50%)" }}
               >
                 <span className="text-data whitespace-nowrap">Reposition</span>
@@ -121,7 +126,7 @@ export default async function Home() {
           </div>
 
           {/* barra de property management */}
-          <div className="col-span-12 mt-8 flex flex-wrap justify-center gap-x-4 gap-y-2 bg-s2-black px-6 py-6">
+          <div className="col-span-12 mt-8 flex flex-wrap justify-center gap-x-4 gap-y-2 bg-s2-black px-5 py-5 lg:col-span-10 lg:col-start-2">
             <span className="text-data">Leasing</span>
             <span className="text-data" aria-hidden="true">·</span>
             <span className="text-data">Accounting</span>
@@ -133,7 +138,7 @@ export default async function Home() {
             <span className="text-data">Governance</span>
           </div>
 
-          <div className="col-span-12 mt-5 flex justify-between gap-x-8">
+          <div className="col-span-12 mt-5 flex justify-between gap-x-8 lg:col-span-10 lg:col-start-2">
             <p className="text-micro">Property management</p>
             <p className="text-micro text-right">
               The investor acts at moments · The owner acts every day
@@ -166,9 +171,27 @@ export default async function Home() {
           { value: "Florida", label: "Core submarkets" },
         ]}
       />
+
+<section className="s2-subgrid items-center ">
+        <hr className="col-span-12 border-t border-s2-black lg:col-start-2 lg:col-span-10 " />
+      </section>
+
+
       {projects.length > 0 ? (
         <ProjectIndex heading="Projects." projects={projects} />
       ) : null}
+
+
+      <section className="s2-subgrid items-center pt-20 pb-30">
+        <Button
+          href="/portfolio"
+          variant="black"
+          className="col-span-12 w-fit  lg:justify-self-center black"
+        >
+          See all projects
+        </Button>
+      </section>
+      <Cta />
     </main>
   );
 }

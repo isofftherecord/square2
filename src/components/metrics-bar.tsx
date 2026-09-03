@@ -15,7 +15,7 @@ const SPAN_CLASS = {
 export function MetricsBar({ items }: { items: Metric[] }) {
   return (
     // 10 columnas centradas; 2 + 2 + 4 + 2. En móvil se apilan.
-    <section className="s2-subgrid items-center py-12">
+    <section className="s2-subgrid items-center py-23">
       {items.map((item, index) => (
         <div
           key={item.label}

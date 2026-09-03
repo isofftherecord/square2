@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { Button } from "@/components/button";
 import { SITE_NAV } from "@/lib/site-nav";
 
 const CONNECTIONS = [
@@ -95,21 +96,9 @@ export function Footer() {
             placeholder="Your Email"
             className="text-data w-full border-b border-s2-white bg-s2-white/10 px-3.5 py-6 text-s2-steel placeholder:text-s2-steel placeholder:uppercase focus-visible:border-s2-orange focus-visible:outline-none"
           />
-          <button
-            type="submit"
-            className="text-data flex w-full items-center justify-center gap-1.5 bg-s2-white px-5 py-4 text-s2-black"
-          >
+          <Button type="submit" className="w-full">
             Subscribe
-            <span className="relative h-[9px] w-[10px] shrink-0 overflow-clip">
-              <img
-                src="/icons/arrow-right.svg"
-                alt=""
-                width={10}
-                height={9}
-                className="size-full"
-              />
-            </span>
-          </button>
+          </Button>
         </form>
 
         <p className="text-navigation col-span-12 text-s2-steel lg:col-span-11 lg:col-start-2">

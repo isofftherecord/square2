@@ -131,12 +131,48 @@ a otros colores de marca.
 
 // Texto secundario
 <p className="text-body text-s2-slate">Texto de apoyo…</p>
-
-// Botón de marca
-<button className="text-navigation bg-s2-black text-s2-white px-6 py-3 rounded-full">
-  View project
-</button>
 ```
+
+## Botones
+
+Todos los botones del sitio salen de `src/components/button.tsx`. No escribas
+las clases a mano: si necesitas un botón nuevo, usa el componente o agrégale
+una variante.
+
+El componente es polimórfico. Con `href` renderiza un `Link` de Next; sin
+`href` renderiza un `<button>` (útil para submits y acciones).
+
+| Prop | Valores | Default | Qué hace |
+|---|---|---|---|
+| `variant` | `white`, `black`, `orange` | `white` | Fondo y color de texto |
+| `withArrow` | `boolean` | `true` | Muestra la flecha pixelada a la derecha |
+| `className` | string | `""` | Solo layout: `col-span-*`, ancho, alineación |
+| `href` | string | — | Si está, el botón es un enlace |
+
+La regla importante: **la apariencia vive dentro del componente y el layout
+fuera**. Padding, tipografía (`text-data`), color, gap, flecha y focus son
+fijos; `col-span-5`, `w-full` o `justify-self-end` se pasan por `className`
+desde la página. Si mezclas layout dentro del componente terminas creando una
+variante nueva cada vez que cambia la posición.
+
+```tsx
+import { Button } from "@/components/button";
+
+// Enlace, alineado a la derecha en una banda de 12 columnas
+<Button href="/contact" className="col-span-12 w-fit lg:col-span-5 lg:justify-self-end">
+  Get in touch
+</Button>
+
+// Submit de formulario, ancho completo
+<Button type="submit" className="w-full">Subscribe</Button>
+
+// Sobre fondo claro, sin flecha
+<Button href="/portfolio" variant="black" withArrow={false}>View portfolio</Button>
+```
+
+La flecha es `public/icons/arrow-right.svg`. Como es un archivo estático, su
+naranja está fijo: si una variante necesita la flecha en otro color, hay que
+exportar un SVG nuevo a `public/icons/` y mapearlo en el componente.
 
 ## Reglas rápidas
 
@@ -147,4 +183,6 @@ a otros colores de marca.
 3. **Un solo `text-h1` por página**, por jerarquía y SEO.
 4. **Layout sobre la grilla 1440 / 12**. Usa `s2-page`, `s2-subgrid` y `col-span-*`.
    No uses `max-w-6xl`, `px-6` u otros anchos sueltos para el canvas.
-5. Si el diseño cambia en Figma, actualiza `globals.css` y esta guía a la vez.
+5. **Los botones salen de `Button`** (`src/components/button.tsx`). No repitas
+   sus clases en una página; agrega una variante si falta.
+6. Si el diseño cambia en Figma, actualiza `globals.css` y esta guía a la vez.
