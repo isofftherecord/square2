@@ -7,7 +7,7 @@ import { MetricsBar } from "@/components/metrics-bar";
 import { ProjectIndex, type ProjectSummary } from "@/components/project-index";
 import { isSanityConfigured } from "@/sanity/env";
 import { client } from "@/sanity/lib/client";
-import { urlFor } from "@/sanity/lib/image";
+import { hasImageAsset, urlFor } from "@/sanity/lib/image";
 import { homeHeroQuery, projectsQuery } from "@/sanity/lib/queries";
 
 
@@ -31,7 +31,9 @@ type HomeHeroDoc = {
 function toHeroSlides(doc: HomeHeroDoc | null): HeroSlide[] {
   return (
     doc?.slides
-      ?.filter((slide) => slide.image && slide.property && slide.year)
+      ?.filter(
+        (slide) => hasImageAsset(slide.image) && slide.property && slide.year,
+      )
       .map((slide) => ({
         src: urlFor(slide.image!).width(2880).height(1800).url(),
         property: slide.property!,

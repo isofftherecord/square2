@@ -1,6 +1,6 @@
 import type { TitleHeroSlide } from "@/components/second-hero";
 
-import { urlFor } from "./image";
+import { hasImageAsset, urlFor } from "./image";
 
 export type TitleHeroDoc = {
   slides?: {
@@ -13,7 +13,7 @@ export type TitleHeroDoc = {
 export function toTitleHeroSlides(doc: TitleHeroDoc | null): TitleHeroSlide[] {
   return (
     doc?.slides
-      ?.filter((slide) => slide.title && slide.image)
+      ?.filter((slide) => slide.title && hasImageAsset(slide.image))
       .map((slide) => ({
         title: slide.title!,
         src: urlFor(slide.image!).width(2880).height(1600).url(),

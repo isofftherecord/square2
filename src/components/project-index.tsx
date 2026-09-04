@@ -1,5 +1,51 @@
 import Link from "next/link";
 
+export type ProjectImage = { alt?: string; _key?: string } & Record<
+  string,
+  unknown
+>;
+
+export type ProjectMetric = {
+  _key?: string;
+  value?: string;
+  label?: string;
+};
+
+export type ProjectParagraph = {
+  _key?: string;
+  text?: string;
+  emphasis?: boolean;
+};
+
+export type ProjectChapter = {
+  _key?: string;
+  heading?: string;
+  paragraphs?: ProjectParagraph[];
+  image?: ProjectImage;
+  caption?: string;
+  beforeImage?: ProjectImage;
+  gallery?: ProjectImage[];
+};
+
+export type ProjectExitSide = {
+  value?: string;
+  line?: string;
+  details?: string[];
+};
+
+export type ProjectExit = {
+  heading?: string;
+  acquired?: ProjectExitSide;
+  sold?: ProjectExitSide;
+  metrics?: ProjectMetric[];
+};
+
+export type ProjectCredit = {
+  _key?: string;
+  label?: string;
+  detail?: string;
+};
+
 export type ProjectSummary = {
   _id: string;
   title: string;
@@ -10,8 +56,17 @@ export type ProjectSummary = {
   years?: string;
   role?: string;
   summary?: string;
-  mainImage?: { alt?: string } & Record<string, unknown>;
+  mainImage?: ProjectImage;
+  gallery?: ProjectImage[];
   featured?: boolean;
+  address?: string;
+  owner?: string;
+  status?: string;
+  dealHeading?: string;
+  dealMetrics?: ProjectMetric[];
+  chapters?: ProjectChapter[];
+  exit?: ProjectExit;
+  credits?: ProjectCredit[];
 };
 
 function formatSquareFootage(value: number) {

@@ -114,6 +114,7 @@ de Tailwind con el prefijo `s2-`:
 | Slate | `#333333` | `--S2-SLATE` | `bg-s2-slate`, `text-s2-slate`, `border-s2-slate` |
 | Steel | `#97999B` | `--S2-STEEL` | `bg-s2-steel`, `text-s2-steel`, `border-s2-steel` |
 | White | `#FFFFFF` | `--S2-White` | `bg-s2-white`, `text-s2-white`, `border-s2-white` |
+| Fog | `#F9F9F9` | `--S2-Fog` | `bg-s2-fog`, `text-s2-fog`, `border-s2-fog` |
 
 Además hay dos alias semánticos que controlan el tema general:
 

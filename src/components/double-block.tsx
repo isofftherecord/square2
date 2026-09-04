@@ -39,7 +39,7 @@ export function DoubleBlock({
     <div className={`col-span-12 lg:col-start-2 ${spanClasses[space]} max-w-[500px]`}>
         <Heading className={headingClass[headingAs]}>{heading}</Heading>
       </div>
-      <div className={`col-span-12 lg:col-start-6 ${spanClasses[space2]} lg:col-span-6`}>
+      <div className={`col-span-12 lg:col-start-6 ${spanClasses[space2]} lg:col-span-5`}>
         <p className="text-body">{body}</p>
       </div>
     </section>

@@ -14,8 +14,8 @@ Léelo antes de escribir o modificar cualquier UI.
 - **Grilla**: canvas 1440px, 12 columnas de 100px (`s2-page`, `s2-subgrid`,
   `col-span-*`). No uses `max-w-6xl` ni padding horizontal suelto para el layout.
 - **Colores**: usa solo la paleta de marca (`s2-black`, `s2-orange`,
-  `s2-slate`, `s2-steel`, `s2-white`) y los alias `bg-background` /
-  `text-foreground`. No uses colores genéricos de Tailwind ni hex sueltos.
+ `s2-slate`, `s2-steel`, `s2-white`, `s2-fog`) y los alias `bg-background` /
+ `text-foreground`. No uses colores genéricos de Tailwind ni hex sueltos.
 - **Definiciones**: los estilos viven en `src/app/globals.css` (bloques
   `@utility` y variables) y las fuentes en `src/app/layout.tsx`.
 - **Logo**: `public/logo.png`, pensado para fondos claros.

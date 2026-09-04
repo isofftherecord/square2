@@ -5,6 +5,7 @@ import { visionTool } from "@sanity/vision";
 import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
 
+import { SeedLasOlasAction } from "./src/sanity/actions/seed-las-olas";
 import { apiVersion, dataset, projectId } from "./src/sanity/env";
 import { schemaTypes } from "./src/sanity/schemaTypes";
 
@@ -23,6 +24,9 @@ export default defineConfig({
           template.schemaType !== "homeHero" &&
           template.schemaType !== "firmHero",
       ),
+  },
+  document: {
+    actions: (input) => [...input, SeedLasOlasAction],
   },
   plugins: [
     structureTool({

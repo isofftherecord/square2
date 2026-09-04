@@ -34,7 +34,29 @@ export const projectsQuery = defineQuery(`
       role,
       summary,
       mainImage,
-      featured
+      gallery,
+      featured,
+      address,
+      owner,
+      status,
+      dealHeading,
+      dealMetrics[] { _key, value, label },
+      chapters[] {
+        _key,
+        heading,
+        paragraphs[] { _key, text, emphasis },
+        image,
+        caption,
+        beforeImage,
+        gallery
+      },
+      exit {
+        heading,
+        acquired { value, line, details },
+        sold { value, line, details },
+        metrics[] { _key, value, label }
+      },
+      credits[] { _key, label, detail }
     }
 `);
 
@@ -51,7 +73,28 @@ export const projectBySlugQuery = defineQuery(`
     summary,
     mainImage,
     gallery,
-    content
+    content,
+    address,
+    owner,
+    status,
+    dealHeading,
+    dealMetrics[] { _key, value, label },
+    chapters[] {
+      _key,
+      heading,
+      paragraphs[] { _key, text, emphasis },
+      image,
+      caption,
+      beforeImage,
+      gallery
+    },
+    exit {
+      heading,
+      acquired { value, line, details },
+      sold { value, line, details },
+      metrics[] { _key, value, label }
+    },
+    credits[] { _key, label, detail }
   }
 `);
 
