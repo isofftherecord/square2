@@ -144,7 +144,7 @@ El componente es polimórfico. Con `href` renderiza un `Link` de Next; sin
 
 | Prop | Valores | Default | Qué hace |
 |---|---|---|---|
-| `variant` | `white`, `black`, `orange` | `white` | Fondo y color de texto |
+| `variant` | `white`, `black`, `orange`, `text` | `white` | Fondo y color de texto. `text` es label + flecha, sin relleno ni padding |
 | `withArrow` | `boolean` | `true` | Muestra la flecha pixelada a la derecha |
 | `className` | string | `""` | Solo layout: `col-span-*`, ancho, alineación |
 | `href` | string | — | Si está, el botón es un enlace |
@@ -168,6 +168,9 @@ import { Button } from "@/components/button";
 
 // Sobre fondo claro, sin flecha
 <Button href="/portfolio" variant="black" withArrow={false}>View portfolio</Button>
+
+// Enlace de texto (sin caja), con flecha naranja
+<Button href="/portfolio" variant="text">The assets we own</Button>
 ```
 
 La flecha es `public/icons/arrow-right.svg`. Como es un archivo estático, su

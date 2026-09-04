@@ -47,6 +47,8 @@ export default async function FirmPage() {
     <>
       <TitleHero slides={slides} />
       <DoubleBlock
+      space="4"
+      space2="5"
         heading="The Firm."
         body={
           <>

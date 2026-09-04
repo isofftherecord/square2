@@ -52,7 +52,8 @@ export default async function Home() {
   return (
     <main className="s2-subgrid">
       {heroSlides.length > 0 ? <MainHero slides={heroSlides} /> : null}
-      <DoubleBlock
+      <DoubleBlock 
+        space="5"
         heading={
           <>
             Underwrite like an <span className="italic">investor</span>. Operate

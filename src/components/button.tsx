@@ -1,15 +1,17 @@
 import Link from "next/link";
 import type { ComponentProps, ReactNode } from "react";
 
-export type ButtonVariant = "white" | "black" | "orange";
+export type ButtonVariant = "white" | "black" | "orange" | "text";
 
 const BASE =
-  "text-data inline-flex cursor-pointer items-center justify-center gap-1.5 px-5 py-4 transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-s2-orange";
+  "text-data inline-flex cursor-pointer items-center justify-center gap-1.5 transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-s2-orange";
 
 const VARIANTS: Record<ButtonVariant, string> = {
-  white: "bg-s2-white text-s2-black",
-  black: "bg-s2-black text-s2-steel",
-  orange: "bg-s2-orange text-s2-white",
+  white: "bg-s2-white text-s2-black px-5 py-4",
+  black: "bg-s2-black text-s2-steel px-5 py-4",
+  orange: "bg-s2-orange text-s2-white px-5 py-4",
+  // Solo label + flecha; el padding vive en las variantes rellenas.
+  text: "text-s2-black",
 };
 
 type BaseProps = {
