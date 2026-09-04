@@ -202,6 +202,7 @@ export function ProjectCaseStudy({
   const rootRef = useRef<HTMLDivElement>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [panel, setPanel] = useState(0);
+  const [progress, setProgress] = useState(0);
   useSoftHorizontalScroll(scrollerRef, rootRef);
 
   const chapters = useMemo(
@@ -225,7 +226,14 @@ export function ProjectCaseStudy({
     setPanel(
       Math.min(panelCount - 1, Math.max(0, Math.round(el.scrollLeft / width))),
     );
+    // La barra arranca en 1/N (slide visible) y crece con el scroll.
+    const seen = el.scrollLeft + el.clientWidth;
+    setProgress(el.scrollWidth > 0 ? seen / el.scrollWidth : 0);
   }, [panelCount]);
+
+  useEffect(() => {
+    syncPanel();
+  }, [syncPanel]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -245,25 +253,35 @@ export function ProjectCaseStudy({
       data-case-study={project.slug}
       className="flex h-full flex-col bg-background text-foreground"
     >
-      <header className="s2-page shrink-0 items-center py-5">
-        <p className="text-micro col-span-3">{project.title}</p>
-        {headerLine ? (
-          <p className="text-micro col-start-6 col-span-5">{headerLine}</p>
-        ) : null}
-        <button
-          type="button"
-          aria-label="Close project"
-          onClick={onClose}
-          className="col-start-12 justify-self-end bg-s2-orange p-1.5 text-s2-white"
-        >
-          <svg viewBox="0 0 10 10" className="size-2.5" aria-hidden="true">
-            <path
-              d="M1 1 L9 9 M9 1 L1 9"
-              stroke="currentColor"
-              strokeWidth="1.5"
-            />
-          </svg>
-        </button>
+      <header className="relative shrink-0">
+        <div className="s2-page items-center py-5">
+          <p className="text-navigation col-span-3 col-start-2">
+            {project.title}
+          </p>
+          {headerLine ? (
+            <p className="text-navigation col-span-6 col-start-5 justify-self-center">
+              {headerLine}
+            </p>
+          ) : null}
+          <button
+            type="button"
+            aria-label="Close project"
+            onClick={onClose}
+            className="col-start-12 flex size-8 items-center justify-center justify-self-end bg-s2-orange text-s2-white"
+          >
+            <svg viewBox="0 0 10 10" className="size-3" aria-hidden="true">
+              <path
+                d="M1 1 L9 9 M9 1 L1 9"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              />
+            </svg>
+          </button>
+        </div>
+        <div
+          aria-hidden
+          className="absolute bottom-0 left-[calc(50%-50vw)] h-px w-screen max-w-[100vw] bg-s2-steel/40"
+        />
       </header>
 
       <div
@@ -301,24 +319,58 @@ export function ProjectCaseStudy({
         </div>
       </div>
 
-      <footer className="s2-page shrink-0 items-center py-5">
-        <p className="text-micro col-span-3">
-          {pad(panel + 1)} / {pad(panelCount)}
-        </p>
-        {nextProject && onOpenNext && panel === panelCount - 1 ? (
-          <button
-            type="button"
-            onClick={onOpenNext}
-            className="text-micro col-start-8 col-span-3 justify-self-start text-left"
-          >
-            Next · {nextProject.title}{" "}
-            <span className="text-s2-orange">→</span>
-          </button>
-        ) : panelCount > 1 ? (
-          <p className="text-micro col-start-11 col-span-2 justify-self-end">
-            Scroll <span className="text-s2-orange">→</span>
-          </p>
-        ) : null}
+      <footer className="relative shrink-0">
+        <div
+          aria-hidden
+          className="absolute top-0 left-[calc(50%-50vw)] h-px w-screen max-w-[100vw] bg-s2-steel/40"
+        />
+        <div className="s2-page items-end py-5">
+          <div className="col-span-4 col-start-2">
+            <p className="text-navigation">
+              {pad(panel + 1)} / {pad(panelCount)}
+            </p>
+            <div
+              className="mt-3 h-px bg-s2-steel/40"
+              role="progressbar"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={Math.round(progress * 100)}
+              aria-label="Case study progress"
+            >
+              <div
+                className="h-0.5 -translate-y-px bg-s2-black"
+                style={{ width: `${Math.max(progress, 1 / Math.max(panelCount, 1)) * 100}%` }}
+              />
+            </div>
+          </div>
+          {nextProject && onOpenNext && panel === panelCount - 1 ? (
+            <button
+              type="button"
+              onClick={onOpenNext}
+              className="text-navigation col-span-3 col-start-8 justify-self-start text-left"
+            >
+              Next · {nextProject.title}{" "}
+              <img
+                src="/icons/arrow-right.svg"
+                alt=""
+                width={10}
+                height={9}
+                className="ml-1.5 inline-block"
+              />
+            </button>
+          ) : panelCount > 1 ? (
+            <p className="text-navigation col-span-2 col-start-11 inline-flex items-center justify-self-end gap-1.5">
+              Scroll
+              <img
+                src="/icons/arrow-right.svg"
+                alt=""
+                width={10}
+                height={9}
+                className="shrink-0"
+              />
+            </p>
+          ) : null}
+        </div>
       </footer>
     </div>
   );
@@ -345,8 +397,8 @@ function CoverPanel({ project }: { project: ProjectSummary }) {
     : [];
 
   return (
-    <section className="s2-page h-full w-screen shrink-0 content-start overflow-y-auto py-20">
-      <div className="col-start-2 col-span-8">
+    <section className="s2-page h-full w-screen shrink-0 items-center">
+      <div className="col-span-7 col-start-2">
         <h2 className="text-h1">{project.title}</h2>
         {addressLines.length > 0 ? (
           <p className="text-body mt-6">
@@ -360,11 +412,16 @@ function CoverPanel({ project }: { project: ProjectSummary }) {
         ) : null}
 
         {facts.length > 0 ? (
-          <dl className="mt-16 border-t border-s2-black">
+          <dl className="mt-16 border-t-2 border-s2-black">
             {facts.map((row) => (
-              <div key={row.label} className="flex border-b border-s2-black py-4">
-                <dt className="text-micro w-32 shrink-0">{row.label}</dt>
-                <dd className="text-body">{row.value}</dd>
+              <div
+                key={row.label}
+                className="flex border-b border-s2-steel/40 py-4"
+              >
+                <dt className="text-micro w-32 shrink-0 text-s2-steel">
+                  {row.label}
+                </dt>
+                <dd className="text-metrics">{row.value}</dd>
               </div>
             ))}
           </dl>
@@ -372,20 +429,27 @@ function CoverPanel({ project }: { project: ProjectSummary }) {
       </div>
 
       {dealMetrics.length > 0 ? (
-        <div className="col-start-11 col-span-2">
-          <h3 className="text-metrics">
-            {present(project.dealHeading) ? project.dealHeading : "The Deal."}
-          </h3>
-          <dl className="mt-8 space-y-8">
-            {dealMetrics.map((metric, index) => (
-              <div key={metric._key || index}>
-                <dt className="text-h2">{metric.value}</dt>
-                {present(metric.label) ? (
-                  <dd className="text-micro mt-1">{metric.label}</dd>
-                ) : null}
-              </div>
-            ))}
-          </dl>
+        <div className="relative col-span-3 col-start-10 h-full">
+          <div
+            aria-hidden
+            className="absolute inset-y-0 left-0 w-px bg-s2-steel/40"
+          />
+          <div className="flex h-full flex-col justify-center pl-8">
+            <h3 className="text-metrics">
+              {present(project.dealHeading) ? project.dealHeading : "The Deal."}
+            </h3>
+            <div aria-hidden className="mt-2 h-px w-16 bg-s2-black" />
+            <dl className="mt-8 space-y-7">
+              {dealMetrics.map((metric, index) => (
+                <div key={metric._key || index}>
+                  <dt className="text-h2">{metric.value}</dt>
+                  {present(metric.label) ? (
+                    <dd className="text-micro mt-1">{metric.label}</dd>
+                  ) : null}
+                </div>
+              ))}
+            </dl>
+          </div>
         </div>
       ) : null}
     </section>

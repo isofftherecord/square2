@@ -36,7 +36,7 @@ export function DoubleBlock({
   return (
     // 10 columnas centradas (1 vacía a cada lado); en móvil se apilan.
     <section className="s2-subgrid items-start py-30">
-    <div className={`col-span-12 lg:col-start-2 ${spanClasses[space]} max-w-[500px]`}>
+    <div className={`col-span-12 lg:col-start-2 ${spanClasses[space]} max-w-[507px]`}>
         <Heading className={headingClass[headingAs]}>{heading}</Heading>
       </div>
       <div className={`col-span-12 lg:col-start-6 ${spanClasses[space2]} lg:col-span-5`}>

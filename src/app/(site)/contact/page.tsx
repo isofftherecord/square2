@@ -14,7 +14,8 @@ export default function ContactPage() {
 
       <DoubleBlock
         space="5"
-        heading={<>Two conversations.</>}
+        space2="7"
+        heading="Two conversations."
         body={
           <>
             Investors and capital partners come to evaluate a sponsor: the
