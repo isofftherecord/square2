@@ -17,6 +17,11 @@ export type ProjectParagraph = {
   emphasis?: boolean;
 };
 
+export type ProjectGalleryItem = ProjectImage & {
+  image?: ProjectImage;
+  beforeImage?: ProjectImage;
+};
+
 export type ProjectChapter = {
   _key?: string;
   heading?: string;
@@ -24,7 +29,7 @@ export type ProjectChapter = {
   image?: ProjectImage;
   caption?: string;
   beforeImage?: ProjectImage;
-  gallery?: ProjectImage[];
+  gallery?: ProjectGalleryItem[];
 };
 
 export type ProjectExitSide = {
@@ -55,10 +60,7 @@ export type ProjectSummary = {
   squareFootage?: number;
   years?: string;
   role?: string;
-  summary?: string;
   mainImage?: ProjectImage;
-  gallery?: ProjectImage[];
-  featured?: boolean;
   address?: string;
   owner?: string;
   status?: string;
@@ -126,7 +128,13 @@ export function ProjectIndex({
               </span>
               <span className="col-span-12 lg:col-span-1">
                 {project.role ? (
-                  <span className="text-navigation bg-s2-orange px-2 py-1 text-s2-white">
+                  <span
+                    className={`text-navigation px-2 py-1 text-s2-white ${
+                      project.role === "Managed"
+                        ? "bg-s2-black"
+                        : "bg-s2-orange"
+                    }`}
+                  >
                     {project.role}
                   </span>
                 ) : null}

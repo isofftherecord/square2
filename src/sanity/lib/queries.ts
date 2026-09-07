@@ -32,10 +32,7 @@ export const projectsQuery = defineQuery(`
       squareFootage,
       years,
       role,
-      summary,
       mainImage,
-      gallery,
-      featured,
       address,
       owner,
       status,
@@ -48,7 +45,14 @@ export const projectsQuery = defineQuery(`
         image,
         caption,
         beforeImage,
-        gallery
+        gallery[] {
+          _key,
+          _type,
+          alt,
+          asset,
+          image,
+          beforeImage
+        }
       },
       exit {
         heading,
@@ -58,51 +62,4 @@ export const projectsQuery = defineQuery(`
       },
       credits[] { _key, label, detail }
     }
-`);
-
-export const projectBySlugQuery = defineQuery(`
-  *[_type == "project" && slug.current == $slug][0] {
-    _id,
-    title,
-    "slug": slug.current,
-    market,
-    assetClass,
-    squareFootage,
-    years,
-    role,
-    summary,
-    mainImage,
-    gallery,
-    content,
-    address,
-    owner,
-    status,
-    dealHeading,
-    dealMetrics[] { _key, value, label },
-    chapters[] {
-      _key,
-      heading,
-      paragraphs[] { _key, text, emphasis },
-      image,
-      caption,
-      beforeImage,
-      gallery
-    },
-    exit {
-      heading,
-      acquired { value, line, details },
-      sold { value, line, details },
-      metrics[] { _key, value, label }
-    },
-    credits[] { _key, label, detail }
-  }
-`);
-
-export const categoriesQuery = defineQuery(`
-  *[_type == "category" && defined(slug.current)] | order(title asc) {
-    _id,
-    title,
-    "slug": slug.current,
-    description
-  }
 `);

@@ -1,7 +1,6 @@
 import type { ProjectSummary } from "@/components/project-index";
 
 export const LAS_OLAS_SLUG = "las-olas-square";
-export const LAS_OLAS_DOCUMENT_ID = "9e4cbfce-ef17-4ece-ad2a-b05f23a38978";
 
 export const lasOlasCaseStudy: Pick<
   ProjectSummary,
@@ -95,12 +94,12 @@ export const lasOlasCaseStudy: Pick<
     heading: "The exit.",
     acquired: {
       value: "$90M",
-      line: "2016 · Acquired",
+      line: "June 2016 · Acquired",
       details: ["$330 per square foot", "77% leased"],
     },
     sold: {
       value: "$145.5M",
-      line: "2022 · Sold",
+      line: "March 2022 · Sold",
       details: ["$521 per square foot", "94% leased · 5.5% cap"],
     },
     metrics: [
@@ -138,34 +137,6 @@ export const lasOlasCaseStudy: Pick<
     },
   ],
 };
-
-function hasItems<T>(value?: T[] | null) {
-  return Array.isArray(value) && value.length > 0;
-}
-
-export function hydrateLasOlas(project: ProjectSummary): ProjectSummary {
-  if (project.slug !== LAS_OLAS_SLUG) return project;
-
-  return {
-    ...project,
-    address: project.address || lasOlasCaseStudy.address,
-    owner: project.owner || lasOlasCaseStudy.owner,
-    status: project.status || lasOlasCaseStudy.status,
-    dealHeading: project.dealHeading || lasOlasCaseStudy.dealHeading,
-    dealMetrics: hasItems(project.dealMetrics)
-      ? project.dealMetrics
-      : lasOlasCaseStudy.dealMetrics,
-    chapters: hasItems(project.chapters)
-      ? project.chapters
-      : lasOlasCaseStudy.chapters,
-    exit: project.exit?.acquired || project.exit?.sold || project.exit?.metrics
-      ? project.exit
-      : lasOlasCaseStudy.exit,
-    credits: hasItems(project.credits)
-      ? project.credits
-      : lasOlasCaseStudy.credits,
-  };
-}
 
 export function lasOlasSanityPatch() {
   return {

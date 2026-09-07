@@ -8,6 +8,8 @@ import { ProjectCaseStudy } from "@/components/project-case-study";
 import type { ProjectSummary } from "@/components/project-index";
 import { hasImageAsset, urlFor } from "@/sanity/lib/image";
 
+const CASE_STUDY_HEIGHT = 800;
+
 function projectImageSrc(image?: ProjectSummary["mainImage"]) {
   if (!hasImageAsset(image)) return null;
   return urlFor(image).width(800).height(800).url();
@@ -15,14 +17,14 @@ function projectImageSrc(image?: ProjectSummary["mainImage"]) {
 
 function useExpand(open: boolean) {
   const [render, setRender] = useState(open);
-  const [height, setHeight] = useState(open ? "100dvh" : "0px");
+  const [height, setHeight] = useState(open ? `${CASE_STUDY_HEIGHT}px` : "0px");
   const skipIntro = useRef(open);
 
   useEffect(() => {
     if (skipIntro.current) {
       skipIntro.current = false;
       setRender(open);
-      setHeight(open ? "100dvh" : "0px");
+      setHeight(open ? `${CASE_STUDY_HEIGHT}px` : "0px");
       return;
     }
 
@@ -30,7 +32,7 @@ function useExpand(open: boolean) {
       setRender(true);
       setHeight("0px");
       const frame = requestAnimationFrame(() => {
-        requestAnimationFrame(() => setHeight("100dvh"));
+        requestAnimationFrame(() => setHeight(`${CASE_STUDY_HEIGHT}px`));
       });
       return () => cancelAnimationFrame(frame);
     }
@@ -68,54 +70,43 @@ function LedgerRow({
   useEffect(() => {
     if (!isOpen) return;
     const timer = window.setTimeout(() => {
-      panelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      panelRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }, 80);
     return () => window.clearTimeout(timer);
   }, [isOpen]);
 
   return (
     <article id={`project-${project.slug}`} className="s2-subgrid">
-      <div
-        className={`s2-subgrid relative ${isOpen ? "items-start py-6" : "items-start max-lg:py-16 lg:h-[520px]"}`}
-      >
-        <button
-          type="button"
-          aria-expanded={isOpen}
-          aria-controls={`case-${project.slug}`}
-          onClick={onToggle}
-          className="absolute inset-0 z-10 cursor-pointer"
-        >
-          <span className="sr-only">
-            {isOpen ? "Close" : "Open"} {project.title}
-          </span>
-        </button>
+      {!isOpen ? (
+        <div className="s2-subgrid relative items-start max-lg:py-16 lg:h-[520px]">
+          <button
+            type="button"
+            aria-expanded={false}
+            aria-controls={`case-${project.slug}`}
+            onClick={onToggle}
+            className="absolute inset-0 z-10 cursor-pointer"
+          >
+            <span className="sr-only">Open {project.title}</span>
+          </button>
 
-        {!isOpen ? (
-          <div aria-hidden className="pointer-events-none absolute inset-0">
+          <div aria-hidden className="pointer-events-none absolute inset-0 z-[1]">
             {isFirst ? (
-              <div className="absolute top-0 left-[calc(50%-50vw)] h-px w-screen max-w-[100vw] bg-s2-steel/40" />
+              <div className="absolute top-0 left-[calc(50%-50vw)] h-px w-screen max-w-[100vw] bg-s2-steel" />
             ) : null}
-            <div className="absolute bottom-0 left-[calc(50%-50vw)] h-px w-screen max-w-[100vw] bg-s2-steel/40" />
+            <div className="absolute bottom-0 left-[calc(50%-50vw)] h-px w-screen max-w-[100vw] bg-s2-steel" />
           </div>
-        ) : null}
 
-        <div
-          className={`relative z-[1] col-span-12 lg:col-span-3 lg:col-start-2 ${isOpen ? "" : "lg:pt-16 lg:pb-12"}`}
-        >
-          {!isOpen ? (
+          <div className="relative z-0 col-span-12 lg:col-span-3 lg:col-start-2 lg:pt-16 lg:pb-12">
             <div
               aria-hidden
               className="pointer-events-none absolute inset-0 -z-10 hidden lg:block"
             >
               {/* Celda fog: cruza el gutter para unirse a la vertical de la foto */}
               <div className="absolute inset-y-0 left-[calc(50%-50vw)] right-[calc(var(--s2-gutter)*-1-1px)] bg-s2-fog" />
-              <div className="absolute right-[calc(var(--s2-gutter)*-1-1px)] bottom-0 left-[calc(50%-50vw)] h-px bg-s2-steel/40" />
+              <div className="absolute right-[calc(var(--s2-gutter)*-1-1px)] bottom-0 left-[calc(50%-50vw)] h-px bg-s2-steel" />
             </div>
-          ) : null}
 
-          <h3 className="text-h4 text-s2-black">{project.title}</h3>
-
-          {!isOpen ? (
+            <h3 className="text-h4 text-s2-black">{project.title}</h3>
             <div className="mt-6">
               {project.market ? (
                 <p className="text-data text-s2-black">{project.market}</p>
@@ -127,28 +118,25 @@ function LedgerRow({
                 <p className="text-data text-s2-black">{project.years}</p>
               ) : null}
             </div>
-          ) : null}
+            {project.role ? (
+              <span
+                className={`text-tags mt-5 inline-block px-3 py-1 text-s2-white ${
+                  project.role === "Managed" ? "bg-s2-black" : "bg-s2-orange"
+                }`}
+              >
+                {project.role}
+              </span>
+            ) : null}
+          </div>
 
-          {project.role ? (
-            <span
-              className={`text-tags mt-5 inline-block px-3 py-1 text-s2-white ${
-                project.role === "Managed" ? "bg-s2-black" : "bg-s2-orange"
-              }`}
-            >
-              {project.role}
-            </span>
-          ) : null}
-        </div>
-
-        {!isOpen ? (
-          <div className="relative col-span-12 mt-8 aspect-square self-center lg:col-span-4 lg:col-start-5 lg:mt-0">
+          <div className="relative z-[1] col-span-12 mt-8 aspect-square self-center lg:col-span-4 lg:col-start-5 lg:mt-0">
             <div
               aria-hidden
-              className="pointer-events-none absolute top-1/2 left-0 hidden h-[520px] w-px -translate-y-1/2 bg-s2-steel/40 lg:block"
+              className="pointer-events-none absolute top-1/2 left-0 hidden h-[520px] w-px -translate-y-1/2 bg-s2-steel lg:block"
             />
             <div
               aria-hidden
-              className="pointer-events-none absolute top-1/2 right-0 hidden h-[520px] w-px -translate-y-1/2 bg-s2-steel/40 lg:block"
+              className="pointer-events-none absolute top-1/2 right-0 hidden h-[520px] w-px -translate-y-1/2 bg-s2-steel lg:block"
             />
             {imageSrc ? (
               <Image
@@ -174,29 +162,27 @@ function LedgerRow({
               </svg>
             )}
           </div>
-        ) : null}
 
-        {!isOpen ? (
-          <div className="relative z-20 col-span-12 mt-8 self-end lg:col-span-3 lg:col-start-9 lg:mt-0 lg:pb-8">
+          <div className="relative z-0 col-span-12 mt-8 self-end lg:col-span-3 lg:col-start-9 lg:mt-0 lg:pb-8">
             <div
               aria-hidden
               className="pointer-events-none absolute inset-0 -z-10 hidden lg:block"
             >
               {/* Cruza el gutter para unirse a la vertical de la foto */}
               <div className="absolute inset-0 left-[calc(var(--s2-gutter)*-1-1px)] right-[calc(50%-50vw)] bg-s2-fog" />
-              <div className="absolute top-0 left-[calc(var(--s2-gutter)*-1-1px)] right-[calc(50%-50vw)] h-px bg-s2-steel/40" />
+              <div className="absolute top-0 left-[calc(var(--s2-gutter)*-1-1px)] right-[calc(50%-50vw)] h-px bg-s2-steel" />
             </div>
             <Button
               type="button"
               variant="text"
               onClick={onToggle}
-              className="mt-5 text-navigation"
+              className="relative z-20 mt-5 text-navigation"
             >
               Details
             </Button>
           </div>
-        ) : null}
-      </div>
+        </div>
+      ) : null}
 
       <div
         ref={panelRef}
@@ -205,7 +191,7 @@ function LedgerRow({
         style={{ height: expand.height }}
         aria-hidden={!isOpen}
       >
-        <div className="h-[100dvh]">
+        <div className="h-[800px]">
           {expand.render ? (
             <ProjectCaseStudy
               project={project}

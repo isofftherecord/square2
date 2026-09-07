@@ -6,6 +6,7 @@ import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
 
 import { SeedLasOlasAction } from "./src/sanity/actions/seed-las-olas";
+import { ArrayItemWithDone } from "./src/sanity/components/array-item-with-done";
 import { apiVersion, dataset, projectId } from "./src/sanity/env";
 import { schemaTypes } from "./src/sanity/schemaTypes";
 
@@ -24,6 +25,11 @@ export default defineConfig({
           template.schemaType !== "homeHero" &&
           template.schemaType !== "firmHero",
       ),
+  },
+  form: {
+    components: {
+      item: ArrayItemWithDone,
+    },
   },
   document: {
     actions: (input) => [...input, SeedLasOlasAction],

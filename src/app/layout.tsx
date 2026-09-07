@@ -39,7 +39,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${signifier.variable} ${archivo.variable} ${fragmentMono.variable} h-full overflow-x-clip antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-background text-foreground">
+      <body className="min-h-full flex flex-col overflow-x-clip bg-background text-foreground">
         {children}
       </body>
     </html>

@@ -101,12 +101,12 @@ const patch = {
     heading: "The exit.",
     acquired: {
       value: "$90M",
-      line: "2016 · Acquired",
+      line: "June 2016 · Acquired",
       details: ["$330 per square foot", "77% leased"],
     },
     sold: {
       value: "$145.5M",
-      line: "2022 · Sold",
+      line: "March 2022 · Sold",
       details: ["$521 per square foot", "94% leased · 5.5% cap"],
     },
     metrics: [

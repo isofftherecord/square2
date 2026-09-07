@@ -150,16 +150,6 @@ export const project = defineType({
       validation: (rule) => rule.required().error("Role is required"),
     }),
     defineField({
-      name: "summary",
-      title: "Short summary",
-      description: "One or two sentences for the project page.",
-      type: "text",
-      rows: 3,
-      group: "listing",
-      validation: (rule) =>
-        rule.max(200).warning("Keep it short (max 200 characters)"),
-    }),
-    defineField({
       name: "mainImage",
       title: "Main image",
       type: "image",
@@ -167,37 +157,6 @@ export const project = defineType({
       options: { hotspot: true },
       fields: altImageFields(),
       validation: (rule) => rule.required().error("Add a main image"),
-    }),
-    defineField({
-      name: "gallery",
-      title: "Photo gallery (optional)",
-      description:
-        "Used when the project has no story chapters. Each image becomes a horizontal panel.",
-      type: "array",
-      group: "listing",
-      of: [
-        defineArrayMember({
-          type: "image",
-          options: { hotspot: true },
-          fields: altImageFields(),
-        }),
-      ],
-    }),
-    defineField({
-      name: "content",
-      title: "Full description",
-      description: "Unused. Story copy now lives in 02–04 Story.",
-      type: "array",
-      group: "listing",
-      hidden: true,
-      of: [
-        defineArrayMember({ type: "block" }),
-        defineArrayMember({
-          type: "image",
-          options: { hotspot: true },
-          fields: altImageFields(),
-        }),
-      ],
     }),
     defineField({
       name: "featured",
@@ -337,7 +296,7 @@ export const project = defineType({
               name: "beforeImage",
               title: "Before image",
               description:
-                "If set together with Image, the panel shows a Before / After toggle.",
+                "If set together with Image, the panel shows a Before / After comparison slider.",
               type: "image",
               options: { hotspot: true },
               fields: altImageFields(),
@@ -346,13 +305,55 @@ export const project = defineType({
               name: "gallery",
               title: "Extra images",
               description:
-                "Optional extra photos in this chapter, with previous / next controls.",
+                "Optional extra photos. Add After only for a single image, or After and Before for a comparison slider.",
               type: "array",
               of: [
                 defineArrayMember({
-                  type: "image",
-                  options: { hotspot: true },
-                  fields: altImageFields(),
+                  type: "object",
+                  name: "galleryImage",
+                  title: "Image",
+                  fields: [
+                    defineField({
+                      name: "image",
+                      title: "After",
+                      description:
+                        "Shown alone if Before is empty.",
+                      type: "image",
+                      options: { hotspot: true },
+                      fields: altImageFields(),
+                    }),
+                    defineField({
+                      name: "beforeImage",
+                      title: "Before",
+                      description:
+                        "If set together with After, this extra shows a Before / After slider.",
+                      type: "image",
+                      options: { hotspot: true },
+                      fields: altImageFields(),
+                    }),
+                  ],
+                  preview: {
+                    select: {
+                      media: "image",
+                      before: "beforeImage.asset",
+                      alt: "image.alt",
+                    },
+                    prepare({
+                      media,
+                      before,
+                      alt,
+                    }: {
+                      media?: string;
+                      before?: string;
+                      alt?: string;
+                    }) {
+                      return {
+                        title: alt || "Extra image",
+                        subtitle: before ? "Before / After" : "After",
+                        media,
+                      };
+                    },
+                  },
                 }),
               ],
             }),

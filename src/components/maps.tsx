@@ -26,7 +26,7 @@ function ensureMapsOptions() {
 
 function createPin() {
   const pin = document.createElement("div");
-  pin.className = "flex flex-col items-center";
+  pin.className = "s2-map-pin flex flex-col items-center";
   pin.innerHTML = `
     <div class="bg-s2-white px-4 py-3">
       <img src="/logo.png" alt="Square2" width="112" height="22" />
@@ -54,16 +54,31 @@ export function OfficeMap() {
       const { AdvancedMarkerElement } = await importLibrary("marker");
       if (cancelled || !ref.current) return;
 
+      // Vector + tilt: edificios 3D en bloque (el raster es plano).
+      const camera = { center: OFFICE, zoom: 18, heading: 35, tilt: 67.5 };
       const map = new Map(ref.current, {
-        center: OFFICE,
-        zoom: 17,
-        heading: 30,
-        tilt: 60,
+        ...camera,
         mapId: MAP_ID,
+        renderingType: "VECTOR",
+        tiltInteractionEnabled: true,
+        headingInteractionEnabled: true,
         disableDefaultUI: true,
         gestureHandling: "cooperative",
         keyboardShortcuts: false,
+        clickableIcons: false,
+        backgroundColor: "#ffffff",
+        colorScheme: "LIGHT",
       });
+
+      // El tilt a veces se ignora hasta que el vector termina de cargar.
+      let cameraReady = false;
+      const applyCamera = () => {
+        if (cancelled || cameraReady) return;
+        map.moveCamera(camera);
+        if ((map.getTilt() ?? 0) >= 60) cameraReady = true;
+      };
+      map.addListener("tilesloaded", applyCamera);
+      map.addListener("renderingtype_changed", applyCamera);
 
       const marker = new AdvancedMarkerElement({
         map,
@@ -87,7 +102,7 @@ export function OfficeMap() {
   return (
     // Hero a sangre, mismo breakout que TitleHero / MainHero.
     <section className="col-span-12 ml-[calc(50%-50vw)] w-screen max-w-[100vw]">
-      <div ref={ref} className="h-[800px] w-full bg-s2-white" />
+      <div ref={ref} className="s2-office-map h-[800px] w-full bg-s2-white" />
 
 
     </section>

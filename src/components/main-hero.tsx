@@ -3,6 +3,8 @@
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 
+import { Arrow } from "@/components/arrow";
+
 const BRAND = "var(--color-s2-orange)";
 
 export type HeroSlide = {
@@ -121,7 +123,7 @@ export function MainHero({ slides }: { slides: HeroSlide[] }) {
                 aria-label="Previous project"
                 className="cursor-pointer text-s2-black transition-transform duration-200 hover:-translate-x-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-s2-orange)]"
               >
-                <Arrow className="rotate-180 " />
+                <Arrow className="rotate-180" />
               </button>
               <button
                 type="button"
@@ -136,23 +138,5 @@ export function MainHero({ slides }: { slides: HeroSlide[] }) {
         </div>
       </div>
     </section>
-  );
-}
-
-function Arrow({ className = "" }: { className?: string }) {
-  return (
-    <svg
-      width="26"
-      height="14"
-      viewBox="0 0 26 14"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.4"
-      className={className}
-      aria-hidden="true"
-    >
-      <path d="M0 7h24" strokeLinecap="round" />
-      <path d="M18 1l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
   );
 }

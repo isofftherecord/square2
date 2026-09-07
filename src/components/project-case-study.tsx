@@ -9,12 +9,14 @@ import {
   useState,
   type RefObject,
 } from "react";
-
+import { Arrow } from "@/components/arrow";
+import { BeforeAfterSlider } from "@/components/before-after-slider";
 import type {
   ProjectChapter,
   ProjectCredit,
   ProjectExit,
   ProjectExitSide,
+  ProjectGalleryItem,
   ProjectImage,
   ProjectMetric,
   ProjectSummary,
@@ -27,11 +29,6 @@ function present(value?: string | null) {
 
 function pad(n: number) {
   return String(n).padStart(2, "0");
-}
-
-function assetId(image: ProjectImage) {
-  const asset = image.asset as { _ref?: string; _id?: string } | undefined;
-  return asset?._ref ?? asset?._id ?? "";
 }
 
 function filledMetrics(metrics?: ProjectMetric[]) {
@@ -54,28 +51,51 @@ function filledDetails(details?: string[]) {
   return (details ?? []).filter((line) => present(line));
 }
 
-function chapterImages(chapter: ProjectChapter) {
-  const seen = new Set<string>();
-  const images: ProjectImage[] = [];
+type ChapterSlide = {
+  after?: ProjectImage;
+  before?: ProjectImage;
+};
 
-  for (const image of [chapter.image, ...(chapter.gallery ?? [])]) {
-    if (!image || !hasImageAsset(image)) continue;
-    const id = assetId(image);
-    if (id && seen.has(id)) continue;
-    if (id) seen.add(id);
-    images.push(image);
+function galleryAfter(item: ProjectGalleryItem) {
+  if (hasImageAsset(item.image)) return item.image;
+  // Ítems viejos: la extra era una imagen suelta, no un objeto After/Before.
+  if (hasImageAsset(item)) return item;
+  return undefined;
+}
+
+function chapterSlides(chapter: ProjectChapter) {
+  const slides: ChapterSlide[] = [];
+  const mainAfter = hasImageAsset(chapter.image) ? chapter.image : undefined;
+  const mainBefore = hasImageAsset(chapter.beforeImage)
+    ? chapter.beforeImage
+    : undefined;
+
+  if (mainAfter || mainBefore) {
+    slides.push({ after: mainAfter, before: mainBefore });
   }
 
-  return images;
+  for (const item of chapter.gallery ?? []) {
+    const after = galleryAfter(item);
+    const before = hasImageAsset(item.beforeImage)
+      ? item.beforeImage
+      : undefined;
+    // Cada extra es un slide propio, aunque reutilice el After del capítulo.
+    if (!after && !before) continue;
+    slides.push({ after, before });
+  }
+
+  return slides;
+}
+
+function slideImage(slide: ChapterSlide) {
+  return slide.after ?? slide.before;
 }
 
 function hasChapter(chapter: ProjectChapter) {
   return (
     present(chapter.heading) ||
     filledParagraphs(chapter).length > 0 ||
-    hasImageAsset(chapter.image) ||
-    hasImageAsset(chapter.beforeImage) ||
-    chapterImages(chapter).length > 0
+    chapterSlides(chapter).length > 0
   );
 }
 
@@ -96,94 +116,26 @@ function hasExitContent(exit?: ProjectExit) {
   );
 }
 
-function fallbackImages(project: ProjectSummary): ProjectImage[] {
-  const seen = new Set<string>();
-  const images: ProjectImage[] = [];
-
-  for (const image of [project.mainImage, ...(project.gallery ?? [])]) {
-    if (!image || !hasImageAsset(image)) continue;
-    const id = assetId(image);
-    if (id && seen.has(id)) continue;
-    if (id) seen.add(id);
-    images.push(image);
-  }
-
-  return images;
-}
-
-// Inercia tipo BIG.dk: la rueda empuja un objetivo y el riel se acerca con lerp.
-const SCROLL_EASE = 0.12;
-const SCROLL_SCALE = 0.55;
-
-function useSoftHorizontalScroll(
-  scrollerRef: RefObject<HTMLDivElement | null>,
-  rootRef: RefObject<HTMLDivElement | null>,
-) {
+// Chrome trata la rueda vertical como scroll X si el riel solo desborda en horizontal.
+// Ese gesto se lo devolvemos a la página; el proyecto solo se recorre en horizontal.
+function useVerticalPageScroll(scrollerRef: RefObject<HTMLDivElement | null>) {
   useEffect(() => {
     const scroller = scrollerRef.current;
-    const root = rootRef.current;
-    if (!scroller || !root) return;
-
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let target = scroller.scrollLeft;
-    let current = scroller.scrollLeft;
-    let raf = 0;
-
-    const maxScroll = () =>
-      Math.max(0, scroller.scrollWidth - scroller.clientWidth);
-
-    const clamp = (value: number) => Math.min(maxScroll(), Math.max(0, value));
-
-    const tick = () => {
-      current += (target - current) * SCROLL_EASE;
-      if (Math.abs(target - current) < 0.35) {
-        current = target;
-        scroller.scrollLeft = current;
-        raf = 0;
-        return;
-      }
-      scroller.scrollLeft = current;
-      raf = requestAnimationFrame(tick);
-    };
+    if (!scroller) return;
 
     const onWheel = (event: WheelEvent) => {
-      if (event.ctrlKey) return;
-
-      // Gesto nativo horizontal (trackpad): no interferir.
-      if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
-        target = scroller.scrollLeft;
-        current = scroller.scrollLeft;
-        return;
-      }
-
-      const max = maxScroll();
-      const goingRight = event.deltaY > 0;
-      const goingLeft = event.deltaY < 0;
-      if ((goingRight && scroller.scrollLeft >= max - 0.5) || (goingLeft && scroller.scrollLeft <= 0.5)) {
-        return;
-      }
+      if (event.ctrlKey || event.shiftKey) return;
+      if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) return;
 
       event.preventDefault();
       const pixels =
         event.deltaMode === 1 ? event.deltaY * 16 : event.deltaY;
-      const delta = pixels * SCROLL_SCALE;
-
-      if (reduced) {
-        scroller.scrollLeft = clamp(scroller.scrollLeft + delta);
-        return;
-      }
-
-      current = scroller.scrollLeft;
-      target = clamp(target + delta);
-      if (!raf) raf = requestAnimationFrame(tick);
+      window.scrollBy({ top: pixels, left: 0, behavior: "instant" });
     };
 
-    root.addEventListener("wheel", onWheel, { passive: false });
-    return () => {
-      root.removeEventListener("wheel", onWheel);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, [rootRef, scrollerRef]);
+    scroller.addEventListener("wheel", onWheel, { passive: false });
+    return () => scroller.removeEventListener("wheel", onWheel);
+  }, [scrollerRef]);
 }
 
 type ProjectCaseStudyProps = {
@@ -203,7 +155,7 @@ export function ProjectCaseStudy({
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [panel, setPanel] = useState(0);
   const [progress, setProgress] = useState(0);
-  useSoftHorizontalScroll(scrollerRef, rootRef);
+  useVerticalPageScroll(scrollerRef);
 
   const chapters = useMemo(
     () => (project.chapters ?? []).filter(hasChapter),
@@ -214,10 +166,8 @@ export function ProjectCaseStudy({
     [project.credits],
   );
   const showExit = hasExitContent(project.exit) || credits.length > 0;
-  const galleryPanels =
-    chapters.length === 0 ? fallbackImages(project) : [];
 
-  const panelCount = 1 + chapters.length + galleryPanels.length + (showExit ? 1 : 0);
+  const panelCount = 1 + chapters.length + (showExit ? 1 : 0);
 
   const syncPanel = useCallback(() => {
     const el = scrollerRef.current;
@@ -234,6 +184,12 @@ export function ProjectCaseStudy({
   useEffect(() => {
     syncPanel();
   }, [syncPanel]);
+
+  useEffect(() => {
+    if (scrollerRef.current) scrollerRef.current.scrollLeft = 0;
+    setPanel(0);
+    setProgress(0);
+  }, [project.slug]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -253,7 +209,7 @@ export function ProjectCaseStudy({
       data-case-study={project.slug}
       className="flex h-full flex-col bg-background text-foreground"
     >
-      <header className="relative shrink-0">
+      <header className="relative shrink-0 bg-s2-fog">
         <div className="s2-page items-center py-5">
           <p className="text-navigation col-span-3 col-start-2">
             {project.title}
@@ -267,20 +223,33 @@ export function ProjectCaseStudy({
             type="button"
             aria-label="Close project"
             onClick={onClose}
-            className="col-start-12 flex size-8 items-center justify-center justify-self-end bg-s2-orange text-s2-white"
+            className="col-start-12 flex size-8 items-center cursor-pointer justify-center justify-self-end bg-s2-orange text-s2-white"
           >
-            <svg viewBox="0 0 10 10" className="size-3" aria-hidden="true">
-              <path
-                d="M1 1 L9 9 M9 1 L1 9"
-                stroke="currentColor"
-                strokeWidth="1.5"
-              />
-            </svg>
+       
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 13 13" fill="none" className="size-3" aria-hidden="true">
+<rect x="11.375" width="1.625" height="1.625" fill="white"/>
+<rect width="1.625" height="1.625" fill="white"/>
+<rect x="9.75" y="1.625" width="1.625" height="1.625" fill="white"/>
+<rect x="1.625" y="1.625" width="1.625" height="1.625" fill="white"/>
+<rect x="8.125" y="3.25" width="1.625" height="1.625" fill="white"/>
+<rect x="3.25" y="3.25" width="1.625" height="1.625" fill="white"/>
+<rect x="6.5" y="4.875" width="1.625" height="1.625" fill="white"/>
+<rect x="4.875" y="4.875" width="1.625" height="1.625" fill="white"/>
+<rect x="4.875" y="6.5" width="1.625" height="1.625" fill="white"/>
+<rect x="6.5" y="6.5" width="1.625" height="1.625" fill="white"/>
+<rect x="8.125" y="8.125" width="1.625" height="1.625" fill="white"/>
+<rect x="3.25" y="8.125" width="1.625" height="1.625" fill="white"/>
+<rect x="9.75" y="9.75" width="1.625" height="1.625" fill="white"/>
+<rect x="1.625" y="9.75" width="1.625" height="1.625" fill="white"/>
+<rect x="11.375" y="11.375" width="1.625" height="1.625" fill="white"/>
+<rect y="11.375" width="1.625" height="1.625" fill="white"/>
+</svg>
+           
           </button>
         </div>
         <div
           aria-hidden
-          className="absolute bottom-0 left-[calc(50%-50vw)] h-px w-screen max-w-[100vw] bg-s2-steel/40"
+          className="absolute bottom-0 left-[calc(50%-50vw)] h-px w-screen max-w-[100vw] bg-s2-steel"
         />
       </header>
 
@@ -300,14 +269,6 @@ export function ProjectCaseStudy({
             />
           ))}
 
-          {galleryPanels.map((image, index) => (
-            <ImagePanel
-              key={assetId(image) || index}
-              image={image}
-              fallbackAlt={project.title}
-            />
-          ))}
-
           {showExit ? (
             <ExitPanel
               exit={project.exit}
@@ -319,10 +280,10 @@ export function ProjectCaseStudy({
         </div>
       </div>
 
-      <footer className="relative shrink-0">
+      <footer className="relative shrink-0 bg-s2-fog">
         <div
           aria-hidden
-          className="absolute top-0 left-[calc(50%-50vw)] h-px w-screen max-w-[100vw] bg-s2-steel/40"
+          className="absolute top-0 left-[calc(50%-50vw)] h-px w-screen max-w-[100vw] bg-s2-steel"
         />
         <div className="s2-page items-end py-5">
           <div className="col-span-4 col-start-2">
@@ -330,7 +291,7 @@ export function ProjectCaseStudy({
               {pad(panel + 1)} / {pad(panelCount)}
             </p>
             <div
-              className="mt-3 h-px bg-s2-steel/40"
+              className="mt-3 h-px bg-s2-steel"
               role="progressbar"
               aria-valuemin={0}
               aria-valuemax={100}
@@ -343,22 +304,7 @@ export function ProjectCaseStudy({
               />
             </div>
           </div>
-          {nextProject && onOpenNext && panel === panelCount - 1 ? (
-            <button
-              type="button"
-              onClick={onOpenNext}
-              className="text-navigation col-span-3 col-start-8 justify-self-start text-left"
-            >
-              Next · {nextProject.title}{" "}
-              <img
-                src="/icons/arrow-right.svg"
-                alt=""
-                width={10}
-                height={9}
-                className="ml-1.5 inline-block"
-              />
-            </button>
-          ) : panelCount > 1 ? (
+          {panelCount > 1 && panel < panelCount - 1 ? (
             <p className="text-navigation col-span-2 col-start-11 inline-flex items-center justify-self-end gap-1.5">
               Scroll
               <img
@@ -432,9 +378,9 @@ function CoverPanel({ project }: { project: ProjectSummary }) {
         <div className="relative col-span-3 col-start-10 h-full">
           <div
             aria-hidden
-            className="absolute inset-y-0 left-0 w-px bg-s2-steel/40"
+            className="absolute inset-y-0 left-0 z-[1] w-px bg-s2-steel"
           />
-          <div className="flex h-full flex-col justify-center pl-8">
+          <div className="flex h-full flex-col justify-center bg-s2-fog pl-8">
             <h3 className="text-metrics">
               {present(project.dealHeading) ? project.dealHeading : "The Deal."}
             </h3>
@@ -464,18 +410,16 @@ function ChapterPanel({
   fallbackAlt: string;
 }) {
   const paragraphs = filledParagraphs(chapter);
-  const images = chapterImages(chapter);
-  const hasBefore = hasImageAsset(chapter.beforeImage);
-  const hasAfter = hasImageAsset(chapter.image) || images.length > 0;
+  const slides = chapterSlides(chapter);
   const showText = present(chapter.heading) || paragraphs.length > 0;
-  const showFigure = hasBefore || hasAfter;
+  const showFigure = slides.length > 0;
 
   return (
-    <section className="s2-page h-full w-screen shrink-0 content-start overflow-y-auto py-20">
+    <section className="s2-page h-full w-screen shrink-0 content-start overflow-hidden py-20">
       {showFigure ? (
         <ChapterFigure
           chapter={chapter}
-          images={images}
+          slides={slides}
           fallbackAlt={fallbackAlt}
           wide={!showText}
         />
@@ -508,141 +452,87 @@ function ChapterPanel({
 
 function ChapterFigure({
   chapter,
-  images,
+  slides,
   fallbackAlt,
   wide,
 }: {
   chapter: ProjectChapter;
-  images: ProjectImage[];
+  slides: ChapterSlide[];
   fallbackAlt: string;
   wide: boolean;
 }) {
-  const hasBefore = hasImageAsset(chapter.beforeImage);
-  const afterImage = hasImageAsset(chapter.image)
-    ? chapter.image
-    : images[0];
-  const extras = afterImage
-    ? images.filter((image) => assetId(image) !== assetId(afterImage))
-    : images;
-  const slides = afterImage ? [afterImage, ...extras] : extras;
-  const [side, setSide] = useState<"before" | "after">(
-    hasBefore && afterImage ? "after" : hasBefore ? "before" : "after",
-  );
-  const [slide, setSlide] = useState(0);
-  const showToggle = hasBefore && Boolean(afterImage);
-  const active =
-    showToggle && side === "before"
-      ? chapter.beforeImage
-      : slides[slide] ?? afterImage ?? chapter.beforeImage;
+  const [index, setIndex] = useState(0);
+  const current = slides[index] ?? slides[0];
+  const after = current?.after;
+  const before = current?.before;
+  const showCompare = hasImageAsset(before) && hasImageAsset(after);
+  const active = slideImage(current);
   const caption = present(chapter.caption)
     ? chapter.caption
     : present(active?.alt)
       ? active?.alt
       : null;
 
-  if (!active || !hasImageAsset(active)) return null;
+  if (!current || !active || !hasImageAsset(active)) return null;
 
   return (
     <figure className={wide ? "col-start-2 col-span-10" : "col-start-2 col-span-5"}>
-      <div className="relative aspect-[4/3]">
-        <Image
-          src={urlFor(active).width(1200).height(900).url()}
-          alt={active.alt ?? fallbackAlt}
-          fill
-          sizes="580px"
-          className="object-cover"
+      {showCompare && before && after ? (
+        <BeforeAfterSlider
+          before={{
+            src: urlFor(before).width(1200).height(900).url(),
+            alt: before.alt ?? fallbackAlt,
+          }}
+          after={{
+            src: urlFor(after).width(1200).height(900).url(),
+            alt: after.alt ?? fallbackAlt,
+          }}
+          sizes={wide ? "1200px" : "580px"}
         />
-        {showToggle ? (
-          <div className="absolute left-4 top-4 flex gap-x-1">
-            <button
-              type="button"
-              aria-pressed={side === "before"}
-              onClick={() => setSide("before")}
-              className={`text-micro px-3 py-1.5 ${
-                side === "before"
-                  ? "bg-s2-orange text-s2-white"
-                  : "bg-s2-white text-s2-black"
-              }`}
-            >
-              Before
-            </button>
-            <button
-              type="button"
-              aria-pressed={side === "after"}
-              onClick={() => setSide("after")}
-              className={`text-micro px-3 py-1.5 ${
-                side === "after"
-                  ? "bg-s2-orange text-s2-white"
-                  : "bg-s2-white text-s2-black"
-              }`}
-            >
-              After
-            </button>
-          </div>
-        ) : null}
-      </div>
+      ) : (
+        <div className="relative aspect-[4/3]">
+          <Image
+            src={urlFor(active).width(1200).height(900).url()}
+            alt={active.alt ?? fallbackAlt}
+            fill
+            sizes={wide ? "1200px" : "580px"}
+            className="object-cover"
+          />
+        </div>
+      )}
       {caption ? (
         <figcaption className="text-micro bg-s2-orange px-4 py-3 text-s2-white">
           {caption}
         </figcaption>
       ) : null}
-      {slides.length > 1 && !(showToggle && side === "before") ? (
-        <div className="flex items-center justify-between bg-s2-black px-4 py-3 text-s2-white">
-          <p className="text-micro">
-            {pad(slide + 1)}/{pad(slides.length)}
+      {slides.length > 1 ? (
+        <div className="ml-auto flex w-[230px] items-center justify-between bg-s2-black px-4 py-3 text-s2-white">
+          <p className="text-body">
+            {pad(index + 1)}/{pad(slides.length)}
           </p>
-          <div className="flex gap-x-4">
+          <div className="flex gap-x-6">
             <button
               type="button"
               aria-label="Previous image"
               className="text-micro"
               onClick={() =>
-                setSlide((current) => (current - 1 + slides.length) % slides.length)
+                setIndex((current) => (current - 1 + slides.length) % slides.length)
               }
             >
-              ←
+               <Arrow className="rotate-180" />
             </button>
             <button
               type="button"
               aria-label="Next image"
-              className="text-micro"
-              onClick={() => setSlide((current) => (current + 1) % slides.length)}
+              className="text-micro text-s2-orange" 
+              onClick={() => setIndex((current) => (current + 1) % slides.length)}
             >
-              →
+                <Arrow  />
             </button>
           </div>
         </div>
       ) : null}
     </figure>
-  );
-}
-
-function ImagePanel({
-  image,
-  fallbackAlt,
-}: {
-  image: ProjectImage;
-  fallbackAlt: string;
-}) {
-  return (
-    <section className="s2-page h-full w-screen shrink-0 content-start overflow-y-auto py-20">
-      <figure className="col-start-2 col-span-10 flex h-full flex-col">
-        <div className="relative min-h-0 flex-1">
-          <Image
-            src={urlFor(image).width(1600).url()}
-            alt={image.alt ?? fallbackAlt}
-            fill
-            sizes="100vw"
-            className="object-cover"
-          />
-        </div>
-        {present(image.alt) ? (
-          <figcaption className="text-micro bg-s2-orange px-4 py-3 text-s2-white">
-            {image.alt}
-          </figcaption>
-        ) : null}
-      </figure>
-    </section>
   );
 }
 
@@ -668,23 +558,38 @@ function ExitPanel({
       : null;
 
   return (
-    <section className="s2-page h-full w-screen shrink-0 content-start overflow-y-auto py-20">
+    <section className="s2-page h-full w-screen shrink-0 overflow-hidden">
+      {credits.length > 0 ? (
+        <div
+          aria-hidden
+          className="relative col-start-8 col-span-5 row-start-1 h-full"
+        >
+          <div className="absolute inset-0 bg-s2-fog" />
+        
+        
+        </div>
+      ) : null}
+
       {showStory ? (
-        <div className="col-start-2 col-span-7">
-          {heading ? <h2 className="text-metrics">{heading}</h2> : null}
+        <div className="col-start-2 col-span-6 row-start-1 max-w-[630px] py-16">
+          {heading ? (
+            <h2 className="text-metrics border-b border-s2-black pb-4">{heading}</h2>
+          ) : null}
 
           {acquired || sold ? (
-            <div className="mt-12 flex items-end gap-x-16">
-              {acquired ? <ExitSideBlock side={acquired} variant="acquired" /> : null}
+            <div className="mt-12 flex items-end justify-between gap-x-12">
+              {acquired ? (
+                <ExitSideBlock side={acquired} variant="acquired" />
+              ) : null}
               {sold ? <ExitSideBlock side={sold} variant="sold" /> : null}
             </div>
           ) : null}
 
           {metrics.length > 0 ? (
-            <dl className="mt-20 flex gap-x-16 border-t border-s2-black pt-6">
+            <dl className="mt-16 flex justify-between border-t border-s2-black pt-3">
               {metrics.map((metric, index) => (
                 <div key={metric._key || index}>
-                  <dt className="text-data">{metric.value}</dt>
+                  <dt className="text-metrics">{metric.value}</dt>
                   {present(metric.label) ? (
                     <dd className="text-micro mt-1">{metric.label}</dd>
                   ) : null}
@@ -697,19 +602,24 @@ function ExitPanel({
 
       {credits.length > 0 ? (
         <div
-          className={`flex h-full flex-col ${
-            showStory ? "col-start-10 col-span-3" : "col-start-2 col-span-4"
+          className={`relative row-start-1 flex h-full flex-col py-16 max-w-[400px] ${
+            showStory ? "col-start-9 col-span-4" : "col-start-2 col-span-4"
           }`}
         >
           <h2 className="text-metrics border-b border-s2-black pb-4">Credits.</h2>
-          <dl className="mt-8">
+          <dl>
             {credits.map((credit, index) => (
-              <div key={credit._key || index} className={index === 0 ? "" : "mt-6"}>
+              <div
+                key={credit._key || index}
+                className="border-b border-s2-steel py-3"
+              >
                 {present(credit.label) ? (
                   <dt className="text-micro">{credit.label}</dt>
                 ) : null}
                 {present(credit.detail) ? (
-                  <dd className={`text-body ${present(credit.label) ? "mt-1" : ""}`}>
+                  <dd
+                    className={`text-body ${present(credit.label) ? "mt-1" : ""}`}
+                  >
                     {credit.detail}
                   </dd>
                 ) : null}
@@ -720,10 +630,16 @@ function ExitPanel({
             <button
               type="button"
               onClick={onOpenNext}
-              className="text-micro mt-auto self-end bg-s2-black px-5 py-3 text-s2-white"
+              className=" cursor-pointer text-data mt-auto inline-flex items-center gap-1.5 self-end bg-s2-black px-5 py-4 text-s2-steel"
             >
-              Next · {nextProject.title}{" "}
-              <span className="text-s2-orange">→</span>
+              Next · {nextProject.title}
+              <img
+                src="/icons/arrow-right.svg"
+                alt=""
+                width={10}
+                height={9}
+                className="shrink-0"
+              />
             </button>
           ) : null}
         </div>
@@ -744,19 +660,24 @@ function ExitSideBlock({
   return (
     <div>
       {variant === "acquired" ? (
-        <div className="h-24 w-40 bg-s2-black" />
+        <div className="h-[90px] w-[200px] bg-s2-black" />
       ) : (
-        <div className="h-32 w-32 bg-s2-orange" />
+        <div className="relative flex h-[146px] w-[200px] items-center justify-center bg-s2-orange">
+          <img
+            src="/icons/s2-mark.svg"
+            alt=""
+            width={146}
+            height={146}
+            className="size-[146px]"
+          />
+        </div>
       )}
-      {present(side.value) ? <p className="text-h2 mt-8">{side.value}</p> : null}
+      {present(side.value) ? <p className="text-h1 mt-8">{side.value}</p> : null}
       {present(side.line) ? (
-        <p className="text-micro mt-2">{side.line}</p>
+        <p className="text-micro mt-5 text-s2-steel">{side.line}</p>
       ) : null}
       {details.map((line, index) => (
-        <p
-          key={line}
-          className={`text-data ${index === 0 ? "mt-3" : ""}`}
-        >
+        <p key={line} className={`text-body ${index === 0 ? "mt-3" : ""}`}>
           {line}
         </p>
       ))}

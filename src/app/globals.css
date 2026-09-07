@@ -177,3 +177,9 @@ body {
   font-size: 8px;
   text-transform: uppercase;
 }
+
+/* Mapa de Contact: escala de blancos sin aplanar los volúmenes 3D.
+   El pin HTML queda fuera de este nodo. */
+.s2-office-map .gm-style > div:first-child {
+  filter: grayscale(1) saturate(0) brightness(1.08) contrast(1.12);
+}
