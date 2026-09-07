@@ -42,16 +42,18 @@ export default function PlatformPage() {
     <section className="s2-subgrid items-start gap-y-12 py-10">
 
       <div className="col-span-12 lg:col-span-5 lg:col-start-2">
-        <p className="text-h3">The Investor’s Eye</p>
+        <p className="text-h3">Investment</p>
         <hr className="border-t border-s2-black mt-5 max-w-[465px]"  />
         <p className="text-body pt-5">Office, mixed-use, and adaptive re-use across Florida's core submarkets. Sourced off-market through principal relationships. Underwritten below replacement cost, with a thesis built from the submarket up. Value-add through opportunistic returns.</p>
+
         <Button href="/portfolio" variant="text" className="mt-7 text-navigation">THE ASSETS WE OWN </Button>
 
       </div>
       <div className="col-span-12 lg:col-span-5">
-        <p className="text-h3">The Owner’s Hand</p>
+        <p className="text-h3">Property Management</p>
         <hr className="border-t border-s2-black  mt-5  max-w-[465px]" />
-        <p className="text-body pt-5">Dedicated on-site teams. Managers accountable for the financials, not only the finishes. Experience governance at every point of entry, proactive rather than reactive maintenance, and the protection of how a building is perceived by its tenants, its market, and its owner.</p>
+        <p className="text-body pt-5">Dedicated on-site teams. Managers accountable for the financials, not only the finishes. Experience governance at every point of entry, proactive rather than reactive maintenance, and the protection of how a building is perceived by its tenants, its market, and its owner.
+        </p>
         <Button href="/portfolio" variant="text" className="mt-7 text-navigation">THE ASSETS WE OPERATE </Button>
 
       </div>

@@ -24,39 +24,27 @@ function ensureMapsOptions() {
   mapsOptionsReady = true;
 }
 
-function createPin() {
-  const pin = document.createElement("div");
-  pin.className = "s2-map-pin flex flex-col items-center";
-  pin.innerHTML = `
-    <div class="bg-s2-white px-4 py-3">
-      <img src="/logo.png" alt="Square2" width="112" height="22" />
-    </div>
-    <div class="h-4 w-px bg-s2-orange"></div>
-    <div class="size-2 bg-s2-orange"></div>
-  `;
-  return pin;
-}
-
 export function OfficeMap() {
-  const ref = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<HTMLDivElement>(null);
+  const pinRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const el = ref.current;
-    if (!el || !API_KEY || !MAP_ID) return;
+    const el = mapRef.current;
+    const pin = pinRef.current;
+    if (!el || !pin || !API_KEY || !MAP_ID) return;
 
     let cancelled = false;
-    let clearMarker: (() => void) | undefined;
+    let overlay: { setMap: (map: unknown) => void } | undefined;
 
     ensureMapsOptions();
 
     (async () => {
-      const { Map } = await importLibrary("maps");
-      const { AdvancedMarkerElement } = await importLibrary("marker");
-      if (cancelled || !ref.current) return;
+      const { Map, OverlayView } = await importLibrary("maps");
+      if (cancelled || !mapRef.current) return;
 
       // Vector + tilt: edificios 3D en bloque (el raster es plano).
       const camera = { center: OFFICE, zoom: 18, heading: 35, tilt: 67.5 };
-      const map = new Map(ref.current, {
+      const map = new Map(mapRef.current, {
         ...camera,
         mapId: MAP_ID,
         renderingType: "VECTOR",
@@ -80,31 +68,48 @@ export function OfficeMap() {
       map.addListener("tilesloaded", applyCamera);
       map.addListener("renderingtype_changed", applyCamera);
 
-      const marker = new AdvancedMarkerElement({
-        map,
-        position: OFFICE,
-        content: createPin(),
-        title: "Square2 — 3250 Mary Street, Suite 207",
-      });
-      clearMarker = () => {
-        marker.map = null;
+      // El pin vive fuera de .gm-style para que el filtro gris no lo pinte.
+      const pinOverlay = new OverlayView();
+      pinOverlay.onAdd = () => {};
+      pinOverlay.onRemove = () => {};
+      pinOverlay.draw = () => {
+        const projection = pinOverlay.getProjection();
+        if (!projection) return;
+        const point = projection.fromLatLngToContainerPixel(OFFICE);
+        if (!point) return;
+        pin.style.transform = `translate(${point.x}px, ${point.y}px) translate(-50%, -50%)`;
+        pin.style.visibility = "visible";
       };
+      pinOverlay.setMap(map);
+      overlay = pinOverlay;
     })().catch(() => {
       // Sin mapa interactivo si la API falla; queda el contenedor y la dirección.
     });
 
     return () => {
       cancelled = true;
-      clearMarker?.();
+      overlay?.setMap(null);
     };
   }, []);
 
   return (
-    // Hero a sangre, mismo breakout que TitleHero / MainHero.
-    <section className="col-span-12 ml-[calc(50%-50vw)] w-screen max-w-[100vw]">
-      <div ref={ref} className="s2-office-map h-[420px] w-full bg-s2-white lg:h-[800px]" />
-
-
+    // Mismo marco 1440 que TitleHero / MainHero.
+    <section className="s2-hero">
+      <div className="relative h-[420px] w-full bg-s2-white lg:h-[800px]">
+        <div ref={mapRef} className="s2-office-map absolute inset-0" />
+        <div
+          ref={pinRef}
+          className="s2-map-pin pointer-events-none absolute top-0 left-0 z-10 invisible"
+        >
+          <img
+            className="block size-14"
+            src="/icons/s2-mark-orange.png"
+            alt="Square2"
+            width={56}
+            height={56}
+          />
+        </div>
+      </div>
     </section>
   );
 }

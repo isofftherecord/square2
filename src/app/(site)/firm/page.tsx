@@ -122,7 +122,7 @@ export default async function FirmPage() {
 
       <section className="s2-subgrid items-center pt-5 pb-16 lg:pb-35">
         <div className="col-span-12 lg:col-start-2 lg:col-span-12">
-          <p className="text-h1">One team with one standard out.</p>
+          <p className="text-h1">One team with one <span className="italic">standard</span> out.</p>
         </div>
       </section>
 

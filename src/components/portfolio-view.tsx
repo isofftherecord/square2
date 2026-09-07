@@ -30,8 +30,8 @@ export function PortfolioView({
 
   return (
     <>
-      {/* The record — hero con filtros encajados */}
-      <section className="bg-s2-orange col-span-12 ml-[calc(50%-50vw)] w-screen max-w-[100vw] text-s2-white">
+      {/* The record — hero con filtros encajados; canvas 1440 */}
+      <section className="s2-hero bg-s2-orange text-s2-white">
         <div className="s2-page min-h-[380px] items-end pt-28 lg:h-[640px] lg:grid-rows-1 lg:pt-64">
           <div className="col-span-12 self-start lg:col-span-5 lg:col-start-2">
             <h2 className="text-h1">The record.</h2>

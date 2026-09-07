@@ -96,7 +96,7 @@ function LedgerRow({
   return (
     <article id={`project-${project.slug}`} className="s2-subgrid">
       {!isOpen ? (
-        <div className="s2-subgrid relative items-start max-lg:py-10 lg:h-[520px]">
+        <div className="relative col-span-12 max-lg:py-10 lg:-mx-[var(--s2-margin)] lg:grid lg:h-[var(--s2-ledger-row)] lg:grid-cols-[427fr_520fr_40fr_453fr]">
           <button
             type="button"
             aria-expanded={false}
@@ -107,97 +107,115 @@ function LedgerRow({
             <span className="sr-only">Open {project.title}</span>
           </button>
 
-          <div aria-hidden className="pointer-events-none absolute inset-0 z-[1]">
-            {isFirst ? (
-              <div className="absolute top-0 left-[calc(50%-50vw)] h-px w-screen max-w-[100vw] bg-s2-steel" />
-            ) : null}
-            <div className="absolute bottom-0 left-[calc(50%-50vw)] h-px w-screen max-w-[100vw] bg-s2-steel" />
-          </div>
-
-          <div className="relative z-0 col-span-12 lg:col-span-3 lg:col-start-2 lg:pt-16 lg:pb-12">
+          {/* Celda 1 (427): fog y regla solo hasta el alto del texto */}
+          <div className="relative lg:pl-[130px] lg:pt-[84px]">
             <div
               aria-hidden
-              className="pointer-events-none absolute inset-0 -z-10 hidden lg:block"
+              className="pointer-events-none absolute inset-0 hidden lg:block"
             >
-              {/* Celda fog: cruza el gutter para unirse a la vertical de la foto */}
-              <div className="absolute inset-y-0 left-[calc(50%-50vw)] right-[calc(var(--s2-gutter)*-1-1px)] bg-s2-fog" />
-              <div className="absolute right-[calc(var(--s2-gutter)*-1-1px)] bottom-0 left-[calc(50%-50vw)] h-px bg-s2-steel" />
+              <div className="absolute inset-x-0 top-0 h-[var(--s2-ledger-head)] bg-s2-fog" />
+              <div className="absolute inset-x-0 top-[var(--s2-ledger-head)] h-[0.5px] bg-s2-steel" />
+              <div className="absolute inset-y-0 right-0 w-px bg-s2-steel" />
             </div>
 
-            <h3 className="text-h4 text-s2-black">{project.title}</h3>
-            <div className="mt-6">
-              {project.market ? (
-                <p className="text-data text-s2-black">{project.market}</p>
-              ) : null}
-              {project.assetClass ? (
-                <p className="text-data text-s2-black">{project.assetClass}</p>
-              ) : null}
-              {project.years ? (
-                <p className="text-data text-s2-black">{project.years}</p>
+            <div className="relative">
+              <h3 className="text-h4 text-s2-black">{project.title}</h3>
+              <div className="mt-6">
+                {project.market ? (
+                  <p className="text-data text-s2-black">{project.market}</p>
+                ) : null}
+                {project.assetClass ? (
+                  <p className="text-data text-s2-black">{project.assetClass}</p>
+                ) : null}
+                {project.years ? (
+                  <p className="text-data text-s2-black">{project.years}</p>
+                ) : null}
+              </div>
+              {project.role ? (
+                <span
+                  className={`text-tags mt-5 inline-block px-3 py-1.5 text-s2-white ${
+                    project.role === "Managed" ? "bg-s2-black" : "bg-s2-orange"
+                  }`}
+                >
+                  {project.role}
+                </span>
               ) : null}
             </div>
-            {project.role ? (
-              <span
-                className={`text-tags mt-5 inline-block px-3 py-1 text-s2-white ${
-                  project.role === "Managed" ? "bg-s2-black" : "bg-s2-orange"
-                }`}
-              >
-                {project.role}
-              </span>
-            ) : null}
           </div>
 
-          <div className="relative z-[1] col-span-12 mt-8 aspect-[4/3] self-center lg:col-span-4 lg:col-start-5 lg:mt-0 lg:aspect-square">
+          {/* Celda 2 (520): cuadrada, con la foto de 400 centrada */}
+          <div className="relative">
             <div
               aria-hidden
-              className="pointer-events-none absolute top-1/2 left-0 hidden h-[520px] w-px -translate-y-1/2 bg-s2-steel lg:block"
+              className="pointer-events-none absolute inset-y-0 right-0 hidden w-px bg-s2-steel lg:block"
             />
-            <div
-              aria-hidden
-              className="pointer-events-none absolute top-1/2 right-0 hidden h-[520px] w-px -translate-y-1/2 bg-s2-steel lg:block"
-            />
-            {imageSrc ? (
-              <Image
-                src={imageSrc}
-                alt={alt}
-                fill
-                sizes="(min-width: 1024px) 400px, 100vw"
-                className="object-cover object-center lg:p-12"
-              />
-            ) : (
-              <svg
-                className="absolute inset-0 h-full w-full"
-                viewBox="0 0 100 100"
-                preserveAspectRatio="none"
-                aria-hidden="true"
-              >
-                <path
-                  d="M0 0 L100 100 M100 0 L0 100"
-                  fill="none"
-                  stroke="currentColor"
-                  vectorEffect="non-scaling-stroke"
+
+            <div className="relative mt-8 aspect-[4/3] lg:mx-auto lg:mt-[61px] lg:aspect-square lg:size-[400px]">
+              {imageSrc ? (
+                <Image
+                  src={imageSrc}
+                  alt={alt}
+                  fill
+                  sizes="(min-width: 1024px) 400px, 100vw"
+                  className="object-cover object-center"
                 />
-              </svg>
-            )}
+              ) : (
+                <svg
+                  className="absolute inset-0 h-full w-full"
+                  viewBox="0 0 100 100"
+                  preserveAspectRatio="none"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M0 0 L100 100 M100 0 L0 100"
+                    fill="none"
+                    stroke="currentColor"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                </svg>
+              )}
+            </div>
           </div>
 
-          <div className="relative z-0 col-span-12 mt-6 self-end lg:col-span-3 lg:col-start-9 lg:mt-0 lg:pb-8">
+          {/* Celda 3 (40): solo separa la foto de la franja de Details */}
+          <div className="relative">
             <div
               aria-hidden
-              className="pointer-events-none absolute inset-0 -z-10 hidden lg:block"
+              className="pointer-events-none absolute inset-y-0 right-0 hidden w-px bg-s2-steel lg:block"
+            />
+          </div>
+
+          {/* Celda 4 (453): fog y regla solo en la franja de Details */}
+          <div className="relative lg:flex lg:h-full lg:flex-col lg:justify-end">
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 hidden lg:block"
             >
-              {/* Cruza el gutter para unirse a la vertical de la foto */}
-              <div className="absolute inset-0 left-[calc(var(--s2-gutter)*-1-1px)] right-[calc(50%-50vw)] bg-s2-fog" />
-              <div className="absolute top-0 left-[calc(var(--s2-gutter)*-1-1px)] right-[calc(50%-50vw)] h-px bg-s2-steel" />
+              <div className="absolute inset-x-0 bottom-0 h-[var(--s2-ledger-foot)] bg-s2-fog" />
+              <div className="absolute inset-x-0 bottom-[var(--s2-ledger-foot)] h-px bg-s2-steel" />
             </div>
-            <Button
-              type="button"
-              variant="text"
-              onClick={onToggle}
-              className="relative z-20 mt-2 text-navigation lg:mt-5"
-            >
-              Details
-            </Button>
+
+            <div className="relative mt-6 lg:mt-0 lg:flex lg:h-[var(--s2-ledger-foot)] lg:items-center lg:pl-[var(--s2-gutter)]">
+              <Button
+                type="button"
+                variant="text"
+                onClick={onToggle}
+                className="relative z-20 text-navigation"
+              >
+                Details
+              </Button>
+            </div>
+          </div>
+
+          {/* Reglas de fila a todo el canvas; la de arriba solo en la primera */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 hidden lg:block"
+          >
+            {isFirst ? (
+              <div className="absolute inset-x-0 top-0 h-px bg-s2-steel" />
+            ) : null}
+            <div className="absolute inset-x-0 bottom-0 h-px bg-s2-steel" />
           </div>
         </div>
       ) : null}
@@ -205,7 +223,7 @@ function LedgerRow({
       <div
         ref={panelRef}
         id={`case-${project.slug}`}
-        className="col-span-12 ml-[calc(50%-50vw)] w-screen max-w-[100vw] scroll-mt-24 overflow-hidden transition-[height] duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] motion-reduce:transition-none lg:scroll-mt-32"
+        className="s2-hero scroll-mt-24 overflow-hidden transition-[height] duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] motion-reduce:transition-none lg:scroll-mt-32"
         style={{ height: expand.height }}
         aria-hidden={!isOpen}
       >

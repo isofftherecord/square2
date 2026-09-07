@@ -54,9 +54,9 @@ export function MainHero({ slides }: { slides: HeroSlide[] }) {
   if (!slide) return null;
 
   return (
-    // Sale de la grilla 1440 para ocupar todo el viewport.
-    <section className="col-span-12 ml-[calc(50%-50vw)] w-screen max-w-[100vw]">
-      <div className="relative h-svh   w-full overflow-hidden max-h-[900px]">
+    // Canvas 1440: la imagen no se estira más allá del marco de diseño.
+    <section className="s2-hero">
+      <div className="relative h-svh w-full overflow-hidden max-h-[900px]">
         {/* Imágenes */}
         {slides.map((s, i) => (
           <Image
@@ -65,7 +65,7 @@ export function MainHero({ slides }: { slides: HeroSlide[] }) {
             alt={s.property}
             fill
             priority={i === 0}
-            sizes="100vw"
+            sizes="(min-width: 1440px) 1440px, 100vw"
             className={`object-cover transition-opacity duration-700 ease-out ${
               i === index ? "opacity-100" : "opacity-0"
             }`}
@@ -93,7 +93,7 @@ export function MainHero({ slides }: { slides: HeroSlide[] }) {
 
         {/* Ficha de proyecto */}
         <div className="absolute bottom-0 right-0 flex max-w-full flex-col items-end">
-          <div className="flex h-[68px] w-[min(327px,100vw)] items-end justify-between bg-s2-white px-3 pb-[10px]">
+          <div className="flex h-[68px] w-[min(327px,100vw)] items-end justify-between bg-s2-white px-4 pt-[13px] pb-[13px]">
             <div>
               <p className="text-label-hero text-s2-steel">
                 Property
@@ -113,7 +113,7 @@ export function MainHero({ slides }: { slides: HeroSlide[] }) {
           </div>
 
           <div className="flex h-[62px] w-[218px] items-center justify-between bg-s2-white px-3">
-            <span className="text-body ">
+            <span className="text-body text-s2-slate ">
               {String(index + 1).padStart(2, "0")}/{String(total).padStart(2, "0")}
             </span>
             <div className="flex items-center gap-5">
@@ -131,7 +131,7 @@ export function MainHero({ slides }: { slides: HeroSlide[] }) {
                 aria-label="Next project"
                 className="cursor-pointer text-s2-orange transition-transform duration-200 hover:translate-x-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-s2-orange)]"
               >
-                <Arrow />
+                <Arrow  />
               </button>
             </div>
           </div>

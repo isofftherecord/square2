@@ -33,6 +33,25 @@ El sitio se diseña sobre un canvas de **1440px** con **12 columnas de 100px**.
 
 La clase `s2-page` centra ese canvas y activa la grilla CSS. Cada hijo directo usa `col-span-*` (1–12) para ocupar columnas. `s2-subgrid` anida secciones en las mismas 12 pistas. Navbar y contenido del sitio viven dentro de este wrapper.
 
+Los heroes (`MainHero`, `TitleHero`, mapa de Contact) y la banda de Portfolio usan `s2-hero`: cubren el canvas de 1440px y no salen al viewport, para que la imagen no se estire en pantallas más anchas.
+
+### Fila del ledger (Portfolio)
+
+La tabla de `/portfolio` es la única excepción a las 12 columnas: en Figma las
+divisiones están puestas a mano sobre el canvas de 1440. La fila se arma con
+cuatro columnas propias en fracciones — `427fr 520fr 40fr 453fr` — para que
+escale igual por debajo de 1440. Los altos viven en `globals.css`:
+
+| Token | Valor | Qué es |
+|---|---|---|
+| `--s2-ledger-row` | 520px | Alto de la fila cerrada |
+| `--s2-ledger-head` | 309px | Bloque fog + regla de la celda del título |
+| `--s2-ledger-foot` | 59px | Franja fog + regla de la celda de Details |
+
+Las tres verticales caen en el borde derecho de las tres primeras columnas
+(427, 947, 987) y la regla horizontal de fila solo se dibuja abajo; la de
+arriba se pinta únicamente en la primera fila para que no se dupliquen.
+
 ```tsx
 <div className="s2-page">
   <header className="col-span-12">{/* ancho completo */}</header>

@@ -18,6 +18,12 @@
   --s2-col: 100px;
   --s2-gutter: 20px;
   --s2-margin: 10px;
+
+  /* Fila del ledger de Portfolio (Figma: canvas 1440 × fila 520).
+     Las columnas 427/520/40/453 viven en el componente como fracciones. */
+  --s2-ledger-row: 520px;
+  --s2-ledger-head: 309px;
+  --s2-ledger-foot: 59px;
 }
 
 
@@ -77,6 +83,15 @@ body {
   grid-column: 1 / -1;
 }
 
+/* Hero a 1440: cancela el margen de s2-page y no sale al viewport. */
+@utility s2-hero {
+  grid-column: 1 / -1;
+  width: calc(100% + 2 * var(--s2-margin));
+  max-width: var(--s2-page);
+  margin-inline: calc(-1 * var(--s2-margin));
+  justify-self: center;
+}
+
 @media (max-width: 1439px) {
   :root {
     --s2-margin: 20px;
@@ -92,7 +107,7 @@ body {
 
 @utility text-h1 {
   font-family: var(--font-signifier), serif;
-  font-weight: 200;
+  font-weight: 400;
   font-size: 40px;
   line-height: 120%;
 
@@ -115,7 +130,7 @@ body {
 @utility text-h3 {
   font-family: var(--font-signifier), serif;
   font-weight: 500;
-  font-size: 28px;
+  font-size: 32px;
   line-height: 115%;
 
   @media (min-width: 1024px) {
@@ -160,7 +175,7 @@ body {
   font-family: var(--font-mono-brand), monospace;
   font-weight: 400;
   font-size: 14px;
-  line-height: 100%;
+  line-height: normal;
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -194,8 +209,8 @@ body {
   text-transform: uppercase;
 }
 
-/* Mapa de Contact: escala de blancos sin aplanar los volúmenes 3D.
-   El pin HTML queda fuera de este nodo. */
-.s2-office-map .gm-style > div:first-child {
+/* Mapa de Contact: grises solo en el canvas. El pin HTML no entra
+   en el filtro; si se aplica al wrapper, el 2 también se ve gris. */
+.s2-office-map .gm-style canvas {
   filter: grayscale(1) saturate(0) brightness(1.08) contrast(1.12);
 }

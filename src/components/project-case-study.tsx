@@ -209,7 +209,7 @@ export function ProjectCaseStudy({
     <div
       ref={rootRef}
       data-case-study={project.slug}
-      className="flex h-auto flex-col bg-background text-foreground lg:h-full"
+      className="@container flex h-auto flex-col bg-background text-foreground lg:h-full"
     >
       <header className="relative shrink-0 bg-s2-fog">
         <div className="s2-page items-center gap-y-3 py-4 lg:py-5">
@@ -251,7 +251,7 @@ export function ProjectCaseStudy({
         </div>
         <div
           aria-hidden
-          className="absolute bottom-0 left-[calc(50%-50vw)] h-px w-screen max-w-[100vw] bg-s2-steel"
+          className="absolute inset-x-0 bottom-0 h-px bg-s2-steel"
         />
       </header>
 
@@ -285,7 +285,7 @@ export function ProjectCaseStudy({
       <footer className="relative hidden shrink-0 bg-s2-fog lg:block">
         <div
           aria-hidden
-          className="absolute top-0 left-[calc(50%-50vw)] h-px w-screen max-w-[100vw] bg-s2-steel"
+          className="absolute inset-x-0 top-0 h-px bg-s2-steel"
         />
         <div className="s2-page items-end py-5">
           <div className="col-span-4 col-start-2">
@@ -345,7 +345,7 @@ function CoverPanel({ project }: { project: ProjectSummary }) {
     : [];
 
   return (
-    <section className="s2-page h-auto w-full shrink-0 items-start gap-y-8 py-10 lg:h-full lg:w-screen lg:items-center lg:gap-y-0 lg:py-0">
+    <section className="s2-page h-auto w-full shrink-0 items-start gap-y-8 py-10 lg:h-full lg:w-[100cqw] lg:items-center lg:gap-y-0 lg:py-0">
       <div className="col-span-12 lg:col-span-7 lg:col-start-2">
         <h2 className="text-h1">{project.title}</h2>
         {addressLines.length > 0 ? (
@@ -417,7 +417,7 @@ function ChapterPanel({
   const showFigure = slides.length > 0;
 
   return (
-    <section className="s2-page h-auto w-full shrink-0 content-start overflow-visible py-10 lg:h-full lg:w-screen lg:overflow-hidden lg:py-20">
+    <section className="s2-page h-auto w-full shrink-0 content-start overflow-visible py-10 lg:h-full lg:w-[100cqw] lg:overflow-hidden lg:py-20">
       {showFigure ? (
         <ChapterFigure
           chapter={chapter}
@@ -568,7 +568,7 @@ function ExitPanel({
       : null;
 
   return (
-    <section className="s2-page h-auto w-full shrink-0 overflow-visible lg:h-full lg:w-screen lg:overflow-hidden">
+    <section className="s2-page h-auto w-full shrink-0 overflow-visible lg:h-full lg:w-[100cqw] lg:overflow-hidden">
       {credits.length > 0 ? (
         <div
           aria-hidden

@@ -30,8 +30,8 @@ export function TitleHero({ slides }: { slides: TitleHeroSlide[] }) {
   if (!slide) return null;
 
   return (
-    // Full-bleed, 800px de alto; el H1 va sobre la grilla 1440.
-    <section className="col-span-12 ml-[calc(50%-50vw)] w-screen max-w-[100vw]">
+    // Canvas 1440, 800px de alto; el H1 va sobre la grilla.
+    <section className="s2-hero">
       <div className="relative h-[420px] w-full overflow-hidden lg:h-[800px]">
         {slides.map((item, i) => (
           <Image
@@ -40,7 +40,7 @@ export function TitleHero({ slides }: { slides: TitleHeroSlide[] }) {
             alt={item.alt}
             fill
             priority={i === 0}
-            sizes="100vw"
+            sizes="(min-width: 1440px) 1440px, 100vw"
             className={`object-cover transition-opacity duration-700 ease-out ${
               i === index ? "opacity-100" : "opacity-0"
             }`}
@@ -55,7 +55,7 @@ export function TitleHero({ slides }: { slides: TitleHeroSlide[] }) {
                 {slide.title}
               </div>
               {total > 1 ? (
-                <div className="flex h-[62px] w-[218px] items-center justify-between bg-s2-orange px-3">
+                <div className="ml-auto flex h-[62px] w-[218px] items-center justify-between bg-s2-orange px-3">
                   <span className="text-body text-s2-black">
                     {String(index + 1).padStart(2, "0")}/
                     {String(total).padStart(2, "0")}

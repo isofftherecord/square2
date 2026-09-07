@@ -23,7 +23,7 @@ export const titleSlidesField = defineField({
         defineField({
           name: "image",
           title: "Image",
-          description: "Full-bleed background. Covers the 800px hero.",
+          description: "Background image. Covers the 1440 × 800 hero.",
           type: "image",
           options: { hotspot: true },
           fields: [

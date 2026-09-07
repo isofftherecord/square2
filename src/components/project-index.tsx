@@ -134,7 +134,7 @@ export function ProjectIndex({
               <span className="col-span-12 mt-3 lg:col-span-1 lg:mt-0">
                 {project.role ? (
                   <span
-                    className={`text-navigation px-2 py-1 text-s2-white ${
+                    className={`text-navigation px-5.5 py-2 text-s2-white ${
                       project.role === "Managed"
                         ? "bg-s2-black"
                         : "bg-s2-orange"
