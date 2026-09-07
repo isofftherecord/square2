@@ -34,7 +34,7 @@ export function OfficeMap() {
     if (!el || !pin || !API_KEY || !MAP_ID) return;
 
     let cancelled = false;
-    let overlay: { setMap: (map: unknown) => void } | undefined;
+    let overlay: google.maps.OverlayView | undefined;
 
     ensureMapsOptions();
 
