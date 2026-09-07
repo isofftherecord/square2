@@ -8,23 +8,32 @@ import { ProjectCaseStudy } from "@/components/project-case-study";
 import type { ProjectSummary } from "@/components/project-index";
 import { hasImageAsset, urlFor } from "@/sanity/lib/image";
 
-const CASE_STUDY_HEIGHT = 800;
-
 function projectImageSrc(image?: ProjectSummary["mainImage"]) {
   if (!hasImageAsset(image)) return null;
   return urlFor(image).width(800).height(800).url();
 }
 
 function useExpand(open: boolean) {
+  const innerRef = useRef<HTMLDivElement>(null);
   const [render, setRender] = useState(open);
-  const [height, setHeight] = useState(open ? `${CASE_STUDY_HEIGHT}px` : "0px");
+  const [height, setHeight] = useState(open ? "auto" : "0px");
   const skipIntro = useRef(open);
+
+  const measure = useCallback(() => {
+    const el = innerRef.current;
+    if (!el) return;
+    setHeight(`${el.getBoundingClientRect().height}px`);
+  }, []);
 
   useEffect(() => {
     if (skipIntro.current) {
       skipIntro.current = false;
       setRender(open);
-      setHeight(open ? `${CASE_STUDY_HEIGHT}px` : "0px");
+      if (open) {
+        const frame = requestAnimationFrame(() => measure());
+        return () => cancelAnimationFrame(frame);
+      }
+      setHeight("0px");
       return;
     }
 
@@ -32,7 +41,7 @@ function useExpand(open: boolean) {
       setRender(true);
       setHeight("0px");
       const frame = requestAnimationFrame(() => {
-        requestAnimationFrame(() => setHeight(`${CASE_STUDY_HEIGHT}px`));
+        requestAnimationFrame(measure);
       });
       return () => cancelAnimationFrame(frame);
     }
@@ -40,9 +49,18 @@ function useExpand(open: boolean) {
     setHeight("0px");
     const timer = window.setTimeout(() => setRender(false), 500);
     return () => window.clearTimeout(timer);
-  }, [open]);
+  }, [open, measure]);
 
-  return { render, height };
+  useEffect(() => {
+    if (!open || !render) return;
+    const el = innerRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [open, render, measure]);
+
+  return { render, height, innerRef };
 }
 
 function LedgerRow({
@@ -70,7 +88,7 @@ function LedgerRow({
   useEffect(() => {
     if (!isOpen) return;
     const timer = window.setTimeout(() => {
-      panelRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      panelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 80);
     return () => window.clearTimeout(timer);
   }, [isOpen]);
@@ -78,7 +96,7 @@ function LedgerRow({
   return (
     <article id={`project-${project.slug}`} className="s2-subgrid">
       {!isOpen ? (
-        <div className="s2-subgrid relative items-start max-lg:py-16 lg:h-[520px]">
+        <div className="s2-subgrid relative items-start max-lg:py-10 lg:h-[520px]">
           <button
             type="button"
             aria-expanded={false}
@@ -129,7 +147,7 @@ function LedgerRow({
             ) : null}
           </div>
 
-          <div className="relative z-[1] col-span-12 mt-8 aspect-square self-center lg:col-span-4 lg:col-start-5 lg:mt-0">
+          <div className="relative z-[1] col-span-12 mt-8 aspect-[4/3] self-center lg:col-span-4 lg:col-start-5 lg:mt-0 lg:aspect-square">
             <div
               aria-hidden
               className="pointer-events-none absolute top-1/2 left-0 hidden h-[520px] w-px -translate-y-1/2 bg-s2-steel lg:block"
@@ -144,7 +162,7 @@ function LedgerRow({
                 alt={alt}
                 fill
                 sizes="(min-width: 1024px) 400px, 100vw"
-                className="object-cover object-center p-12"
+                className="object-cover object-center lg:p-12"
               />
             ) : (
               <svg
@@ -163,7 +181,7 @@ function LedgerRow({
             )}
           </div>
 
-          <div className="relative z-0 col-span-12 mt-8 self-end lg:col-span-3 lg:col-start-9 lg:mt-0 lg:pb-8">
+          <div className="relative z-0 col-span-12 mt-6 self-end lg:col-span-3 lg:col-start-9 lg:mt-0 lg:pb-8">
             <div
               aria-hidden
               className="pointer-events-none absolute inset-0 -z-10 hidden lg:block"
@@ -176,7 +194,7 @@ function LedgerRow({
               type="button"
               variant="text"
               onClick={onToggle}
-              className="relative z-20 mt-5 text-navigation"
+              className="relative z-20 mt-2 text-navigation lg:mt-5"
             >
               Details
             </Button>
@@ -187,11 +205,11 @@ function LedgerRow({
       <div
         ref={panelRef}
         id={`case-${project.slug}`}
-        className="col-span-12 ml-[calc(50%-50vw)] w-screen max-w-[100vw] overflow-hidden transition-[height] duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] motion-reduce:transition-none"
+        className="col-span-12 ml-[calc(50%-50vw)] w-screen max-w-[100vw] scroll-mt-24 overflow-hidden transition-[height] duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] motion-reduce:transition-none lg:scroll-mt-32"
         style={{ height: expand.height }}
         aria-hidden={!isOpen}
       >
-        <div className="h-[800px]">
+        <div ref={expand.innerRef} className="lg:h-[800px]">
           {expand.render ? (
             <ProjectCaseStudy
               project={project}
@@ -245,7 +263,7 @@ export function ProjectLedger({ projects }: { projects: ProjectSummary[] }) {
   }, [projects]);
 
   return (
-    <section className="s2-subgrid pb-30">
+    <section className="s2-subgrid pb-16 lg:pb-30">
       {projects.map((project, index) => (
         <LedgerRow
           key={project._id}

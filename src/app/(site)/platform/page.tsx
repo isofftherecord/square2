@@ -39,9 +39,9 @@ export default function PlatformPage() {
 
     />
 
-    <section className="s2-subgrid items-start py-10 ">
+    <section className="s2-subgrid items-start gap-y-12 py-10">
 
-      <div className="lg:col-start-2 lg:col-span-5 ">
+      <div className="col-span-12 lg:col-span-5 lg:col-start-2">
         <p className="text-h3">The Investor’s Eye</p>
         <hr className="border-t border-s2-black mt-5 max-w-[465px]"  />
         <p className="text-body pt-5">Office, mixed-use, and adaptive re-use across Florida's core submarkets. Sourced off-market through principal relationships. Underwritten below replacement cost, with a thesis built from the submarket up. Value-add through opportunistic returns.</p>
@@ -57,13 +57,13 @@ export default function PlatformPage() {
       </div>
     </section>
 
-    <section className="s2-subgrid py-30">
-      <img src="/heroes/platform.png" alt="Platform" className="col-span-12  col-start-2 h-[560px] object-cover"  />
+    <section className="s2-subgrid py-12 lg:py-30">
+      <img src="/heroes/platform.png" alt="Platform" className="col-span-12 h-[240px] w-full object-cover lg:col-span-10 lg:col-start-2 lg:h-[560px]"  />
 
     </section>
     {/* Investment Criteria: banda a sangre; contenido en columnas 2–11 (span 10). */}
-    <section className="col-span-12 ml-[calc(50%-50vw)] w-screen max-w-[100vw] bg-[#F9F9F9] ">
-      <div className="s2-page py-30">
+    <section className="col-span-12 ml-[calc(50%-50vw)] w-screen max-w-[100vw] bg-s2-fog ">
+      <div className="s2-page py-16 lg:py-30">
         <h2 className="text-h2 col-span-12 lg:col-start-2 lg:col-span-10">
           Investment Criteria.
         </h2>

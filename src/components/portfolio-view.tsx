@@ -31,9 +31,9 @@ export function PortfolioView({
   return (
     <>
       {/* The record — hero con filtros encajados */}
-      <section className="bg-s2-orange col-span-12 ml-[calc(50%-50vw)] h-[640px] w-screen max-w-[100vw] text-s2-white">
-        <div className="s2-page h-full grid-rows-1 pt-64">
-          <div className="col-span-5 col-start-2 self-start">
+      <section className="bg-s2-orange col-span-12 ml-[calc(50%-50vw)] w-screen max-w-[100vw] text-s2-white">
+        <div className="s2-page min-h-[380px] items-end pt-28 lg:h-[640px] lg:grid-rows-1 lg:pt-64">
+          <div className="col-span-12 self-start lg:col-span-5 lg:col-start-2">
             <h2 className="text-h1">The record.</h2>
             <p className="text-body mt-6">
               Every asset Square2 has owned, co-sponsored, or operated. All in
@@ -42,9 +42,9 @@ export function PortfolioView({
             </p>
           </div>
 
-          {/* La muesca: se alinea al fondo de la fila, al ras del borde naranja */}
+          {/* La muesca: a ancho de página en móvil; en desktop, al ras del naranja */}
           <div
-            className="col-span-3 col-start-10 flex justify-center gap-x-2 self-end bg-background py-6 text-foreground"
+            className="-mx-[var(--s2-margin)] col-span-12 mt-10 flex justify-center gap-x-2 self-end bg-background py-5 text-foreground lg:mx-0 lg:col-span-3 lg:col-start-10 lg:mt-0 lg:py-6"
             role="group"
             aria-label="Filter projects by role"
           >

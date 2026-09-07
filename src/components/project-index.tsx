@@ -112,21 +112,26 @@ export function ProjectIndex({
               <span className="text-metrics col-span-12 lg:col-span-3">
                 {project.title}
               </span>
-              <span className="text-metrics col-span-12 lg:col-span-2">
+              <span className="text-micro col-span-12 mt-2 text-s2-steel lg:hidden">
+                {[project.market, project.assetClass, project.years]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </span>
+              <span className="text-metrics hidden lg:col-span-2 lg:block">
                 {project.market}
               </span>
-              <span className="text-metrics col-span-12 lg:col-span-1">
+              <span className="text-metrics hidden lg:col-span-1 lg:block">
                 {project.assetClass}
               </span>
-              <span className="text-metrics col-span-12 lg:col-span-1">
+              <span className="text-metrics hidden lg:col-span-1 lg:block">
                 {project.squareFootage != null
                   ? formatSquareFootage(project.squareFootage)
                   : null}
               </span>
-              <span className="text-metrics col-span-12 lg:col-span-2">
+              <span className="text-metrics hidden lg:col-span-2 lg:block">
                 {project.years}
               </span>
-              <span className="col-span-12 lg:col-span-1">
+              <span className="col-span-12 mt-3 lg:col-span-1 lg:mt-0">
                 {project.role ? (
                   <span
                     className={`text-navigation px-2 py-1 text-s2-white ${

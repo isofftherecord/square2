@@ -67,9 +67,9 @@ export default async function Home() {
       <section className="s2-subgrid items-center ">
         <hr className="col-span-12 border-t border-s2-black lg:col-start-2 lg:col-span-10 " />
       </section>
-      <section className="s2-subgrid items-start py-20 ">
+      <section className="s2-subgrid items-start gap-y-12 py-12 lg:py-20">
 
-        <div className="lg:col-start-2 lg:col-span-5 ">
+        <div className="col-span-12 lg:col-span-5 lg:col-start-2">
           <p className="text-h2">The Investor’s Eye</p>
           <p className="text-body pt-9">Granular submarket knowledge. Opportunities a pure buyer overlooks. An acquisition thesis built from the ground rather than from a spreadsheet.</p>
         </div>
@@ -88,43 +88,39 @@ export default async function Home() {
           <div className="col-span-12 pt-7 lg:col-span-10 lg:col-start-2">
             <p className="text-micro">Investment</p>
 
-            <div className="relative mt-5 h-20">
-              {/* base del bracket */}
-              <div className="absolute inset-x-0 bottom-0 h-px bg-s2-white" />
-
+            <div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-6 lg:relative lg:block lg:h-20">
               {/* Acquire */}
-              <div className="absolute inset-y-0 left-0 flex flex-col items-start">
+              <div className="flex flex-col items-start lg:absolute lg:inset-y-0 lg:left-0">
                 <span className="text-data whitespace-nowrap">Acquire</span>
                 <span className="mt-2 size-2 shrink-0 bg-s2-white" />
-                <span className="w-px flex-1 bg-s2-white" />
+                <span className="hidden w-px flex-1 bg-s2-white lg:block" />
               </div>
 
               {/* Reposition */}
-              <div
-                className="absolute inset-y-0 flex flex-col "
-                style={{ left: "33.333%", transform: "translateX(-50%)" }}
-              >
+              <div className="flex flex-col items-start lg:absolute lg:inset-y-0 lg:left-1/3 lg:-translate-x-1/2">
                 <span className="text-data whitespace-nowrap">Reposition</span>
                 <span className="mt-2 size-2 shrink-0 bg-s2-white" />
-                <span className="w-px flex-1 bg-s2-white" />
+                <span className="hidden w-px flex-1 bg-s2-white lg:block" />
               </div>
 
               {/* Re-tenant */}
-              <div
-                className="absolute inset-y-0 flex flex-col items-center"
-                style={{ left: "66.666%", transform: "translateX(-50%)" }}
-              >
+              <div className="flex flex-col items-start lg:absolute lg:inset-y-0 lg:left-2/3 lg:-translate-x-1/2 lg:items-center">
                 <span className="text-data whitespace-nowrap">Re-tenant</span>
                 <span className="mt-2 size-2 shrink-0 bg-s2-white" />
-                <span className="w-px flex-1 bg-s2-white" />
+                <span className="hidden w-px flex-1 bg-s2-white lg:block" />
               </div>
 
               {/* Exit */}
-              <div className="absolute inset-y-0 right-0 flex flex-col items-end">
+              <div className="flex flex-col items-start lg:absolute lg:inset-y-0 lg:right-0 lg:items-end">
                 <span className="text-data whitespace-nowrap">Exit</span>
                 <span className="mt-2 size-2 shrink-0 bg-s2-white" />
-                <span className="w-px flex-1 bg-s2-white" />
+                <span className="hidden w-px flex-1 bg-s2-white lg:block" />
               </div>
+
+              <div
+                aria-hidden
+                className="absolute inset-x-0 bottom-0 hidden h-px bg-s2-white lg:block"
+              />
             </div>
           </div>
 
@@ -141,9 +137,9 @@ export default async function Home() {
             <span className="text-data">Governance</span>
           </div>
 
-          <div className="col-span-12 mt-5 flex justify-between gap-x-8 lg:col-span-10 lg:col-start-2">
+          <div className="col-span-12 mt-5 flex flex-col gap-2 lg:col-span-10 lg:col-start-2 lg:flex-row lg:justify-between lg:gap-x-8">
             <p className="text-micro">Property management</p>
-            <p className="text-micro text-right">
+            <p className="text-micro lg:text-right">
               The investor acts at moments · The owner acts every day
             </p>
           </div>
@@ -185,7 +181,7 @@ export default async function Home() {
       ) : null}
 
 
-      <section className="s2-subgrid items-center pt-20 pb-30">
+      <section className="s2-subgrid items-center pt-12 pb-16 lg:pt-20 lg:pb-30">
         <Button
           href="/portfolio"
           variant="black"

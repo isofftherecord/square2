@@ -93,35 +93,51 @@ body {
 @utility text-h1 {
   font-family: var(--font-signifier), serif;
   font-weight: 200;
-  font-size: 64px;
+  font-size: 40px;
   line-height: 120%;
+
+  @media (min-width: 1024px) {
+    font-size: 64px;
+  }
 }
 
 @utility text-h2 {
   font-family: var(--font-signifier), serif;
   font-weight: 300;
-  font-size: 48px;
+  font-size: 32px;
   line-height: 105%;
+
+  @media (min-width: 1024px) {
+    font-size: 48px;
+  }
 }
 
 @utility text-h3 {
   font-family: var(--font-signifier), serif;
   font-weight: 500;
-  font-size: 32px;
+  font-size: 28px;
   line-height: 115%;
+
+  @media (min-width: 1024px) {
+    font-size: 32px;
+  }
 }
 
 @utility text-h4 {
   font-family: var(--font-archivo), sans-serif;
   font-weight: 500;
-  font-size:28px; /* 28px */
+  font-size: 22px;
   line-height: 120%;
+
+  @media (min-width: 1024px) {
+    font-size: 28px;
+  }
 }
 
 @utility text-h5 {
   font-family: var(--font-archivo), sans-serif;
   font-weight: 700;
-  font-size:18px; /* 18px */
+  font-size: 18px;
   line-height: 150%;
 }
 

@@ -20,7 +20,7 @@ export function Cta({
   return (
     // Banda naranja a sangre completa; el contenido vuelve a la grilla 1440.
     <section className="col-span-12 ml-[calc(50%-50vw)] w-screen max-w-[100vw] bg-s2-orange">
-      <div className="s2-page items-center gap-y-8 py-20">
+      <div className="s2-page items-center gap-y-8 py-16 lg:py-20">
         <div className="col-span-12 lg:col-span-5 lg:col-start-2">
           <h2 className="text-h2 text-s2-white">{heading}</h2>
           <p className="text-body mt-5 text-s2-white">{body}</p>

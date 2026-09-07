@@ -15,7 +15,7 @@ export function ProjectCaseStudyPage({
   const router = useRouter();
 
   return (
-    <div className="col-span-12 ml-[calc(50%-50vw)] h-[800px] w-screen max-w-[100vw]">
+    <div className="col-span-12 ml-[calc(50%-50vw)] w-screen max-w-[100vw] lg:h-[800px]">
       <ProjectCaseStudy
         project={project}
         nextProject={nextProject}

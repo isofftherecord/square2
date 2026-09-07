@@ -32,7 +32,7 @@ export function TitleHero({ slides }: { slides: TitleHeroSlide[] }) {
   return (
     // Full-bleed, 800px de alto; el H1 va sobre la grilla 1440.
     <section className="col-span-12 ml-[calc(50%-50vw)] w-screen max-w-[100vw]">
-      <div className="relative h-[800px] w-full overflow-hidden">
+      <div className="relative h-[420px] w-full overflow-hidden lg:h-[800px]">
         {slides.map((item, i) => (
           <Image
             key={`${item.src}-${i}`}
@@ -51,7 +51,7 @@ export function TitleHero({ slides }: { slides: TitleHeroSlide[] }) {
           {/* Título y controles apilados sin separación, centrados en el hero */}
           <div className="s2-page h-full items-center">
             <div className="col-span-12 max-w-[535px] lg:col-span-6 lg:col-start-2">
-              <div className="text-h1 bg-s2-orange px-10 py-10 text-s2-white">
+              <div className="text-h1 bg-s2-orange px-5 py-6 text-s2-white lg:px-10 lg:py-10">
                 {slide.title}
               </div>
               {total > 1 ? (

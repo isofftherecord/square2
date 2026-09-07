@@ -123,7 +123,9 @@ function useVerticalPageScroll(scrollerRef: RefObject<HTMLDivElement | null>) {
     const scroller = scrollerRef.current;
     if (!scroller) return;
 
+    const desktop = window.matchMedia("(min-width: 1024px)");
     const onWheel = (event: WheelEvent) => {
+      if (!desktop.matches) return;
       if (event.ctrlKey || event.shiftKey) return;
       if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) return;
 
@@ -207,15 +209,15 @@ export function ProjectCaseStudy({
     <div
       ref={rootRef}
       data-case-study={project.slug}
-      className="flex h-full flex-col bg-background text-foreground"
+      className="flex h-auto flex-col bg-background text-foreground lg:h-full"
     >
       <header className="relative shrink-0 bg-s2-fog">
-        <div className="s2-page items-center py-5">
-          <p className="text-navigation col-span-3 col-start-2">
+        <div className="s2-page items-center gap-y-3 py-4 lg:py-5">
+          <p className="text-navigation col-span-10 lg:col-span-3 lg:col-start-2">
             {project.title}
           </p>
           {headerLine ? (
-            <p className="text-navigation col-span-6 col-start-5 justify-self-center">
+            <p className="text-navigation col-span-12 lg:col-span-6 lg:col-start-5 lg:row-start-1 lg:justify-self-center">
               {headerLine}
             </p>
           ) : null}
@@ -223,7 +225,7 @@ export function ProjectCaseStudy({
             type="button"
             aria-label="Close project"
             onClick={onClose}
-            className="col-start-12 flex size-8 items-center cursor-pointer justify-center justify-self-end bg-s2-orange text-s2-white"
+            className="col-span-2 col-start-11 row-start-1 flex size-8 cursor-pointer items-center justify-center justify-self-end bg-s2-orange text-s2-white lg:col-span-1 lg:col-start-12"
           >
        
             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 13 13" fill="none" className="size-3" aria-hidden="true">
@@ -256,9 +258,9 @@ export function ProjectCaseStudy({
       <div
         ref={scrollerRef}
         onScroll={syncPanel}
-        className="min-h-0 flex-1 overflow-x-auto overflow-y-hidden overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="min-h-0 flex-1 max-lg:overflow-visible lg:overflow-x-auto lg:overflow-y-hidden lg:overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
-        <div className="flex h-full">
+        <div className="flex h-auto max-lg:flex-col lg:h-full">
           <CoverPanel project={project} />
 
           {chapters.map((chapter, index) => (
@@ -280,7 +282,7 @@ export function ProjectCaseStudy({
         </div>
       </div>
 
-      <footer className="relative shrink-0 bg-s2-fog">
+      <footer className="relative hidden shrink-0 bg-s2-fog lg:block">
         <div
           aria-hidden
           className="absolute top-0 left-[calc(50%-50vw)] h-px w-screen max-w-[100vw] bg-s2-steel"
@@ -343,8 +345,8 @@ function CoverPanel({ project }: { project: ProjectSummary }) {
     : [];
 
   return (
-    <section className="s2-page h-full w-screen shrink-0 items-center">
-      <div className="col-span-7 col-start-2">
+    <section className="s2-page h-auto w-full shrink-0 items-start gap-y-8 py-10 lg:h-full lg:w-screen lg:items-center lg:gap-y-0 lg:py-0">
+      <div className="col-span-12 lg:col-span-7 lg:col-start-2">
         <h2 className="text-h1">{project.title}</h2>
         {addressLines.length > 0 ? (
           <p className="text-body mt-6">
@@ -358,7 +360,7 @@ function CoverPanel({ project }: { project: ProjectSummary }) {
         ) : null}
 
         {facts.length > 0 ? (
-          <dl className="mt-16 border-t-2 border-s2-black">
+          <dl className="mt-10 border-t-2 border-s2-black lg:mt-16">
             {facts.map((row) => (
               <div
                 key={row.label}
@@ -375,12 +377,12 @@ function CoverPanel({ project }: { project: ProjectSummary }) {
       </div>
 
       {dealMetrics.length > 0 ? (
-        <div className="relative col-span-3 col-start-10 h-full">
+        <div className="relative col-span-12 max-lg:-mx-[var(--s2-margin)] lg:col-span-3 lg:col-start-10 lg:h-full">
           <div
             aria-hidden
-            className="absolute inset-y-0 left-0 z-[1] w-px bg-s2-steel"
+            className="absolute inset-y-0 left-0 z-[1] hidden w-px bg-s2-steel lg:block"
           />
-          <div className="flex h-full flex-col justify-center bg-s2-fog pl-8">
+          <div className="flex flex-col justify-center bg-s2-fog px-6 py-8 lg:h-full lg:px-0 lg:pl-8">
             <h3 className="text-metrics">
               {present(project.dealHeading) ? project.dealHeading : "The Deal."}
             </h3>
@@ -415,7 +417,7 @@ function ChapterPanel({
   const showFigure = slides.length > 0;
 
   return (
-    <section className="s2-page h-full w-screen shrink-0 content-start overflow-hidden py-20">
+    <section className="s2-page h-auto w-full shrink-0 content-start overflow-visible py-10 lg:h-full lg:w-screen lg:overflow-hidden lg:py-20">
       {showFigure ? (
         <ChapterFigure
           chapter={chapter}
@@ -428,7 +430,9 @@ function ChapterPanel({
       {showText ? (
         <div
           className={
-            showFigure ? "col-start-8 col-span-4" : "col-start-2 col-span-8"
+            showFigure
+              ? "col-span-12 mt-8 lg:col-span-4 lg:col-start-8 lg:mt-0"
+              : "col-span-12 lg:col-span-8 lg:col-start-2"
           }
         >
           {present(chapter.heading) ? (
@@ -476,7 +480,13 @@ function ChapterFigure({
   if (!current || !active || !hasImageAsset(active)) return null;
 
   return (
-    <figure className={wide ? "col-start-2 col-span-10" : "col-start-2 col-span-5"}>
+    <figure
+      className={
+        wide
+          ? "col-span-12 lg:col-span-10 lg:col-start-2"
+          : "col-span-12 lg:col-span-5 lg:col-start-2"
+      }
+    >
       {showCompare && before && after ? (
         <BeforeAfterSlider
           before={{
@@ -487,7 +497,7 @@ function ChapterFigure({
             src: urlFor(after).width(1200).height(900).url(),
             alt: after.alt ?? fallbackAlt,
           }}
-          sizes={wide ? "1200px" : "580px"}
+          sizes={wide ? "(min-width: 1024px) 1200px, 100vw" : "(min-width: 1024px) 580px, 100vw"}
         />
       ) : (
         <div className="relative aspect-[4/3]">
@@ -495,7 +505,7 @@ function ChapterFigure({
             src={urlFor(active).width(1200).height(900).url()}
             alt={active.alt ?? fallbackAlt}
             fill
-            sizes={wide ? "1200px" : "580px"}
+            sizes={wide ? "(min-width: 1024px) 1200px, 100vw" : "(min-width: 1024px) 580px, 100vw"}
             className="object-cover"
           />
         </div>
@@ -506,7 +516,7 @@ function ChapterFigure({
         </figcaption>
       ) : null}
       {slides.length > 1 ? (
-        <div className="ml-auto flex w-[230px] items-center justify-between bg-s2-black px-4 py-3 text-s2-white">
+        <div className="ml-auto flex w-full items-center justify-between bg-s2-black px-4 py-3 text-s2-white lg:w-[230px]">
           <p className="text-body">
             {pad(index + 1)}/{pad(slides.length)}
           </p>
@@ -558,26 +568,24 @@ function ExitPanel({
       : null;
 
   return (
-    <section className="s2-page h-full w-screen shrink-0 overflow-hidden">
+    <section className="s2-page h-auto w-full shrink-0 overflow-visible lg:h-full lg:w-screen lg:overflow-hidden">
       {credits.length > 0 ? (
         <div
           aria-hidden
-          className="relative col-start-8 col-span-5 row-start-1 h-full"
+          className="relative col-span-12 hidden h-full lg:col-span-5 lg:col-start-8 lg:row-start-1 lg:block"
         >
           <div className="absolute inset-0 bg-s2-fog" />
-        
-        
         </div>
       ) : null}
 
       {showStory ? (
-        <div className="col-start-2 col-span-6 row-start-1 max-w-[630px] py-16">
+        <div className="col-span-12 py-10 lg:col-span-6 lg:col-start-2 lg:row-start-1 lg:max-w-[630px] lg:py-16">
           {heading ? (
             <h2 className="text-metrics border-b border-s2-black pb-4">{heading}</h2>
           ) : null}
 
           {acquired || sold ? (
-            <div className="mt-12 flex items-end justify-between gap-x-12">
+            <div className="mt-10 flex flex-col gap-10 sm:flex-row sm:items-end sm:justify-between sm:gap-x-12 lg:mt-12">
               {acquired ? (
                 <ExitSideBlock side={acquired} variant="acquired" />
               ) : null}
@@ -586,7 +594,7 @@ function ExitPanel({
           ) : null}
 
           {metrics.length > 0 ? (
-            <dl className="mt-16 flex justify-between border-t border-s2-black pt-3">
+            <dl className="mt-10 flex flex-col gap-6 border-t border-s2-black pt-3 sm:flex-row sm:justify-between lg:mt-16">
               {metrics.map((metric, index) => (
                 <div key={metric._key || index}>
                   <dt className="text-metrics">{metric.value}</dt>
@@ -602,8 +610,10 @@ function ExitPanel({
 
       {credits.length > 0 ? (
         <div
-          className={`relative row-start-1 flex h-full flex-col py-16 max-w-[400px] ${
-            showStory ? "col-start-9 col-span-4" : "col-start-2 col-span-4"
+          className={`relative flex flex-col bg-s2-fog px-5 py-10 max-lg:-mx-[var(--s2-margin)] lg:h-full lg:bg-transparent lg:px-0 lg:py-16 ${
+            showStory
+              ? "col-span-12 lg:col-span-4 lg:col-start-9 lg:row-start-1 lg:max-w-[400px]"
+              : "col-span-12 lg:col-span-4 lg:col-start-2 lg:row-start-1 lg:max-w-[400px]"
           }`}
         >
           <h2 className="text-metrics border-b border-s2-black pb-4">Credits.</h2>
@@ -630,7 +640,7 @@ function ExitPanel({
             <button
               type="button"
               onClick={onOpenNext}
-              className=" cursor-pointer text-data mt-auto inline-flex items-center gap-1.5 self-end bg-s2-black px-5 py-4 text-s2-steel"
+              className="text-data mt-8 inline-flex cursor-pointer items-center justify-center gap-1.5 self-stretch bg-s2-black px-5 py-4 text-s2-steel lg:mt-auto lg:w-auto lg:self-end"
             >
               Next · {nextProject.title}
               <img

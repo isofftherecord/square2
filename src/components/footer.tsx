@@ -15,7 +15,7 @@ async function subscribe(formData: FormData) {
 export function Footer() {
   return (
     <footer className="mt-auto w-full bg-s2-black">
-      <div className="s2-page gap-y-15 pt-20 pb-15">
+        <div className="s2-page gap-y-10 pt-16 pb-12 lg:gap-y-15 lg:pt-20 lg:pb-15">
         <div className="col-span-12 col-start-1 flex flex-col gap-4 lg:col-span-2 lg:col-start-2">
           <p className="text-navigation text-s2-orange">SQUARE2 Capital, LLC</p>
           <p className="text-data text-s2-steel">

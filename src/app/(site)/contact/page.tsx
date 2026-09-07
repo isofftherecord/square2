@@ -66,7 +66,7 @@ export default function ContactPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-x-5 border-b border-s2-black py-10">
+          <div className="grid grid-cols-1 gap-x-5 gap-y-6 border-b border-s2-black py-10 lg:grid-cols-2">
             <p className="text-body">
             For limited partners, joint-venture partners, and allocators evaluating Square2 as a sponsor.
             </p>
@@ -75,7 +75,7 @@ export default function ContactPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-x-5">
+          <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-x-5">
             <div className="flex items-center border-b border-s2-black py-10">
               <label htmlFor="name" className="text-micro w-20 shrink-0">
                 Name
@@ -103,7 +103,7 @@ export default function ContactPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-x-5">
+          <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-x-5">
             <div className="flex items-center border-b border-s2-black py-10">
               <label htmlFor="email" className="text-micro w-20 shrink-0">
                 Email

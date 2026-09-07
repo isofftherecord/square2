@@ -102,7 +102,7 @@ export function OfficeMap() {
   return (
     // Hero a sangre, mismo breakout que TitleHero / MainHero.
     <section className="col-span-12 ml-[calc(50%-50vw)] w-screen max-w-[100vw]">
-      <div ref={ref} className="s2-office-map h-[800px] w-full bg-s2-white" />
+      <div ref={ref} className="s2-office-map h-[420px] w-full bg-s2-white lg:h-[800px]" />
 
 
     </section>

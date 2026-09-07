@@ -66,10 +66,10 @@ peso, tamaño, interlineado y (en los estilos mono) mayúsculas automáticas.
 
 | Estilo | Clase | Fuente | Tamaño / interlineado | Cuándo usarlo |
 |---|---|---|---|---|
-| H1 | `text-h1` | Signifier Extralight | 64px / 120% | Título principal de cada página (uno por página) |
-| H2 | `text-h2` | Signifier Light | 48px / 105% | Títulos de sección |
-| H3 | `text-h3` | Signifier Medium | 32px / 115% | Subtítulos destacados |
-| H4 | `text-h4` | Archivo Medium | 28px / 120% | Encabezados de bloques de contenido |
+| H1 | `text-h1` | Signifier Extralight | 40px / 120% (64px ≥1024px) | Título principal de cada página (uno por página) |
+| H2 | `text-h2` | Signifier Light | 32px / 105% (48px ≥1024px) | Títulos de sección |
+| H3 | `text-h3` | Signifier Medium | 28px / 115% (32px ≥1024px) | Subtítulos destacados |
+| H4 | `text-h4` | Archivo Medium | 22px / 120% (28px ≥1024px) | Encabezados de bloques de contenido |
 | H5 | `text-h5` | Archivo Bold | 18px / 150% | Títulos de tarjetas y elementos pequeños |
 | Micro | `text-micro` | Fragment Mono | 10px / 120%, MAYÚSCULAS | Notas al pie, créditos, metadatos mínimos |
 | Body | `text-body` | Archivo Regular | 18px / 150% | Párrafos y texto corrido |

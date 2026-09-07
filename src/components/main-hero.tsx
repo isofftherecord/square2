@@ -92,8 +92,8 @@ export function MainHero({ slides }: { slides: HeroSlide[] }) {
         </div>
 
         {/* Ficha de proyecto */}
-        <div className="absolute bottom-0 right-0 flex flex-col items-end">
-          <div className="flex h-[68px] w-[327px] items-end justify-between bg-s2-white px-3 pb-[10px]">
+        <div className="absolute bottom-0 right-0 flex max-w-full flex-col items-end">
+          <div className="flex h-[68px] w-[min(327px,100vw)] items-end justify-between bg-s2-white px-3 pb-[10px]">
             <div>
               <p className="text-label-hero text-s2-steel">
                 Property

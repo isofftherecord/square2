@@ -60,11 +60,11 @@ export default async function FirmPage() {
 
       />
 
-      <section className="s2-subgrid items-center ">
-        <div className="col-span-12 lg:col-start-2 lg:col-span-12">
+      <section className="s2-subgrid items-center gap-y-4">
+        <div className="col-span-12 lg:col-start-2 lg:col-span-10">
           <p className="text-h1">Defined by what we <span className="italic">refuse</span> to be.</p>
         </div>
-        <div className="col-span-12 lg:col-start-5 lg:col-span-12 py-17">
+        <div className="col-span-12 lg:col-start-5 lg:col-span-7 py-8 lg:py-17">
           <p className="text-body py-5">Not the absentee manager who splits attention across buildings and passes the buck.</p>
           <hr className="border-t border-s2-black" />
           <p className="text-body py-5">Not the principal whose ego runs ahead of the partnership.</p>
@@ -120,14 +120,14 @@ export default async function FirmPage() {
         </div>
       </section>
 
-      <section className="s2-subgrid items-cente pt-5 pb-35 ">
+      <section className="s2-subgrid items-center pt-5 pb-16 lg:pb-35">
         <div className="col-span-12 lg:col-start-2 lg:col-span-12">
           <p className="text-h1">One team with one standard out.</p>
         </div>
       </section>
 
       <section className="col-span-12 ml-[calc(50%-50vw)] w-screen max-w-[100vw] bg-s2-orange">
-      <div className="s2-page items-center gap-y-8 py-20">
+      <div className="s2-page items-center gap-y-8 py-16 lg:py-20">
         <div className="col-span-12 lg:col-span-5 lg:col-start-2">
           <h2 className="text-h3 text-s2-white">That standard has a method.</h2>
           <p className="text-body mt-5 text-s2-white">How Square2 underwrites, and how it operates once the capital is in.</p>
