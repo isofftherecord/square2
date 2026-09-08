@@ -1,11 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Arrow } from "@/components/arrow";
-
-const BRAND = "var(--color-s2-orange)";
+import { PixelSwap } from "@/components/pixel-swap";
 
 export type HeroSlide = {
   src: string;
@@ -13,42 +12,86 @@ export type HeroSlide = {
   year: string;
 };
 
-// Mosaico: 11 columnas x 5 filas, anclado al borde inferior.
-// 0 = vacío · 1 = naranja translúcido · 2 = naranja sólido
-const PATTERN: number[][] = [
-  [0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 2],
-  [0, 0, 0, 0, 0, 0, 2, 0, 0, 1, 0],
-  [0, 0, 2, 0, 0, 0, 0, 1, 1, 1, 2],
-  [0, 2, 0, 1, 1, 0, 2, 1, 1, 2, 0],
-  [1, 1, 0, 1, 2, 0, 1, 1, 2, 0, 1],
-];
+function HeroFrame({
+  slide,
+  priority,
+}: {
+  slide: HeroSlide | null;
+  priority?: boolean;
+}) {
+  if (!slide) {
+    return <div className="absolute inset-0 bg-s2-orange" />;
+  }
+
+  return (
+    <div className="absolute inset-0">
+      <Image
+        src={slide.src}
+        alt={slide.property}
+        fill
+        priority={priority}
+        sizes="(min-width: 1440px) 1440px, 100vw"
+        className="object-cover"
+      />
+    </div>
+  );
+}
 
 export function MainHero({ slides }: { slides: HeroSlide[] }) {
+  const rootRef = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
-  const [revealed, setRevealed] = useState(false);
+  const [active, setActive] = useState(false);
+  const [busy, setBusy] = useState(true);
+  const [sized, setSized] = useState(false);
+  // null = cubre naranja del intro; el otro slot arranca con el primer slide.
+  const [firstIndex, setFirstIndex] = useState<number | null>(null);
+  const [secondIndex, setSecondIndex] = useState(0);
 
   const total = slides.length;
   const slide = slides[index] ?? slides[0];
-
-  // Reinicia el mosaico en cada slide para que la animación se repita.
-  useEffect(() => {
-    setRevealed(false);
-    let frame = requestAnimationFrame(() => {
-      frame = requestAnimationFrame(() => setRevealed(true));
-    });
-    return () => cancelAnimationFrame(frame);
-  }, [index]);
+  const firstSlide = firstIndex === null ? null : (slides[firstIndex] ?? null);
+  const secondSlide = slides[secondIndex] ?? null;
 
   useEffect(() => {
     if (index >= total) setIndex(0);
   }, [index, total]);
 
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+    const markReady = () => {
+      if (el.clientWidth > 0 && el.clientHeight > 0) setSized(true);
+    };
+    markReady();
+    const observer = new ResizeObserver(markReady);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Dispara el swap inicial cuando el hero ya tiene medidas.
+  useEffect(() => {
+    if (!sized) return;
+    const timer = window.setTimeout(() => setActive(true), 60);
+    return () => window.clearTimeout(timer);
+  }, [sized]);
+
   const go = useCallback(
     (dir: 1 | -1) => {
-      if (total === 0) return;
-      setIndex((prev) => (prev + dir + total) % total);
+      if (busy || total < 2) return;
+      const next = (index + dir + total) % total;
+      if (next === index) return;
+
+      setBusy(true);
+      if (active) {
+        setFirstIndex(next);
+        setActive(false);
+      } else {
+        setSecondIndex(next);
+        setActive(true);
+      }
+      setIndex(next);
     },
-    [total]
+    [active, busy, index, total]
   );
 
   if (!slide) return null;
@@ -56,65 +99,48 @@ export function MainHero({ slides }: { slides: HeroSlide[] }) {
   return (
     // Canvas 1440: la imagen no se estira más allá del marco de diseño.
     <section className="s2-hero">
-      <div className="relative h-svh w-full overflow-hidden max-h-[900px]">
-        {/* Imágenes */}
-        {slides.map((s, i) => (
-          <Image
-            key={`${s.src}-${i}`}
-            src={s.src}
-            alt={s.property}
-            fill
-            priority={i === 0}
-            sizes="(min-width: 1440px) 1440px, 100vw"
-            className={`object-cover transition-opacity duration-700 ease-out ${
-              i === index ? "opacity-100" : "opacity-0"
-            }`}
-          />
-        ))}
-
-        {/* Mosaico naranja */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 grid grid-cols-11">
-          {PATTERN.map((row, r) =>
-            row.map((cell, c) => (
-              <span
-                key={`${r}-${c}`}
-                className="aspect-square transition-opacity ease-out motion-reduce:transition-none"
-                style={{
-                  backgroundColor: cell === 0 ? "transparent" : BRAND,
-                  opacity: !revealed || cell === 0 ? 0 : cell === 2 ? 1 : 0.62,
-                  // El reset es instantáneo; solo la entrada se escalona.
-                  transitionDuration: revealed ? "500ms" : "0ms",
-                  transitionDelay: revealed ? `${(r + c) * 45}ms` : "0ms",
-                }}
-              />
-            ))
-          )}
-        </div>
+      <div
+        ref={rootRef}
+        className="relative h-svh w-full max-h-[900px] overflow-hidden"
+      >
+        <PixelSwap
+          firstContent={<HeroFrame slide={firstSlide} priority />}
+          secondContent={<HeroFrame slide={secondSlide} priority />}
+          pixelSize={130}
+          gap={0}
+          pixelRadius={0}
+          pixelSpin={0}
+          pixelScale={0.35}
+          duration={1400}
+          pixelDuration={450}
+          pattern="diagonal"
+          randomness={0.45}
+          fade
+          trigger="manual"
+          active={active}
+          onComplete={() => setBusy(false)}
+          aspectRatio="auto"
+          className="h-full w-full"
+          style={{ height: "100%" }}
+        />
 
         {/* Ficha de proyecto */}
-        <div className="absolute bottom-0 right-0 flex max-w-full flex-col items-end">
+        <div className="absolute right-0 bottom-0 z-10 flex max-w-full flex-col items-end">
           <div className="flex h-[68px] w-[min(327px,100vw)] items-end justify-between bg-s2-white px-4 pt-[13px] pb-[13px]">
             <div>
-              <p className="text-label-hero text-s2-steel">
-                Property
-              </p>
-              <p className="text-body">
-                {slide.property}
-              </p>
+              <p className="text-label-hero text-s2-steel">Property</p>
+              <p className="text-body">{slide.property}</p>
             </div>
             <div className="text-right">
-              <p className="text-label-hero text-s2-steel">
-                Year
-              </p>
-              <p className="text-body">
-                {slide.year}
-              </p>
+              <p className="text-label-hero text-s2-steel">Year</p>
+              <p className="text-body">{slide.year}</p>
             </div>
           </div>
 
           <div className="flex h-[62px] w-[218px] items-center justify-between bg-s2-white px-3">
-            <span className="text-body text-s2-slate ">
-              {String(index + 1).padStart(2, "0")}/{String(total).padStart(2, "0")}
+            <span className="text-body text-s2-slate">
+              {String(index + 1).padStart(2, "0")}/
+              {String(total).padStart(2, "0")}
             </span>
             <div className="flex items-center gap-5">
               <button
@@ -131,7 +157,7 @@ export function MainHero({ slides }: { slides: HeroSlide[] }) {
                 aria-label="Next project"
                 className="cursor-pointer text-s2-orange transition-transform duration-200 hover:translate-x-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-s2-orange)]"
               >
-                <Arrow  />
+                <Arrow />
               </button>
             </div>
           </div>

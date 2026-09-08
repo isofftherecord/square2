@@ -1,16 +1,11 @@
 import Link from "next/link";
 
-import { Button } from "@/components/button";
+import { SubscribeForm } from "@/components/subscribe-form";
 import { SITE_NAV } from "@/lib/site-nav";
 
 const CONNECTIONS = [
   { href: "#", label: "LinkedIn" },
 ] as const;
-
-async function subscribe(formData: FormData) {
-  "use server";
-  formData.get("email");
-}
 
 export function Footer() {
   return (
@@ -79,27 +74,7 @@ export function Footer() {
           </ul>
         </nav>
 
-        <form
-          action={subscribe}
-          className="col-span-12 col-start-1 flex flex-col gap-4 lg:col-span-3 lg:col-start-9"
-          aria-label="Subscribe"
-        >
-          <label htmlFor="footer-email" className="text-navigation text-s2-orange">
-            Subscribe
-          </label>
-          <input
-            id="footer-email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            required
-            placeholder="Your Email"
-            className="text-data w-full border-b border-s2-white bg-s2-white/10 px-3.5 py-6 text-s2-steel placeholder:text-s2-steel placeholder:uppercase focus-visible:border-s2-orange focus-visible:outline-none"
-          />
-          <Button type="submit" className="w-full">
-            Subscribe
-          </Button>
-        </form>
+        <SubscribeForm />
 
         <p className="text-navigation col-span-12 text-s2-steel lg:col-span-11 lg:col-start-2">
           ©2026 All rights reserved.
