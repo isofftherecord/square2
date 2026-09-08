@@ -134,7 +134,7 @@ export default async function FirmPage() {
         </div>
 
         <Button
-        href= "/contact"
+        href= "/platform"
           className="col-span-12 w-fit lg:col-span-5 lg:justify-self-end"
         >
      HOW WE INVEST AND OPERATE
