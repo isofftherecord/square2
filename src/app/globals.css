@@ -25,6 +25,9 @@
   --s2-ledger-row: 520px;
   --s2-ledger-head: 309px;
   --s2-ledger-foot: 59px;
+
+  /* Case study abierto (Figma: 800). No se recorta con el viewport. */
+  --s2-case-study: 800px;
 }
 
 

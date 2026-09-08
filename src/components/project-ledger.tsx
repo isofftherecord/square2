@@ -8,6 +8,23 @@ import { ProjectCaseStudy } from "@/components/project-case-study";
 import type { ProjectSummary } from "@/components/project-index";
 import { hasImageAsset, urlFor } from "@/sanity/lib/image";
 
+// Centra el case study en el área libre bajo el navbar fijo.
+function scrollCaseStudyIntoView(
+  panel: HTMLElement,
+  inner: HTMLElement | null,
+) {
+  const nav = document.querySelector<HTMLElement>('nav[aria-label="Main"]');
+  const topClearance = (nav?.getBoundingClientRect().bottom ?? 100) + 24;
+  const height = inner?.offsetHeight ?? panel.offsetHeight;
+  const absoluteTop = panel.getBoundingClientRect().top + window.scrollY;
+  const extra = Math.max(0, window.innerHeight - topClearance - 24 - height);
+
+  window.scrollTo({
+    top: Math.max(0, absoluteTop - topClearance - extra / 2),
+    behavior: "smooth",
+  });
+}
+
 function projectImageSrc(image?: ProjectSummary["mainImage"]) {
   if (!hasImageAsset(image)) return null;
   return urlFor(image).width(800).height(800).url();
@@ -87,10 +104,25 @@ function LedgerRow({
 
   useEffect(() => {
     if (!isOpen) return;
-    const timer = window.setTimeout(() => {
-      panelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 80);
-    return () => window.clearTimeout(timer);
+    const panel = panelRef.current;
+    if (!panel) return;
+
+    let done = false;
+    const reveal = () => {
+      if (done) return;
+      done = true;
+      scrollCaseStudyIntoView(panel, expand.innerRef.current);
+    };
+
+    const onEnd = (event: TransitionEvent) => {
+      if (event.propertyName === "height") reveal();
+    };
+    panel.addEventListener("transitionend", onEnd);
+    const fallback = window.setTimeout(reveal, 520);
+    return () => {
+      panel.removeEventListener("transitionend", onEnd);
+      window.clearTimeout(fallback);
+    };
   }, [isOpen]);
 
   return (
@@ -223,11 +255,11 @@ function LedgerRow({
       <div
         ref={panelRef}
         id={`case-${project.slug}`}
-        className="s2-hero scroll-mt-24 overflow-hidden transition-[height] duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] motion-reduce:transition-none lg:scroll-mt-32"
+        className="s2-hero overflow-hidden transition-[height] duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] motion-reduce:transition-none"
         style={{ height: expand.height }}
         aria-hidden={!isOpen}
       >
-        <div ref={expand.innerRef} className="lg:h-[800px]">
+        <div ref={expand.innerRef} className="lg:h-[var(--s2-case-study)]">
           {expand.render ? (
             <ProjectCaseStudy
               project={project}

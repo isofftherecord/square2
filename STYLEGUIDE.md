@@ -47,6 +47,7 @@ escale igual por debajo de 1440. Los altos viven en `globals.css`:
 | `--s2-ledger-row` | 520px | Alto de la fila cerrada |
 | `--s2-ledger-head` | 309px | Bloque fog + regla de la celda del título |
 | `--s2-ledger-foot` | 59px | Franja fog + regla de la celda de Details |
+| `--s2-case-study` | 800px | Alto del case study abierto |
 
 Las tres verticales caen en el borde derecho de las tres primeras columnas
 (427, 947, 987) y la regla horizontal de fila solo se dibuja abajo; la de

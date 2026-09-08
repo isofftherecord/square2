@@ -15,7 +15,7 @@ export function ProjectCaseStudyPage({
   const router = useRouter();
 
   return (
-    <div className="s2-hero lg:h-[800px]">
+    <div className="s2-hero lg:h-[var(--s2-case-study)]">
       <ProjectCaseStudy
         project={project}
         nextProject={nextProject}

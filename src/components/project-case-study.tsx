@@ -116,9 +116,28 @@ function hasExitContent(exit?: ProjectExit) {
   );
 }
 
-// Chrome trata la rueda vertical como scroll X si el riel solo desborda en horizontal.
-// Ese gesto se lo devolvemos a la página; el proyecto solo se recorre en horizontal.
-function useVerticalPageScroll(scrollerRef: RefObject<HTMLDivElement | null>) {
+function navClearance() {
+  const nav = document.querySelector<HTMLElement>('nav[aria-label="Main"]');
+  return (nav?.getBoundingClientRect().bottom ?? 0) + 16;
+}
+
+function caseStudyFrame(el: HTMLElement) {
+  const rect = el.getBoundingClientRect();
+  const topMin = navClearance();
+  const slack = 2;
+  return {
+    topHidden: rect.top < topMin - slack,
+    bottomHidden: rect.bottom > window.innerHeight + slack,
+    fits: rect.height <= window.innerHeight - topMin + slack * 2,
+  };
+}
+
+// La rueda recorre paneles solo cuando el case study cabe entero en pantalla.
+// Si aún se corta, el gesto baja o sube la página hasta revelarlo.
+function useCaseStudyWheel(
+  scrollerRef: RefObject<HTMLDivElement | null>,
+  rootRef: RefObject<HTMLDivElement | null>,
+) {
   useEffect(() => {
     const scroller = scrollerRef.current;
     if (!scroller) return;
@@ -129,15 +148,43 @@ function useVerticalPageScroll(scrollerRef: RefObject<HTMLDivElement | null>) {
       if (event.ctrlKey || event.shiftKey) return;
       if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) return;
 
-      event.preventDefault();
       const pixels =
         event.deltaMode === 1 ? event.deltaY * 16 : event.deltaY;
-      window.scrollBy({ top: pixels, left: 0, behavior: "instant" });
+      if (pixels === 0) return;
+
+      const frame = caseStudyFrame(rootRef.current ?? scroller);
+      const fullyVisible = !frame.topHidden && !frame.bottomHidden;
+      const revealing =
+        !fullyVisible &&
+        (frame.fits ||
+          (pixels > 0 && frame.bottomHidden) ||
+          (pixels < 0 && frame.topHidden));
+
+      if (revealing) {
+        event.preventDefault();
+        window.scrollBy({ top: pixels, left: 0, behavior: "instant" });
+        return;
+      }
+
+      const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
+      const atStart = scroller.scrollLeft <= 0 && pixels < 0;
+      const atEnd = scroller.scrollLeft >= max - 1 && pixels > 0;
+
+      event.preventDefault();
+      if (atStart || atEnd) {
+        window.scrollBy({ top: pixels, left: 0, behavior: "instant" });
+        return;
+      }
+
+      scroller.scrollLeft = Math.min(
+        max,
+        Math.max(0, scroller.scrollLeft + pixels),
+      );
     };
 
     scroller.addEventListener("wheel", onWheel, { passive: false });
     return () => scroller.removeEventListener("wheel", onWheel);
-  }, [scrollerRef]);
+  }, [scrollerRef, rootRef]);
 }
 
 type ProjectCaseStudyProps = {
@@ -157,7 +204,7 @@ export function ProjectCaseStudy({
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [panel, setPanel] = useState(0);
   const [progress, setProgress] = useState(0);
-  useVerticalPageScroll(scrollerRef);
+  useCaseStudyWheel(scrollerRef, rootRef);
 
   const chapters = useMemo(
     () => (project.chapters ?? []).filter(hasChapter),
