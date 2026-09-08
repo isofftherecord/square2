@@ -107,7 +107,7 @@ body {
 
 @utility text-h1 {
   font-family: var(--font-signifier), serif;
-  font-weight: 400;
+  font-weight: 200;
   font-size: 40px;
   line-height: 120%;
 
