@@ -8,6 +8,7 @@
   --S2-STEEL: #97999B;
   --S2-White: #FFF;
   --S2-Fog: #F9F9F9;
+  --S2-LinkedIn: #0435F9;
   --background: var(--S2-White, #FFF);
   --foreground: var(--S2-Black, #000);
 
@@ -37,6 +38,7 @@
   --color-s2-steel: var(--S2-STEEL);
   --color-s2-white: var(--S2-White);
   --color-s2-fog: var(--S2-Fog);
+  --color-s2-linkedin: var(--S2-LinkedIn);
   --font-sans: var(--font-archivo);
   --font-serif: var(--font-signifier);
   --font-mono: var(--font-mono-brand);

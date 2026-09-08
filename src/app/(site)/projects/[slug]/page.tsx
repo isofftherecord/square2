@@ -4,16 +4,14 @@ import { cache } from "react";
 
 import { type ProjectSummary } from "@/components/project-index";
 import { isSanityConfigured } from "@/sanity/env";
-import { client } from "@/sanity/lib/client";
+import { fetchPublished } from "@/sanity/lib/live";
 import { projectsQuery } from "@/sanity/lib/queries";
 
 import { ProjectCaseStudyPage } from "./case-study-page";
 
-export const revalidate = 60;
-
 const getProjects = cache(async () => {
   if (!isSanityConfigured) return [] as ProjectSummary[];
-  return client.fetch<ProjectSummary[]>(projectsQuery);
+  return fetchPublished<ProjectSummary[]>(projectsQuery);
 });
 
 export async function generateMetadata({

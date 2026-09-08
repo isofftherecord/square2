@@ -23,7 +23,9 @@ export default defineConfig({
       templates.filter(
         (template) =>
           template.schemaType !== "homeHero" &&
-          template.schemaType !== "firmHero",
+          template.schemaType !== "firmHero" &&
+          template.schemaType !== "firmTeam" &&
+          template.schemaType !== "firmPartners",
       ),
   },
   form: {
@@ -55,6 +57,24 @@ export default defineConfig({
               .schemaType("firmHero")
               .child(
                 S.document().schemaType("firmHero").documentId("firmHero"),
+              ),
+            S.listItem()
+              .title("Firm — Team")
+              .id("firmTeam")
+              .icon(icons.users)
+              .schemaType("firmTeam")
+              .child(
+                S.document().schemaType("firmTeam").documentId("firmTeam"),
+              ),
+            S.listItem()
+              .title("Firm — Partners")
+              .id("firmPartners")
+              .icon(icons["earth-globe"])
+              .schemaType("firmPartners")
+              .child(
+                S.document()
+                  .schemaType("firmPartners")
+                  .documentId("firmPartners"),
               ),
             S.divider(),
             S.documentTypeListItem("project").title("Projects"),

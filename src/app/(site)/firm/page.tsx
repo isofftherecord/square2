@@ -1,54 +1,125 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { Button } from "@/components/button";
-import { TitleHero } from "@/components/second-hero";
-import { isSanityConfigured } from "@/sanity/env";
-import { client } from "@/sanity/lib/client";
-import { firmHeroQuery } from "@/sanity/lib/queries";
-import { toTitleHeroSlides } from "@/sanity/lib/title-hero";
 import { DoubleBlock } from "@/components/double-block";
+import { TitleHero } from "@/components/second-hero";
+import {
+  Partners,
+  toPartners,
+  type FirmPartnersDoc,
+  type Partner,
+} from "@/components/partners";
+import { Team, toTeamMembers, type FirmTeamDoc, type TeamMember } from "@/components/team";
+import { isSanityConfigured } from "@/sanity/env";
+import { fetchPublished } from "@/sanity/lib/live";
+import {
+  firmHeroQuery,
+  firmPartnersQuery,
+  firmTeamQuery,
+} from "@/sanity/lib/queries";
+import { toTitleHeroSlides, type TitleHeroDoc } from "@/sanity/lib/title-hero";
 
-export const revalidate = 60;
+// Filas de Figma mientras el documento Firm — Team no está publicado.
+const FALLBACK_TEAM: TeamMember[] = [
+  { _key: "alexandra-ramirez", name: "Alexandra Ramirez", title: "Operations" },
+  { _key: "name-surname", name: "Name Surname", title: "Title" },
+];
+
+const FALLBACK_PARTNERS: {
+  intro: string;
+  partners: Partner[];
+} = {
+  intro:
+    "Capital partners, lenders, and advisors Square2 has worked with across the portfolio.",
+  partners: [
+    { _key: "apollo", name: "Apollo Global Management" },
+    { _key: "blackstone", name: "Blackstone" },
+    { _key: "lone-star", name: "Lone Star Funds" },
+    { _key: "ascentris", name: "Ascentris" },
+    { _key: "dra", name: "DRA Advisors" },
+    { _key: "gresham", name: "Gresham Partners" },
+  ],
+};
 
 // Sin `photo` la tarjeta muestra el placeholder del wireframe.
 const LEADERSHIP: {
   name: string;
   role: string;
-  bio: string;
   photo?: string;
+  email?: string;
+  linkedin?: string;
 }[] = [
-    {
-      name: "Jay Caplin",
-      role: "Principal — General contracting",
-      bio: "General contracting. Knows what the work costs before the offer is made.",
-    },
-    {
-      name: "Michael Manno",
-      role: "Principal — Hospitality",
-      bio: "Hospitality. Judges an asset by how it performs for the people inside it.",
-    },
-    {
-      name: "Alexandra Ramirez",
-      role: "Operations — Appraisal & brokerage",
-      bio: "Appraisal and brokerage. Holds the operating numbers against the underwriting.",
-    },
-  ];
+  {
+    name: "Jay Caplin",
+    role: "Co-Founder & PRINCIPAL",
+  },
+  {
+    name: "Michael Manno",
+    role: "Co-Founder & PRINCIPAL",
+  },
+];
+
+function LeadershipChip({
+  href,
+  icon,
+  iconWidth,
+  label,
+  className,
+}: {
+  href?: string;
+  icon: string;
+  iconWidth: number;
+  label: string;
+  className: string;
+}) {
+  const classes = `inline-flex h-5 items-center gap-1.5 px-3 text-navigation text-s2-white ${className}`;
+  const content = (
+    <>
+      <img src={icon} alt="" width={iconWidth} height={7} className="shrink-0" />
+      {label}
+    </>
+  );
+
+  if (href) {
+    const external = href.startsWith("http");
+    return (
+      <a
+        href={href}
+        className={classes}
+        {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+      >
+        {content}
+      </a>
+    );
+  }
+
+  return <span className={classes}>{content}</span>;
+}
 
 export const metadata: Metadata = {
   title: "Firm — Square2",
 };
 
 export default async function FirmPage() {
-  const slides = isSanityConfigured
-    ? toTitleHeroSlides(await client.fetch(firmHeroQuery))
-    : [];
+  const [slides, teamMembers, partnersDoc] = isSanityConfigured
+    ? await Promise.all([
+      fetchPublished<TitleHeroDoc | null>(firmHeroQuery).then(toTitleHeroSlides),
+      fetchPublished<FirmTeamDoc | null>(firmTeamQuery).then(toTeamMembers),
+      fetchPublished<FirmPartnersDoc | null>(firmPartnersQuery).then(
+        toPartners,
+      ),
+    ])
+    : [[], undefined, undefined];
+
+  const members = teamMembers ?? FALLBACK_TEAM;
+  const { intro, partners } = partnersDoc ?? FALLBACK_PARTNERS;
 
   return (
     <>
       <TitleHero slides={slides} />
       <DoubleBlock
-      space="4"
-      space2="5"
+        space="4"
+        space2="5"
         heading="The Firm."
         body={
           <>
@@ -75,22 +146,29 @@ export default async function FirmPage() {
       </section>
 
 
-      {/* Leadership: banda de 10 columnas con 3 tarjetas iguales */}
-      <section className="s2-subgrid pt-20 pb-30">
+      {/* Leadership: 2 tarjetas de 3 columnas, con una columna de aire */}
+      <section className="s2-subgrid pt-20">
         <div className="col-span-12 lg:col-span-10 lg:col-start-2">
           <h2 className="text-h2">Leadership.</h2>
-          <hr className="mt-6 border-t border-s2-black" />
+          <hr className="mt-4 border-t border-s2-black" />
 
-          <ul className="mt-9 grid grid-cols-1 gap-x-5 gap-y-14 lg:grid-cols-3">
-            {LEADERSHIP.map((person) => (
-              <li key={person.name}>
-                <div className="relative aspect-[7/5] w-full border border-s2-black">
+          <ul className="mt-[59px] grid grid-cols-1 gap-x-5 gap-y-14 lg:grid-cols-10">
+            {LEADERSHIP.map((person, index) => (
+              <li
+                key={person.name}
+                className={
+                  index === 1 ? "lg:col-span-3 lg:col-start-5" : "lg:col-span-3"
+                }
+              >
+                <h3 className="text-h4">{person.name}</h3>
+                <p className="text-body">{person.role}</p>
+                <div className="relative mt-[35px] aspect-[345/316] max-w-[345px] border border-s2-black">
                   {person.photo ? (
                     <Image
                       src={person.photo}
                       alt={person.name}
                       fill
-                      sizes="(min-width: 1024px) 380px, 100vw"
+                      sizes="345px"
                       className="object-cover"
                     />
                   ) : (
@@ -110,15 +188,30 @@ export default async function FirmPage() {
                     </svg>
                   )}
                 </div>
-
-                <h4 className="text-h5 mt-8">{person.name}</h4>
-                <p className="text-micro mt-2">{person.role}</p>
-                <p className="text-body mt-3">{person.bio}</p>
+                <div className="mt-4 flex gap-2.5">
+                  <LeadershipChip
+                    href={person.email ? `mailto:${person.email}` : undefined}
+                    icon="/icons/mail.svg"
+                    iconWidth={9}
+                    label="Mail"
+                    className="bg-s2-orange cursor-pointer"
+                  />
+                  <LeadershipChip
+                    href={person.linkedin}
+                    icon="/icons/linkedin.svg"
+                    iconWidth={10}
+                    label="LinkedIn"
+                    className="bg-s2-linkedin cursor-pointer"
+                  />
+                </div>
               </li>
             ))}
           </ul>
         </div>
       </section>
+
+      <Team members={members} />
+      <Partners intro={intro} partners={partners} />
 
       <section className="s2-subgrid items-center pt-5 pb-16 lg:pb-35">
         <div className="col-span-12 lg:col-start-2 lg:col-span-12">
@@ -127,20 +220,20 @@ export default async function FirmPage() {
       </section>
 
       <section className="col-span-12 ml-[calc(50%-50vw)] w-screen max-w-[100vw] bg-s2-orange">
-      <div className="s2-page items-center gap-y-8 py-16 lg:py-20">
-        <div className="col-span-12 lg:col-span-5 lg:col-start-2">
-          <h2 className="text-h3 text-s2-white">That standard has a method.</h2>
-          <p className="text-body mt-5 text-s2-white">How Square2 underwrites, and how it operates once the capital is in.</p>
-        </div>
+        <div className="s2-page items-center gap-y-8 py-16 lg:py-20">
+          <div className="col-span-12 lg:col-span-5 lg:col-start-2">
+            <h2 className="text-h3 text-s2-white">That standard has a method.</h2>
+            <p className="text-body mt-5 text-s2-white">How Square2 underwrites, and how it operates once the capital is in.</p>
+          </div>
 
-        <Button
-        href= "/platform"
-          className="col-span-12 w-fit lg:col-span-5 lg:justify-self-end"
-        >
-     HOW WE INVEST AND OPERATE
-        </Button>
-      </div>
-    </section>
+          <Button
+            href="/platform"
+            className="col-span-12 w-fit lg:col-span-5 lg:justify-self-end"
+          >
+            HOW WE INVEST AND OPERATE
+          </Button>
+        </div>
+      </section>
     </>
   );
 }

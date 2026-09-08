@@ -59,7 +59,7 @@ npm run dev
 1. Open `/studio` (e.g. `https://yoursite.com/studio`) and sign in.
 2. Under **Projects**, create or edit a project: name, category, summary, photos, and description.
 3. In the URL field, press **Generate**.
-4. Press **Publish** so the change goes live (it can take ~1 minute).
+4. Press **Publish** so the change goes live. An open site tab updates as soon as you publish.
 
 Home and Firm heroes are edited from their own Studio documents.
 

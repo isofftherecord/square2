@@ -6,14 +6,12 @@ import { MainHero, type HeroSlide } from "@/components/main-hero";
 import { MetricsBar } from "@/components/metrics-bar";
 import { ProjectIndex, type ProjectSummary } from "@/components/project-index";
 import { isSanityConfigured } from "@/sanity/env";
-import { client } from "@/sanity/lib/client";
+import { fetchPublished } from "@/sanity/lib/live";
 import { hasImageAsset, urlFor } from "@/sanity/lib/image";
 import { homeHeroQuery, projectsQuery } from "@/sanity/lib/queries";
 
 
 import { Button } from "@/components/button";
-
-export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Square2",
@@ -45,8 +43,8 @@ function toHeroSlides(doc: HomeHeroDoc | null): HeroSlide[] {
 export default async function Home() {
   const [heroDoc, projects] = isSanityConfigured
     ? await Promise.all([
-      client.fetch<HomeHeroDoc | null>(homeHeroQuery),
-      client.fetch<ProjectSummary[]>(projectsQuery),
+      fetchPublished<HomeHeroDoc | null>(homeHeroQuery),
+      fetchPublished<ProjectSummary[]>(projectsQuery),
     ])
     : [null, [] as ProjectSummary[]];
   const heroSlides = toHeroSlides(heroDoc);

@@ -21,6 +21,26 @@ export const firmHeroQuery = defineQuery(`
   }
 `);
 
+export const firmTeamQuery = defineQuery(`
+  *[_id == "firmTeam"][0] {
+    members[] {
+      _key,
+      name,
+      title
+    }
+  }
+`);
+
+export const firmPartnersQuery = defineQuery(`
+  *[_id == "firmPartners"][0] {
+    intro,
+    partners[] {
+      _key,
+      name
+    }
+  }
+`);
+
 export const projectsQuery = defineQuery(`
   *[_type == "project" && defined(slug.current)]
     | order(featured desc, title asc) {

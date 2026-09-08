@@ -3,10 +3,8 @@ import type { Metadata } from "next";
 import { type ProjectSummary } from "@/components/project-index";
 import { PortfolioView } from "@/components/portfolio-view";
 import { isSanityConfigured } from "@/sanity/env";
-import { client } from "@/sanity/lib/client";
+import { fetchPublished } from "@/sanity/lib/live";
 import { projectsQuery } from "@/sanity/lib/queries";
-
-export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Portfolio — Square2",
@@ -14,7 +12,7 @@ export const metadata: Metadata = {
 
 async function getProjects() {
   if (!isSanityConfigured) return [] as ProjectSummary[];
-  return client.fetch<ProjectSummary[]>(projectsQuery);
+  return fetchPublished<ProjectSummary[]>(projectsQuery);
 }
 
 export default async function PortfolioPage() {
