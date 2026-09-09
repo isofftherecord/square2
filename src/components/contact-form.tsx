@@ -66,11 +66,10 @@ export function ContactForm() {
 
         <div className="grid grid-cols-1 gap-x-5 gap-y-6 border-b border-s2-black py-10 lg:grid-cols-2">
           <p className="text-body">
-            For limited partners, joint-venture partners, and allocators
-            evaluating Square2 as a sponsor.
+          For limited partners, joint-venture partners, and allocators evaluating SQUARE2 as a sponsor.
           </p>
           <p className="text-body">
-            For owners considering Square2 to operate an asset they hold.
+          For owners considering SQUARE2 to operate an asset they hold.
           </p>
         </div>
 

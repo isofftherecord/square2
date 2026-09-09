@@ -30,7 +30,7 @@ const FALLBACK_PARTNERS: {
   partners: Partner[];
 } = {
   intro:
-    "Capital partners, lenders, and advisors Square2 has worked with across the portfolio.",
+    "Capital partners, lenders, and advisors SQUARE2 has worked with across the portfolio.",
   partners: [
     { _key: "apollo", name: "Apollo Global Management" },
     { _key: "blackstone", name: "Blackstone" },
@@ -123,9 +123,9 @@ export default async function FirmPage() {
         heading="The Firm."
         body={
           <>
-            Square2 is a Miami-based, vertically integrated operator and investor. Founded in 2008, in the teeth of the financial crisis, on the view that the firms worth backing are the ones that can still run the building after the capital is in.<br /><br />
-            That was not a comfortable year to start. It was a useful one. Every assumption about rent, occupancy and exit was being tested in public, and the firms that came through were the ones close enough to the asset to see the problem early. Square2 has underwritten that way ever since.<br /><br />
-            We acquire office, mixed-use, and adaptive re-use assets in Florida markets with high barriers to entry. Submarkets we know at street level, proximate to the people who decide where their companies sit. The list of places we will buy is short, and it does not get longer because capital is available.
+            SQUARE2 is a Miami-based, vertically integrated operator and investor. Founded in 2008, in the teeth of the financial crisis, on the view that the firms worth backing are the ones that can still run the building after the capital is in.<br /><br />
+            That was not a comfortable year to start. It was a useful one. Every assumption about rent, occupancy and exit was being tested in public, and the firms that came through were the ones close enough to the asset to see the problem early. SQUARE2 has underwritten that way ever since.<br /><br />
+            We acquire office, mixed-use, and adaptive reuse assets in Florida markets with high barriers to entry. Submarkets we know at street level, proximate to the people who decide where their companies sit. The list of places we will buy is short, and it does not get longer because capital is available.
           </>
         }
 
@@ -215,7 +215,7 @@ export default async function FirmPage() {
 
       <section className="s2-subgrid items-center pt-5 pb-16 lg:pb-35">
         <div className="col-span-12 lg:col-start-2 lg:col-span-12">
-          <p className="text-h1">One team with one <span className="italic">standard</span> out.</p>
+          <p className="text-h1">One team with one <span className="italic">standard</span>.</p>
         </div>
       </section>
 
@@ -223,7 +223,7 @@ export default async function FirmPage() {
         <div className="s2-page items-center gap-y-8 py-16 lg:py-20">
           <div className="col-span-12 lg:col-span-5 lg:col-start-2">
             <h2 className="text-h3 text-s2-white">That standard has a method.</h2>
-            <p className="text-body mt-5 text-s2-white">How Square2 underwrites, and how it operates once the capital is in.</p>
+            <p className="text-body mt-5 text-s2-white">How SQUARE2 underwrites, and how it operates once the capital is in.</p>
           </div>
 
           <Button

@@ -11,7 +11,7 @@ export const firmPartners = defineType({
       name: "intro",
       title: "Intro",
       description:
-        "Line under the heading. Example: Capital partners, lenders, and advisors Square2 has worked with across the portfolio.",
+        "Line under the heading. Example: Capital partners, lenders, and advisors SQUARE2 has worked with across the portfolio.",
       type: "text",
       rows: 3,
       validation: (rule) => rule.required().error("Intro is required"),
@@ -50,7 +50,7 @@ export const firmPartners = defineType({
   },
   initialValue: {
     intro:
-      "Capital partners, lenders, and advisors Square2 has worked with across the portfolio.",
+      "Capital partners, lenders, and advisors SQUARE2 has worked with across the portfolio.",
     partners: [
       { _type: "partner", name: "Apollo Global Management" },
       { _type: "partner", name: "Blackstone" },

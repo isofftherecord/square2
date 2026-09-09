@@ -13,7 +13,7 @@ type CtaProps = {
 export function Cta({
   heading = "Square it.",
   body = "Bring us a building, a thesis, or a partnership. We'll tell you plainly what we see in it, and whether we're the right firm to hold it.",
-  note = "Capital and Ownership Enquiries.",
+  note = "Capital and Ownership Inquiries.",
   href = "/contact",
   label = "Get in touch",
 }: CtaProps) {

@@ -180,7 +180,7 @@ export const project = defineType({
     defineField({
       name: "owner",
       title: "Owner",
-      description: "Example: Square2 / Apollo JV",
+      description: "Example: SQUARE2 / Apollo JV",
       type: "string",
       group: "cover",
       fieldset: "coverFacts",

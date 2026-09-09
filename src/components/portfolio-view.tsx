@@ -36,7 +36,7 @@ export function PortfolioView({
           <div className="col-span-12 self-start lg:col-span-5 lg:col-start-2">
             <h2 className="text-h1">The record.</h2>
             <p className="text-body mt-6">
-              Every asset Square2 has owned, co-sponsored, or operated. All in
+              Every asset SQUARE2 has owned, co-sponsored, or operated. All in
               the same table, because the standard does not change with the
               deed.
             </p>

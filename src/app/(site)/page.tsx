@@ -150,7 +150,7 @@ export default async function Home() {
         }
         body={
           <>
-            Square2 operates assets for other owners to the same standard it applies to its own. Not as a separate business line. It is the demonstration that the standard is real.
+            SQUARE2 operates assets for other owners to the same standard it applies to its own. Not as a separate business line. It is the demonstration that the standard is real.
             <br /><br />
             A firm that runs someone else's building the way it runs its own is a firm whose incentives you can read.
           </>

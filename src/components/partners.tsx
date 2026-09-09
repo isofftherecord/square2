@@ -34,7 +34,7 @@ export function toPartners(doc: FirmPartnersDoc | null):
 const COLUMN_COUNT = 3;
 
 const DEFAULT_INTRO =
-  "Capital partners, lenders, and advisors Square2 has worked with across the portfolio.";
+  "Capital partners, lenders, and advisors SQUARE2 has worked with across the portfolio.";
 
 /**
  * Reparte N ítems en `columnCount` columnas lo más parejas posible.
@@ -68,7 +68,7 @@ export function Partners({ intro, partners }: PartnersProps) {
   const columns = splitIntoColumns(partners, COLUMN_COUNT);
 
   return (
-    <section className="s2-subgrid pt-20 pb-20">
+    <section className="s2-subgrid pt-40 pb-40">
       <div className="col-span-12 lg:col-span-10 lg:col-start-2">
         <h2 className="text-h2">Partners.</h2>
         {/* 30px bajo el H2, igual que Team y Figma */}

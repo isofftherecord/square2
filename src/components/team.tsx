@@ -37,7 +37,7 @@ export function Team({ members }: TeamProps) {
   if (members.length === 0) return null;
 
   return (
-    <section className="s2-subgrid pt-20">
+    <section className="s2-subgrid pt-40">
       <div className="col-span-12 lg:col-span-10 lg:col-start-2">
         <h2 className="text-h2">Team.</h2>
         {/* 30px bajo el H2, igual que Figma */}
