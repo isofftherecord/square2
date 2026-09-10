@@ -51,7 +51,7 @@ export function TitleHero({ slides }: { slides: TitleHeroSlide[] }) {
           {/* Título y controles apilados sin separación, centrados en el hero */}
           <div className="s2-page h-full items-center">
             <div className="col-span-12 max-w-[535px] lg:col-span-6 lg:col-start-2">
-              <div className="text-h1 bg-s2-orange px-5 py-6 text-s2-white lg:px-10 lg:py-10">
+              <div className="text-h1 bg-s2-orange px-5 py-6 text-s2-white lg:px-10 lg:py-10 pr-[115px]">
                 {slide.title}
               </div>
               {total > 1 ? (
