@@ -41,9 +41,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${signifier.variable} ${archivo.variable} ${fragmentMono.variable} h-full overflow-x-clip antialiased`}
+      className={`${signifier.variable} ${archivo.variable} ${fragmentMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col overflow-x-clip bg-background text-foreground">
+      <body className="min-h-full flex flex-col text-foreground">
         {children}
         {isSanityConfigured ? <SanityLive /> : null}
       </body>

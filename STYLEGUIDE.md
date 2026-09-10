@@ -29,11 +29,15 @@ El sitio se diseña sobre un canvas de **1440px** con **12 columnas de 100px**.
 | Gutter | 20px | `--s2-gutter` |
 | Margen lateral | 10px | `--s2-margin` |
 
-`10 + 12×100 + 11×20 + 10 = 1440`. Por debajo de 1440px el margen pasa a 20px y el gutter a 16px; las columnas se comprimen.
+`10 + 12×100 + 11×20 + 10 = 1440`. El canvas permanece fijo también
+por debajo de 1440px; en esos viewports se usa desplazamiento horizontal.
+Fuera del canvas, el fondo global usa Frame (`#F5F5F5`).
 
 La clase `s2-page` centra ese canvas y activa la grilla CSS. Cada hijo directo usa `col-span-*` (1–12) para ocupar columnas. `s2-subgrid` anida secciones en las mismas 12 pistas. Navbar y contenido del sitio viven dentro de este wrapper.
 
-Los heroes (`MainHero`, `TitleHero`, mapa de Contact) y la banda de Portfolio usan `s2-hero`: cubren el canvas de 1440px y no salen al viewport, para que la imagen no se estire en pantallas más anchas.
+Los heroes (`MainHero`, `TitleHero`, mapa de Contact), las bandas naranjas y
+Portfolio usan `s2-hero`: cubren el canvas de 1440px y no salen al viewport.
+El footer es el único fondo que se extiende de borde a borde.
 
 ### Fila del ledger (Portfolio)
 
@@ -135,6 +139,7 @@ de Tailwind con el prefijo `s2-`:
 | Steel | `#97999B` | `--S2-STEEL` | `bg-s2-steel`, `text-s2-steel`, `border-s2-steel` |
 | White | `#FFFFFF` | `--S2-White` | `bg-s2-white`, `text-s2-white`, `border-s2-white` |
 | Fog | `#F9F9F9` | `--S2-Fog` | `bg-s2-fog`, `text-s2-fog`, `border-s2-fog` |
+| Frame | `#F5F5F5` | `--S2-Frame` | `bg-s2-frame`, `text-s2-frame`, `border-s2-frame` |
 | LinkedIn | `#0435F9` | `--S2-LinkedIn` | `bg-s2-linkedin`, `text-s2-linkedin`, `border-s2-linkedin` |
 
 Además hay dos alias semánticos que controlan el tema general:

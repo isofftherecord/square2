@@ -98,7 +98,7 @@ export default async function Home() {
       </section>
 
       {/* The Hold — Figma solo tiene 1440; <sm apila el timeline en 2×2 */}
-      <section className="col-span-12 ml-[calc(50%-50vw)] w-screen max-w-[100vw] bg-s2-orange text-s2-white">
+      <section className="s2-hero bg-s2-orange text-s2-white">
         <div className="s2-page py-14 lg:pt-[58px] lg:pb-[93px]">
           <div className="col-span-12 flex flex-col gap-3 md:flex-row md:items-baseline md:gap-5 lg:col-span-10 lg:col-start-2">
             <h2 className="text-h2">The Hold.</h2>

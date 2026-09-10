@@ -61,8 +61,8 @@ The arrangement has a practical consequence. What the operating team learns abou
       <img src="/heroes/platform.png" alt="Platform" className="col-span-12 h-[240px] w-full object-cover lg:col-span-10 lg:col-start-2 lg:h-[560px]"  />
 
     </section>
-    {/* Investment Criteria: banda a sangre; contenido en columnas 2–11 (span 10). */}
-    <section className="col-span-12 ml-[calc(50%-50vw)] w-screen max-w-[100vw] bg-s2-fog ">
+    {/* Investment Criteria: fondo dentro del canvas; contenido en columnas 2–11. */}
+    <section className="s2-hero bg-s2-fog">
       <div className="s2-page py-16 lg:py-30">
         <h2 className="text-h2 col-span-12 lg:col-start-2 lg:col-span-10">
           Investment Criteria.

@@ -8,6 +8,7 @@
   --S2-STEEL: #97999B;
   --S2-White: #FFF;
   --S2-Fog: #F9F9F9;
+  --S2-Frame: #F5F5F5;
   --S2-LinkedIn: #0435F9;
   --background: var(--S2-White, #FFF);
   --foreground: var(--S2-Black, #000);
@@ -41,6 +42,7 @@
   --color-s2-steel: var(--S2-STEEL);
   --color-s2-white: var(--S2-White);
   --color-s2-fog: var(--S2-Fog);
+  --color-s2-frame: var(--S2-Frame);
   --color-s2-linkedin: var(--S2-LinkedIn);
   --font-sans: var(--font-archivo);
   --font-serif: var(--font-signifier);
@@ -52,6 +54,7 @@
 }
 
 html {
+  min-width: var(--s2-page);
   scroll-behavior: smooth;
 }
 
@@ -62,19 +65,20 @@ html {
 }
 
 body {
-  background: var(--background);
+  min-width: var(--s2-page);
+  background: var(--S2-Frame);
   color: var(--foreground);
   font-family: var(--font-archivo), Arial, Helvetica, sans-serif;
 }
 
 /* ---------------------------------------------------------------------------
    Grilla de página: 1440px, 12 columnas de 100px, gutter 20px, margen 10px.
-   En viewports más estrechos las columnas se comprimen (1fr).
+   El canvas permanece fijo y permite desplazamiento horizontal bajo 1440px.
 --------------------------------------------------------------------------- */
 
 @utility s2-page {
-  width: 100%;
-  max-width: var(--s2-page);
+  width: var(--s2-page);
+  max-width: none;
   margin-inline: auto;
   padding-inline: var(--s2-margin);
   display: grid;
@@ -97,13 +101,6 @@ body {
   justify-self: center;
 }
 
-@media (max-width: 1439px) {
-  :root {
-    --s2-margin: 20px;
-    --s2-gutter: 16px;
-  }
-}
-
 /* ---------------------------------------------------------------------------
    Styleguide tipográfico
    Mismos nombres que la guía de diseño: H1–H5, Micro, Body, Tags,
@@ -114,7 +111,7 @@ body {
   font-family: var(--font-signifier), serif;
   font-weight: 200;
   font-size: 40px;
-  line-height: 120%;
+  line-height: 100%;
 
   @media (min-width: 1024px) {
     font-size: 64px;

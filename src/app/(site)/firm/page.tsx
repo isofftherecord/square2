@@ -219,7 +219,7 @@ export default async function FirmPage() {
         </div>
       </section>
 
-      <section className="col-span-12 ml-[calc(50%-50vw)] w-screen max-w-[100vw] bg-s2-orange">
+      <section className="s2-hero bg-s2-orange">
         <div className="s2-page items-center gap-y-8 py-16 lg:py-20">
           <div className="col-span-12 lg:col-span-5 lg:col-start-2">
             <h2 className="text-h3 text-s2-white">That standard has a method.</h2>

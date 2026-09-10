@@ -8,7 +8,7 @@ export default function SiteLayout({
 }) {
   return (
     <>
-      <div className="s2-page flex-1">
+      <div className="s2-page flex-1 bg-background">
         <Navbar />
         {children}
       </div>
