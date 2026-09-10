@@ -24,7 +24,7 @@ export default function PlatformPage() {
       space="4"
       space2="7"
       heading={<>
-        The people who underwrite it are the people who run it.
+        The people who <span className="italic">underwrite</span> it are the people who <span className="italic">run it.</span>
       </>
       }
       body={
@@ -123,7 +123,7 @@ The arrangement has a practical consequence. What the operating team learns abou
       space2="7"
 
       heading={<>
-        An owner's stake, not a fee.
+        An owner's stake, not a <span className="italic">fee.</span>
       </>
       }
       body={

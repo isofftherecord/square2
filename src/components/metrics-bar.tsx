@@ -3,32 +3,30 @@ import type { ReactNode } from "react";
 type Metric = {
   value: ReactNode;
   label: string;
-  /** Columnas en desktop dentro de la banda de 10. */
-  span?: 2 | 4;
 };
-
-const SPAN_CLASS = {
-  2: "lg:col-span-2",
-  4: "lg:col-span-4",
-} as const;
 
 export function MetricsBar({ items }: { items: Metric[] }) {
   return (
-    // 10 columnas centradas; 2 + 2 + 4 + 2. En móvil se apilan.
-    <section className="s2-subgrid items-center  sm:py-10  lg:py-25">
-      {items.map((item, index) => (
-        <div
-          key={item.label}
-          className={`col-span-12 flex flex-col items-center py-6 text-center lg:py-4 ${SPAN_CLASS[item.span ?? 2]} ${
-            index === 0
-              ? "lg:col-start-2"
-              : "border-t border-s2-black lg:border-t-0 lg:border-l"
-          }`}
-        >
-          <p className="text-h2">{item.value}</p>
-          <p className="text-tags mt-2">{item.label}</p>
-        </div>
-      ))}
+    // Banda de 10 columnas; en desktop las 4 celdas siguen las
+    // proporciones de Figma (289 / 267 / 377 / 182). En móvil se apilan.
+    <section className="s2-subgrid ">
+      <div className="col-span-12 grid grid-cols-1 lg:col-span-10 lg:col-start-2 lg:grid-cols-[289fr_267fr_377fr_182fr]">
+        {items.map((item, index) => (
+          <div
+            key={item.label}
+            className={`flex flex-col items-start justify-center py-6 px-5 lg:py-5 ${
+              index === 0
+                ? ""
+                : "border-t border-s2-black lg:border-t-0 lg:border-l lg:pl-5"
+            }`}
+          >
+            <p className="text-h2 whitespace-nowrap">{item.value}</p>
+            <p className="text-tags mt-2 whitespace-nowrap text-s2-orange">
+              {item.label}
+            </p>
+          </div>
+        ))}
+      </div>
     </section>
   );
 }

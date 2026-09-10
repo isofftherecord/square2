@@ -93,12 +93,12 @@ export function ProjectIndex({
       ) : null}
 
       <div className="text-data col-span-12 hidden border-b border-s2-black pb-3 text-s2-black lg:col-span-10 lg:col-start-2 lg:grid lg:grid-cols-subgrid">
-        <span className="col-span-3">Property</span>
+        <span className="col-span-2">Property</span>
         <span className="col-span-2">Market</span>
         <span className="col-span-1">Class</span>
         <span className="col-span-1">SF</span>
         <span className="col-span-2">Year</span>
-        <span className="col-span-1">Role</span>
+        <span className="col-span-2">Role</span>
       </div>
 
       <ul className="contents">
@@ -111,7 +111,7 @@ export function ProjectIndex({
                 href={`/projects/${project.slug}`}
                 className="col-span-full grid grid-cols-subgrid"
               >
-              <span className="text-metrics col-span-12 lg:col-span-3">
+              <span className="text-metrics col-span-12 lg:col-span-2">
                 {project.title}
               </span>
               <span className="text-micro col-span-12 mt-2 text-s2-steel lg:hidden">
@@ -133,10 +133,10 @@ export function ProjectIndex({
               <span className="text-metrics hidden lg:col-span-2 lg:block">
                 {project.years}
               </span>
-              <span className="col-span-12 mt-3 lg:col-span-1 lg:mt-0">
+              <span className="col-span-12 mt-3 lg:col-span-2 lg:mt-0">
                 {project.role ? (
                   <span
-                    className={`text-navigation px-5.5 py-2 text-s2-white ${roleBadgeClass(project.role)}`}
+                    className={`text-navigation inline-block whitespace-nowrap px-5.5 py-2 text-s2-white ${roleBadgeClass(project.role)}`}
                   >
                     {project.role}
                   </span>
