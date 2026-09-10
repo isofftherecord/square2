@@ -9,8 +9,9 @@ export const { sanityFetch, SanityLive } = defineLive({
   browserToken: false,
 });
 
-// Wrapper tipado: Live revalida al publicar; `stega: false` deja strings limpios.
+// Publicado actual en cada request. `sanityFetch` cachea para siempre y Live
+// solo invalida si hay una pestaña del sitio abierta en ese host (localhost
+// no refresca Vercel).
 export async function fetchPublished<T>(query: string): Promise<T> {
-  const { data } = await sanityFetch({ query, stega: false });
-  return data as T;
+  return client.fetch<T>(query, {}, { cache: "no-store", useCdn: false });
 }

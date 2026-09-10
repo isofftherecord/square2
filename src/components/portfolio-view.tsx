@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 
 import { type ProjectSummary } from "@/components/project-index";
 import { ProjectLedger } from "@/components/project-ledger";
+import { matchesRoleFilter } from "@/lib/project-role";
 
 type RoleFilter = "all" | "Owned" | "Managed";
 
@@ -25,7 +26,9 @@ export function PortfolioView({
 
   const visible = useMemo(() => {
     if (filter === "all") return projects;
-    return projects.filter((project) => project.role === filter);
+    return projects.filter((project) =>
+      matchesRoleFilter(project.role, filter),
+    );
   }, [filter, projects]);
 
   return (

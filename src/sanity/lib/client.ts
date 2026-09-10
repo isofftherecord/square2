@@ -6,6 +6,7 @@ export const client = createClient({
   projectId: projectId || "placeholder",
   dataset: dataset || "production",
   apiVersion,
-  useCdn: true,
+  // API en vivo: el CDN de Sanity puede devolver el documento anterior al publicar.
+  useCdn: false,
   perspective: "published",
 });

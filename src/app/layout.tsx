@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 import localFont from "next/font/local";
 
+import { isSanityConfigured } from "@/sanity/env";
+import { SanityLive } from "@/sanity/lib/live";
+
 // Serif para títulos (H1, H2, H3, Metrics)
 const signifier = localFont({
   variable: "--font-signifier",
@@ -43,6 +46,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col overflow-x-clip bg-background text-foreground">
         {children}
+        {isSanityConfigured ? <SanityLive /> : null}
       </body>
     </html>
   );

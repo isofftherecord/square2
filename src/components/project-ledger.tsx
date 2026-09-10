@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/button";
 import { ProjectCaseStudy } from "@/components/project-case-study";
 import type { ProjectSummary } from "@/components/project-index";
+import { roleBadgeClass } from "@/lib/project-role";
 import { hasImageAsset, urlFor } from "@/sanity/lib/image";
 
 // Centra el case study en el área libre bajo el navbar fijo.
@@ -166,7 +167,7 @@ function LedgerRow({
               {project.role ? (
                 <span
                   className={`text-tags mt-5 inline-block px-3 py-1.5 text-s2-white ${
-                    project.role === "Managed" ? "bg-s2-black" : "bg-s2-orange"
+                    roleBadgeClass(project.role)
                   }`}
                 >
                   {project.role}

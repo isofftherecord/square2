@@ -10,6 +10,7 @@ export const PROJECT_CLASSES = [
 export const PROJECT_ROLES = [
   { title: "Owned", value: "Owned" },
   { title: "Managed", value: "Managed" },
+  { title: "Owned & Managed", value: "Owned & Managed" },
 ] as const;
 
 export const PROJECT_STATUSES = [

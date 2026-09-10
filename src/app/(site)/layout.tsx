@@ -1,7 +1,5 @@
 import { Footer } from "@/components/footer";
 import { Navbar } from "@/components/navbar";
-import { isSanityConfigured } from "@/sanity/env";
-import { SanityLive } from "@/sanity/lib/live";
 
 export default function SiteLayout({
   children,
@@ -15,7 +13,6 @@ export default function SiteLayout({
         {children}
       </div>
       <Footer />
-      {isSanityConfigured ? <SanityLive /> : null}
     </>
   );
 }
