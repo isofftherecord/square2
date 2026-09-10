@@ -51,8 +51,12 @@ export function TitleHero({ slides }: { slides: TitleHeroSlide[] }) {
           {/* Título y controles apilados sin separación, centrados en el hero */}
           <div className="s2-page h-full items-center">
             <div className="col-span-12 max-w-[535px] lg:col-span-6 lg:col-start-2">
-              <div className="text-h1 bg-s2-orange px-5 py-6 text-s2-white lg:px-10 lg:py-10 pr-[115px]">
-                {slide.title}
+              <div className="text-h1 bg-s2-orange px-5 py-6 text-s2-white lg:px-10 lg:py-10">
+                {titleLines(slide.title).map((line) => (
+                  <span key={line} className="block">
+                    {line}
+                  </span>
+                ))}
               </div>
               {total > 1 ? (
                 <div className="ml-auto flex h-[62px] w-[218px] items-center justify-between bg-s2-orange px-3">
@@ -86,6 +90,16 @@ export function TitleHero({ slides }: { slides: TitleHeroSlide[] }) {
       </div>
     </section>
   );
+}
+
+// Una frase por línea: "One firm. One standard." → dos renglones.
+function titleLines(title: string) {
+  const trimmed = title.trim();
+  if (!trimmed) return [];
+  if (trimmed.includes("\n")) {
+    return trimmed.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  }
+  return trimmed.split(/(?<=\.)\s+/).filter(Boolean);
 }
 
 function Arrow({ className = "" }: { className?: string }) {
