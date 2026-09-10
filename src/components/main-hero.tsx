@@ -128,11 +128,11 @@ export function MainHero({ slides }: { slides: HeroSlide[] }) {
         <div className="absolute right-0 bottom-0 z-10 flex max-w-full flex-col items-end">
           <div className="flex h-[68px] w-[min(327px,100vw)] items-end justify-between bg-s2-white px-4 pt-[13px] pb-[13px]">
             <div>
-              <p className="text-label-hero text-s2-steel">Property</p>
+              <p className="text-micro text-s2-steel">Property</p>
               <p className="text-body">{slide.property}</p>
             </div>
             <div className="text-right">
-              <p className="text-label-hero text-s2-steel">Year</p>
+              <p className="text-micro text-s2-steel">Year</p>
               <p className="text-body">{slide.year}</p>
             </div>
           </div>
@@ -147,7 +147,7 @@ export function MainHero({ slides }: { slides: HeroSlide[] }) {
                 type="button"
                 onClick={() => go(-1)}
                 aria-label="Previous project"
-                className="cursor-pointer text-s2-black transition-transform duration-200 hover:-translate-x-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-s2-orange)]"
+                className="cursor-pointer text-s2-orange transition-transform duration-200 hover:-translate-x-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-s2-orange)]"
               >
                 <Arrow className="rotate-180" />
               </button>
@@ -155,7 +155,7 @@ export function MainHero({ slides }: { slides: HeroSlide[] }) {
                 type="button"
                 onClick={() => go(1)}
                 aria-label="Next project"
-                className="cursor-pointer text-s2-orange transition-transform duration-200 hover:translate-x-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-s2-orange)]"
+                className="cursor-pointer text-s2-black transition-transform duration-200 hover:translate-x-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-s2-orange)]"
               >
                 <Arrow />
               </button>

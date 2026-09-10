@@ -28,7 +28,7 @@ function scrollCaseStudyIntoView(
 
 function projectImageSrc(image?: ProjectSummary["mainImage"]) {
   if (!hasImageAsset(image)) return null;
-  return urlFor(image).width(800).height(800).url();
+  return urlFor(image).width(600).height(600).url();
 }
 
 function useExpand(open: boolean) {
@@ -141,7 +141,7 @@ function LedgerRow({
           </button>
 
           {/* Celda 1 (427): fog y regla solo hasta el alto del texto */}
-          <div className="relative lg:pl-[130px] lg:pt-[84px]">
+          <div className="relative lg:pt-[84px] lg:pl-[clamp(92px,9.0278vw,130px)]">
             <div
               aria-hidden
               className="pointer-events-none absolute inset-0 hidden lg:block"
@@ -183,13 +183,13 @@ function LedgerRow({
               className="pointer-events-none absolute inset-y-0 right-0 hidden w-px bg-s2-steel lg:block"
             />
 
-            <div className="relative mt-8 aspect-[4/3] lg:mx-auto lg:mt-[61px] lg:aspect-square lg:size-[400px]">
+            <div className="relative mx-auto mt-8 aspect-square w-full max-w-[600px] lg:mt-[61px] lg:size-[clamp(360px,27.7778vw,400px)]">
               {imageSrc ? (
                 <Image
                   src={imageSrc}
                   alt={alt}
                   fill
-                  sizes="(min-width: 1024px) 400px, 100vw"
+                  sizes="(min-width: 1440px) 400px, (min-width: 1296px) 27.78vw, (min-width: 1024px) 360px, 100vw"
                   className="object-cover object-center"
                 />
               ) : (
