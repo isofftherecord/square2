@@ -24,6 +24,9 @@
 .DS_Store
 *.pem
 
+# Capturas internas de verificación (no van al repo)
+.tmp-verify/
+
 # debug
 npm-debug.log*
 yarn-debug.log*

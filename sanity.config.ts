@@ -1,13 +1,11 @@
 "use client";
 
 import { icons } from "@sanity/icons";
-import { visionTool } from "@sanity/vision";
 import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
 
-import { SeedLasOlasAction } from "./src/sanity/actions/seed-las-olas";
 import { ArrayItemWithDone } from "./src/sanity/components/array-item-with-done";
-import { apiVersion, dataset, projectId } from "./src/sanity/env";
+import { dataset, projectId } from "./src/sanity/env";
 import { schemaTypes } from "./src/sanity/schemaTypes";
 
 export default defineConfig({
@@ -32,9 +30,6 @@ export default defineConfig({
     components: {
       item: ArrayItemWithDone,
     },
-  },
-  document: {
-    actions: (input) => [...input, SeedLasOlasAction],
   },
   plugins: [
     structureTool({
@@ -80,7 +75,5 @@ export default defineConfig({
             S.documentTypeListItem("project").title("Projects"),
           ]),
     }),
-    // Herramienta para probar consultas GROQ (útil solo para desarrolladores).
-    visionTool({ defaultApiVersion: apiVersion }),
   ],
 });

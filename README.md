@@ -24,7 +24,6 @@ Copy `.env.example` to `.env.local` and fill in the values:
 # Sanity
 NEXT_PUBLIC_SANITY_PROJECT_ID="abc12345"
 NEXT_PUBLIC_SANITY_DATASET="production"
-SANITY_API_TOKEN=""
 
 # Google Maps (página Contact)
 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=""
@@ -36,7 +35,7 @@ CONTACT_TO_EMAIL=""
 CONTACT_FROM_EMAIL="Square2 <beth.t@example.com>"
 ```
 
-- **Sanity**: get the Project ID at [sanity.io/manage](https://sanity.io/manage). `SANITY_API_TOKEN` is a write token (Editor), used by `scripts/seed-las-olas.mjs`.
+- **Sanity**: get the Project ID at [sanity.io/manage](https://sanity.io/manage).
 - **Google Maps**: API key and Map ID from Google Cloud. Required for the map on `/contact`.
 - **Resend**: API key from [resend.com](https://resend.com). In testing, verify the same inbox you send from. Change `CONTACT_TO_EMAIL` when going to production.
 
