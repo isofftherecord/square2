@@ -78,8 +78,10 @@ export const projectsQuery = defineQuery(`
         heading,
         acquired { value, line, details },
         sold { value, line, details },
-        metrics[] { _key, value, label }
+        metrics[] { _key, value, label },
+        proceedsNote
       },
+      creditsIntro,
       credits[] { _key, label, detail }
     }
 `);

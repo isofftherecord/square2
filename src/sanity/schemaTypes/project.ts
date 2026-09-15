@@ -450,7 +450,25 @@ export const project = defineType({
             }),
           ],
         }),
+        defineField({
+          name: "proceedsNote",
+          title: "Proceeds note",
+          description:
+            "Micro footnote under the exit metrics. Example: Sale price is the building. Gross proceeds include the $22M land assemblage.",
+          type: "text",
+          rows: 2,
+        }),
       ],
+    }),
+    defineField({
+      name: "creditsIntro",
+      title: "Credits intro",
+      description:
+        "Paragraph above the credits list. Example: Cradle to grave. The people who underwrote the acquisition…",
+      type: "text",
+      rows: 4,
+      group: "exit",
+      fieldset: "exitCredits",
     }),
     defineField({
       name: "credits",

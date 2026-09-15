@@ -29,14 +29,14 @@ El sitio se diseña sobre un canvas de **1440px** con **12 columnas de 100px**.
 | Gutter | 20px | `--s2-gutter` |
 | Margen lateral | 10px | `--s2-margin` |
 
-`10 + 12×100 + 11×20 + 10 = 1440`. El canvas permanece fijo también
-por debajo de 1440px; en esos viewports se usa desplazamiento horizontal.
+`10 + 12×100 + 11×20 + 10 = 1440`. El canvas tiene techo de 1440px y, por
+debajo, se estrecha con el viewport (las 12 columnas son fracciones fluidas).
 Fuera del canvas, el fondo global usa Frame (`#F5F5F5`).
 
 La clase `s2-page` centra ese canvas y activa la grilla CSS. Cada hijo directo usa `col-span-*` (1–12) para ocupar columnas. `s2-subgrid` anida secciones en las mismas 12 pistas. Navbar y contenido del sitio viven dentro de este wrapper.
 
 Los heroes (`MainHero`, `TitleHero`, mapa de Contact), las bandas naranjas y
-Portfolio usan `s2-hero`: cubren el canvas de 1440px y no salen al viewport.
+Portfolio usan `s2-hero`: cubren el ancho del canvas y no salen al viewport.
 El footer es el único fondo que se extiende de borde a borde.
 
 ### Fila del ledger (Portfolio)
@@ -56,6 +56,28 @@ escale igual por debajo de 1440. Los altos viven en `globals.css`:
 Las tres verticales caen en el borde derecho de las tres primeras columnas
 (427, 947, 987) y la regla horizontal de fila solo se dibuja abajo; la de
 arriba se pinta únicamente en la primera fila para que no se dupliquen.
+
+### Case study (paneles)
+
+Los paneles del case study también se miden a mano en Figma (no caen en los
+bordes exactos de la grilla 12×100). La clase `s2-case-study` define tokens en
+`%` del canvas; a 1440 equivalen a:
+
+| Token | Valor (1440) | Qué es |
+|---|---|---|
+| `--s2-case-inset` | 96px | Inset izquierdo de título, header y figura |
+| `--s2-case-rail` | 40px | Franja fog + vertical en capítulos / exit |
+| `--s2-case-deal` | 292px | Ancho del panel “The Deal.” (desde la derecha) |
+| `--s2-case-deal-gap` | 74px | Hueco entre la tabla de hechos y el deal |
+| `--s2-case-deal-pad` | 44px (15% del deal) | Padding interno del deal tras la vertical |
+| `--s2-case-figure` | 716×398px | Imagen de capítulo (con texto al lado); aspect `716/398` |
+| `--s2-case-copy` | 480px | Ancho del texto de capítulo |
+| `--s2-case-credits-start` | 867px | Inicio del fog de Credits |
+| `--s2-case-credits-inset` | 950px | Inicio del copy de Credits |
+| `--s2-case-credits-width` | 400px | Ancho del bloque Credits |
+| `--s2-case-exit-inset` | 129px | Inset del bloque “The exit.” |
+
+Verticales: rail a 40px (capítulos/exit); deal a `1440 − 292`; credits a 867.
 
 ```tsx
 <div className="s2-page">
@@ -211,7 +233,7 @@ exportar un SVG nuevo a `public/icons/` y mapearlo en el componente.
 2. **No uses colores fuera de la paleta** (`text-gray-500`, `#666`…).
    Usa las clases `s2-*`.
 3. **Un solo `text-h1` por página**, por jerarquía y SEO.
-4. **Layout sobre la grilla 1440 / 12**. Usa `s2-page`, `s2-subgrid` y `col-span-*`.
+4. **Layout sobre la grilla (max 1440 / 12)**. Usa `s2-page`, `s2-subgrid` y `col-span-*`.
    No uses `max-w-6xl`, `px-6` u otros anchos sueltos para el canvas.
 5. **Los botones salen de `Button`** (`src/components/button.tsx`). No repitas
    sus clases en una página; agrega una variante si falta.

@@ -107,12 +107,38 @@ function hasExitSide(side?: ProjectExitSide) {
   );
 }
 
+// Alturas Figma: sold $145.5M → 146px; acquired $90M → ~90px (proporcional).
+const EXIT_BAR_MAX_HEIGHT = 146;
+const EXIT_BAR_WIDTH = 200;
+
+function parseMoneyValue(value?: string) {
+  if (!present(value)) return null;
+  const match = value!.trim().match(/([\d,.]+)\s*([KMB])?/i);
+  if (!match) return null;
+  const amount = Number.parseFloat(match[1].replace(/,/g, ""));
+  if (Number.isNaN(amount)) return null;
+  const suffix = match[2]?.toUpperCase();
+  const multiplier =
+    suffix === "K" ? 1e3 : suffix === "M" ? 1e6 : suffix === "B" ? 1e9 : 1;
+  return amount * multiplier;
+}
+
+function exitBarHeight(value?: string, peerValue?: string) {
+  const amount = parseMoneyValue(value);
+  const peer = parseMoneyValue(peerValue);
+  if (amount == null || amount <= 0) return EXIT_BAR_MAX_HEIGHT;
+  const max = Math.max(amount, peer ?? amount);
+  if (max <= 0) return EXIT_BAR_MAX_HEIGHT;
+  return Math.max(1, Math.round((amount / max) * EXIT_BAR_MAX_HEIGHT));
+}
+
 function hasExitContent(exit?: ProjectExit) {
   return (
     present(exit?.heading) ||
     hasExitSide(exit?.acquired) ||
     hasExitSide(exit?.sold) ||
-    filledMetrics(exit?.metrics).length > 0
+    filledMetrics(exit?.metrics).length > 0 ||
+    present(exit?.proceedsNote)
   );
 }
 
@@ -214,7 +240,11 @@ export function ProjectCaseStudy({
     () => filledCredits(project.credits),
     [project.credits],
   );
-  const showExit = hasExitContent(project.exit) || credits.length > 0;
+  const creditsIntro = present(project.creditsIntro)
+    ? project.creditsIntro!.trim()
+    : null;
+  const showExit =
+    hasExitContent(project.exit) || credits.length > 0 || Boolean(creditsIntro);
 
   const panelCount = 1 + chapters.length + (showExit ? 1 : 0);
 
@@ -256,15 +286,16 @@ export function ProjectCaseStudy({
     <div
       ref={rootRef}
       data-case-study={project.slug}
-      className="@container flex h-auto flex-col bg-background text-foreground lg:h-full"
+      className="s2-case-study @container flex h-auto flex-col bg-background text-foreground lg:h-full"
     >
       <header className="relative shrink-0 bg-s2-fog">
-        <div className="s2-page items-center gap-y-3 py-4 lg:py-5">
-          <p className="text-navigation col-span-10 lg:col-span-3 lg:col-start-2">
+        {/* Inset izq. 96px (Figma); close cerca del borde derecho. */}
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-3 py-4 pl-[var(--s2-case-inset)] pr-4 max-lg:px-[var(--s2-margin)] lg:py-5">
+          <p className="text-navigation min-w-0 flex-1 truncate lg:flex-none lg:max-w-[280px]">
             {project.title}
           </p>
           {headerLine ? (
-            <p className="text-navigation col-span-12 lg:col-span-6 lg:col-start-5 lg:row-start-1 lg:justify-self-center">
+            <p className="text-navigation order-last w-full lg:absolute lg:left-1/2 lg:order-none lg:w-auto lg:-translate-x-1/2">
               {headerLine}
             </p>
           ) : null}
@@ -272,7 +303,7 @@ export function ProjectCaseStudy({
             type="button"
             aria-label="Close project"
             onClick={onClose}
-            className="col-span-2 col-start-11 row-start-1 flex size-8 cursor-pointer items-center justify-center justify-self-end bg-s2-orange text-s2-white lg:col-span-1 lg:col-start-12"
+            className="ml-auto flex size-8 shrink-0 cursor-pointer items-center justify-center bg-s2-orange text-s2-white"
           >
        
             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 13 13" fill="none" className="size-3" aria-hidden="true">
@@ -321,6 +352,7 @@ export function ProjectCaseStudy({
           {showExit ? (
             <ExitPanel
               exit={project.exit}
+              creditsIntro={creditsIntro}
               credits={credits}
               nextProject={nextProject}
               onOpenNext={onOpenNext}
@@ -334,8 +366,8 @@ export function ProjectCaseStudy({
           aria-hidden
           className="absolute inset-x-0 top-0 h-px bg-s2-steel"
         />
-        <div className="s2-page items-end py-5">
-          <div className="col-span-4 col-start-2">
+        <div className="flex items-end justify-between px-[var(--s2-case-inset)] py-5">
+          <div className="w-[min(196px,14%)]">
             <p className="text-navigation">
               {pad(panel + 1)} / {pad(panelCount)}
             </p>
@@ -354,7 +386,7 @@ export function ProjectCaseStudy({
             </div>
           </div>
           {panelCount > 1 && panel < panelCount - 1 ? (
-            <p className="text-navigation col-span-2 col-start-11 inline-flex items-center justify-self-end gap-1.5">
+            <p className="text-navigation inline-flex items-center gap-1.5">
               Scroll
               <img
                 src="/icons/arrow-right.svg"
@@ -392,11 +424,17 @@ function CoverPanel({ project }: { project: ProjectSummary }) {
     : [];
 
   return (
-    <section className="s2-page h-auto w-full shrink-0 items-start gap-y-8 py-10 lg:h-full lg:w-[100cqw] lg:items-center lg:gap-y-0 lg:py-0">
-      <div className="col-span-12 lg:col-span-7 lg:col-start-2">
-        <h2 className="text-h1">{project.title}</h2>
+    <section className="relative h-auto w-full shrink-0 py-10 max-lg:px-[var(--s2-margin)] lg:flex lg:h-full lg:w-[100cqw] lg:items-center lg:py-0">
+      <div
+        className={`w-full lg:pl-[var(--s2-case-inset)] ${
+          dealMetrics.length > 0
+            ? "lg:pr-[calc(var(--s2-case-deal)+var(--s2-case-deal-gap))]"
+            : "lg:pr-[var(--s2-case-inset)]"
+        }`}
+      >
+        <h1 className="text-h1">{project.title}</h1>
         {addressLines.length > 0 ? (
-          <p className="text-body mt-6">
+          <p className="text-metrics mt-6">
             {addressLines.map((line, index) => (
               <span key={line}>
                 {index > 0 ? <br /> : null}
@@ -413,10 +451,10 @@ function CoverPanel({ project }: { project: ProjectSummary }) {
                 key={row.label}
                 className="flex border-b border-s2-steel/40 py-4"
               >
-                <dt className="text-micro w-32 shrink-0 text-s2-steel">
+                <dt className="text-data w-32 shrink-0 text-s2-steel">
                   {row.label}
                 </dt>
-                <dd className="text-metrics">{row.value}</dd>
+                <dd className="text-body">{row.value}</dd>
               </div>
             ))}
           </dl>
@@ -424,20 +462,20 @@ function CoverPanel({ project }: { project: ProjectSummary }) {
       </div>
 
       {dealMetrics.length > 0 ? (
-        <div className="relative col-span-12 max-lg:-mx-[var(--s2-margin)] lg:col-span-3 lg:col-start-10 lg:h-full">
+        <div className="relative mt-8 max-lg:-mx-[var(--s2-margin)] lg:absolute lg:inset-y-0 lg:right-0 lg:mt-0 lg:w-[var(--s2-case-deal)]">
           <div
             aria-hidden
             className="absolute inset-y-0 left-0 z-[1] hidden w-px bg-s2-steel lg:block"
           />
-          <div className="flex flex-col justify-center bg-s2-fog px-6 py-8 lg:h-full lg:px-0 lg:pl-8">
+          <div className="flex flex-col justify-top bg-s2-fog px-6 pt-20 pb-8 lg:h-full lg:px-0 lg:pl-[var(--s2-case-deal-pad)]">
             <h3 className="text-metrics">
               {present(project.dealHeading) ? project.dealHeading : "The Deal."}
             </h3>
-            <div aria-hidden className="mt-2 h-px w-16 bg-s2-black" />
+            <div aria-hidden className="mt-2 h-px w-[168px] bg-s2-black" />
             <dl className="mt-8 space-y-7">
               {dealMetrics.map((metric, index) => (
                 <div key={metric._key || index}>
-                  <dt className="text-h2">{metric.value}</dt>
+                  <dt className="text-h1">{metric.value}</dt>
                   {present(metric.label) ? (
                     <dd className="text-micro mt-1">{metric.label}</dd>
                   ) : null}
@@ -464,37 +502,55 @@ function ChapterPanel({
   const showFigure = slides.length > 0;
 
   return (
-    <section className="s2-page h-auto w-full shrink-0 content-start overflow-visible py-10 lg:h-full lg:w-[100cqw] lg:overflow-hidden lg:py-20">
+    <section className="relative h-auto w-full shrink-0 overflow-visible py-10 max-lg:px-[var(--s2-margin)] lg:h-full lg:w-[100cqw] lg:overflow-hidden lg:py-20">
+      {/* Rail fog + vertical a 40px (Figma capítulos). */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 left-0 hidden w-[var(--s2-case-rail)] bg-s2-fog lg:block"
+      >
+        <div className="absolute inset-y-0 right-0 w-px bg-s2-steel" />
+      </div>
+
       {showFigure ? (
-        <ChapterFigure
-          chapter={chapter}
-          slides={slides}
-          fallbackAlt={fallbackAlt}
-          wide={!showText}
-        />
+        <div
+          className={
+            showText
+              ? "lg:absolute lg:inset-y-0 lg:left-[var(--s2-case-inset)] lg:flex lg:w-[var(--s2-case-figure)] lg:items-start lg:py-20"
+              : "lg:absolute lg:inset-y-0 lg:left-[var(--s2-case-inset)] lg:right-[var(--s2-case-inset)] lg:flex lg:items-start lg:py-20"
+          }
+        >
+          <ChapterFigure
+            chapter={chapter}
+            slides={slides}
+            fallbackAlt={fallbackAlt}
+            wide={!showText}
+          />
+        </div>
       ) : null}
 
       {showText ? (
         <div
           className={
             showFigure
-              ? "col-span-12 mt-8 lg:col-span-4 lg:col-start-8 lg:mt-0"
-              : "col-span-12 lg:col-span-8 lg:col-start-2"
+              ? "mt-8 w-full lg:absolute lg:inset-y-0 lg:right-[var(--s2-case-inset)] lg:mt-0 lg:flex lg:w-[var(--s2-case-copy)] lg:items-start lg:py-20"
+              : "w-full lg:absolute lg:inset-y-0 lg:left-[var(--s2-case-inset)] lg:flex lg:w-[min(940px,66%)] lg:items-start lg:py-20"
           }
         >
-          {present(chapter.heading) ? (
-            <h2 className="text-metrics border-b border-s2-black pb-4">
-              {chapter.heading}
-            </h2>
-          ) : null}
-          {paragraphs.map((paragraph, index) => (
-            <p
-              key={paragraph._key || index}
-              className={`text-body ${index === 0 && present(chapter.heading) ? "mt-8" : "mt-6"} ${paragraph.emphasis ? "font-bold" : ""}`}
-            >
-              {paragraph.text}
-            </p>
-          ))}
+          <div className="w-full">
+            {present(chapter.heading) ? (
+              <h2 className="text-metrics border-b border-s2-black pb-4">
+                {chapter.heading}
+              </h2>
+            ) : null}
+            {paragraphs.map((paragraph, index) => (
+              <p
+                key={paragraph._key || index}
+                className={`text-body ${index === 0 && present(chapter.heading) ? "mt-8" : "mt-6"} ${paragraph.emphasis ? "font-bold" : ""}`}
+              >
+                {paragraph.text}
+              </p>
+            ))}
+          </div>
         </div>
       ) : null}
     </section>
@@ -527,32 +583,36 @@ function ChapterFigure({
   if (!current || !active || !hasImageAsset(active)) return null;
 
   return (
-    <figure
-      className={
-        wide
-          ? "col-span-12 lg:col-span-10 lg:col-start-2"
-          : "col-span-12 lg:col-span-5 lg:col-start-2"
-      }
-    >
+    <figure className="w-full">
       {showCompare && before && after ? (
         <BeforeAfterSlider
           before={{
-            src: urlFor(before).width(1200).height(900).url(),
+            src: urlFor(before)
+              .width(wide ? 1200 : 1432)
+              .height(wide ? 900 : 796)
+              .url(),
             alt: before.alt ?? fallbackAlt,
           }}
           after={{
-            src: urlFor(after).width(1200).height(900).url(),
+            src: urlFor(after)
+              .width(wide ? 1200 : 1432)
+              .height(wide ? 900 : 796)
+              .url(),
             alt: after.alt ?? fallbackAlt,
           }}
-          sizes={wide ? "(min-width: 1024px) 1200px, 100vw" : "(min-width: 1024px) 580px, 100vw"}
+          sizes={wide ? "(min-width: 1024px) 1200px, 100vw" : "(min-width: 1024px) 716px, 100vw"}
+          className={wide ? "aspect-[4/3]" : "aspect-[716/398]"}
         />
       ) : (
-        <div className="relative aspect-[4/3]">
+        <div className={`relative ${wide ? "aspect-[4/3]" : "aspect-[716/398]"}`}>
           <Image
-            src={urlFor(active).width(1200).height(900).url()}
+            src={urlFor(active)
+              .width(wide ? 1200 : 1432)
+              .height(wide ? 900 : 796)
+              .url()}
             alt={active.alt ?? fallbackAlt}
             fill
-            sizes={wide ? "(min-width: 1024px) 1200px, 100vw" : "(min-width: 1024px) 580px, 100vw"}
+            sizes={wide ? "(min-width: 1024px) 1200px, 100vw" : "(min-width: 1024px) 716px, 100vw"}
             className="object-cover"
           />
         </div>
@@ -595,11 +655,13 @@ function ChapterFigure({
 
 function ExitPanel({
   exit,
+  creditsIntro,
   credits,
   nextProject,
   onOpenNext,
 }: {
   exit?: ProjectExit;
+  creditsIntro?: string | null;
   credits: ProjectCredit[];
   nextProject?: Pick<ProjectSummary, "slug" | "title"> | null;
   onOpenNext?: () => void;
@@ -607,7 +669,9 @@ function ExitPanel({
   const acquired = hasExitSide(exit?.acquired) ? exit!.acquired : null;
   const sold = hasExitSide(exit?.sold) ? exit!.sold : null;
   const metrics = filledMetrics(exit?.metrics);
-  const showStory = Boolean(acquired || sold || metrics.length > 0);
+  const proceedsNote = present(exit?.proceedsNote) ? exit!.proceedsNote : null;
+  const showStory = Boolean(acquired || sold || metrics.length > 0 || proceedsNote);
+  const showCredits = Boolean(creditsIntro) || credits.length > 0;
   const heading = present(exit?.heading)
     ? exit!.heading
     : showStory
@@ -615,18 +679,29 @@ function ExitPanel({
       : null;
 
   return (
-    <section className="s2-page h-auto w-full shrink-0 overflow-visible lg:h-full lg:w-[100cqw] lg:overflow-hidden">
-      {credits.length > 0 ? (
-        <div
-          aria-hidden
-          className="relative col-span-12 hidden h-full lg:col-span-5 lg:col-start-8 lg:row-start-1 lg:block"
-        >
-          <div className="absolute inset-0 bg-s2-fog" />
-        </div>
+    <section className="relative h-auto w-full shrink-0 overflow-visible max-lg:px-[var(--s2-margin)] lg:h-full lg:w-[100cqw] lg:overflow-hidden">
+      {/* Rail izq. 40px + fog de credits desde 867 (Figma). */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 left-0 hidden w-[var(--s2-case-rail)] bg-s2-fog lg:block"
+      >
+        <div className="absolute inset-y-0 right-0 w-px bg-s2-steel" />
+      </div>
+      {showCredits ? (
+        <>
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 left-[var(--s2-case-credits-start)] right-0 hidden bg-s2-fog lg:block"
+          />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 left-[var(--s2-case-credits-start)] hidden w-px bg-s2-steel lg:block"
+          />
+        </>
       ) : null}
 
       {showStory ? (
-        <div className="col-span-12 py-10 lg:col-span-6 lg:col-start-2 lg:row-start-1 lg:max-w-[630px] lg:py-16">
+        <div className="relative py-10 lg:absolute lg:inset-y-0 lg:left-[var(--s2-case-exit-inset)] lg:w-[min(630px,calc(var(--s2-case-credits-start)-var(--s2-case-exit-inset)-2.78%))] lg:pt-20">
           {heading ? (
             <h2 className="text-metrics border-b border-s2-black pb-4">{heading}</h2>
           ) : null}
@@ -634,14 +709,24 @@ function ExitPanel({
           {acquired || sold ? (
             <div className="mt-10 flex flex-col gap-10 sm:flex-row sm:items-end sm:justify-between sm:gap-x-12 lg:mt-12">
               {acquired ? (
-                <ExitSideBlock side={acquired} variant="acquired" />
+                <ExitSideBlock
+                  side={acquired}
+                  variant="acquired"
+                  barHeight={exitBarHeight(acquired.value, sold?.value)}
+                />
               ) : null}
-              {sold ? <ExitSideBlock side={sold} variant="sold" /> : null}
+              {sold ? (
+                <ExitSideBlock
+                  side={sold}
+                  variant="sold"
+                  barHeight={exitBarHeight(sold.value, acquired?.value)}
+                />
+              ) : null}
             </div>
           ) : null}
 
           {metrics.length > 0 ? (
-            <dl className="mt-10 flex flex-col gap-6 border-t border-s2-black pt-3 sm:flex-row sm:justify-between lg:mt-16">
+            <dl className="mt-8 flex flex-col gap-6 border-t border-b border-s2-black pt-3 pb-3 sm:flex-row sm:justify-between lg:mt-10">
               {metrics.map((metric, index) => (
                 <div key={metric._key || index}>
                   <dt className="text-metrics">{metric.value}</dt>
@@ -652,42 +737,60 @@ function ExitPanel({
               ))}
             </dl>
           ) : null}
+
+          {/* Línea + nota micro (Figma 553:1770 / 570:590). */}
+          {proceedsNote ? (
+            <div className={metrics.length > 0 || acquired || sold ? "mt-8" : "mt-10"}>
+              <p className="text-micro mt-8 text-s2-steel">{proceedsNote}</p>
+            </div>
+          ) : null}
         </div>
       ) : null}
 
-      {credits.length > 0 ? (
+      {showCredits ? (
         <div
-          className={`relative flex flex-col bg-s2-fog px-5 py-10 max-lg:-mx-[var(--s2-margin)] lg:h-full lg:bg-transparent lg:px-0 lg:py-16 ${
+          className={`relative flex flex-col bg-s2-fog px-5 pt-10 pb-6 max-lg:-mx-[var(--s2-margin)] lg:absolute lg:inset-y-0 lg:bg-transparent lg:px-0 lg:pt-10 lg:pb-6 ${
             showStory
-              ? "col-span-12 lg:col-span-4 lg:col-start-9 lg:row-start-1 lg:max-w-[400px]"
-              : "col-span-12 lg:col-span-4 lg:col-start-2 lg:row-start-1 lg:max-w-[400px]"
+              ? "lg:left-[var(--s2-case-credits-inset)] lg:w-[var(--s2-case-credits-width)]"
+              : "lg:left-[var(--s2-case-exit-inset)] lg:w-[var(--s2-case-credits-width)]"
           }`}
         >
-          <h2 className="text-metrics border-b border-s2-black pb-4">Credits.</h2>
-          <dl>
-            {credits.map((credit, index) => (
-              <div
-                key={credit._key || index}
-                className="border-b border-s2-steel py-3"
-              >
-                {present(credit.label) ? (
-                  <dt className="text-micro">{credit.label}</dt>
-                ) : null}
-                {present(credit.detail) ? (
-                  <dd
-                    className={`text-body ${present(credit.label) ? "mt-1" : ""}`}
-                  >
-                    {credit.detail}
-                  </dd>
-                ) : null}
-              </div>
-            ))}
-          </dl>
+          {creditsIntro ? (
+            <p className="text-body">{creditsIntro}</p>
+          ) : null}
+          <h2
+            className={`text-metrics border-b border-s2-black pb-4 ${
+              creditsIntro ? "mt-4" : ""
+            }`}
+          >
+            In house.
+          </h2>
+          {credits.length > 0 ? (
+            <dl>
+              {credits.map((credit, index) => (
+                <div
+                  key={credit._key || index}
+                  className="border-b border-s2-steel py-3"
+                >
+                  {present(credit.label) ? (
+                    <dt className="text-micro">{credit.label}</dt>
+                  ) : null}
+                  {present(credit.detail) ? (
+                    <dd
+                      className={`text-body ${present(credit.label) ? "" : ""}`}
+                    >
+                      {credit.detail}
+                    </dd>
+                  ) : null}
+                </div>
+              ))}
+            </dl>
+          ) : null}
           {nextProject && onOpenNext ? (
             <button
               type="button"
               onClick={onOpenNext}
-              className="text-data mt-8 inline-flex cursor-pointer items-center justify-center gap-1.5 self-stretch bg-s2-black px-5 py-4 text-s2-steel lg:mt-auto lg:w-auto lg:self-end"
+              className="text-data mt-10 inline-flex cursor-pointer gap-x-1.5 items-center justify-center self-stretch bg-s2-black px-4 py-3 text-s2-steel lg:mt-auto lg:w-auto lg:self-end"
             >
               Next · {nextProject.title}
               <img
@@ -708,28 +811,27 @@ function ExitPanel({
 function ExitSideBlock({
   side,
   variant,
+  barHeight,
 }: {
   side: ProjectExitSide;
   variant: "acquired" | "sold";
+  barHeight: number;
 }) {
   const details = filledDetails(side.details);
 
   return (
     <div>
-      {variant === "acquired" ? (
-        <div className="h-[90px] w-[200px] bg-s2-black" />
-      ) : (
-        <div className="relative flex h-[146px] w-[200px] items-center justify-center bg-s2-orange">
-          <img
-            src="/icons/s2-mark.svg"
-            alt=""
-            width={146}
-            height={146}
-            className="size-[146px]"
-          />
-        </div>
-      )}
-      {present(side.value) ? <p className="text-h1 mt-8">{side.value}</p> : null}
+      {/* Contenedor fijo para alinear bases; la barra crece con el valor. */}
+      <div
+        className="flex items-end"
+        style={{ height: EXIT_BAR_MAX_HEIGHT, width: EXIT_BAR_WIDTH }}
+      >
+        <div
+          className={variant === "acquired" ? "bg-s2-black" : "bg-s2-orange"}
+          style={{ height: barHeight, width: EXIT_BAR_WIDTH }}
+        />
+      </div>
+      {present(side.value) ? <p className="text-h1 mt-6">{side.value}</p> : null}
       {present(side.line) ? (
         <p className="text-micro mt-5 text-s2-steel">{side.line}</p>
       ) : null}

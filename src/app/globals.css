@@ -31,6 +31,21 @@
   --s2-case-study: 800px;
 }
 
+/* Medidas del case study en % del canvas (ref. 1440 en STYLEGUIDE). */
+@utility s2-case-study {
+  --s2-case-inset: 6.6667%;
+  --s2-case-rail: 2.7778%;
+  --s2-case-deal: 20.2778%;
+  --s2-case-deal-gap: 5.1389%;
+  --s2-case-deal-pad: 15.0685%; /* 44px dentro del deal de 292 */
+  --s2-case-figure: 49.7222%;
+  --s2-case-copy: 33.3333%;
+  --s2-case-credits-start: 60.2083%;
+  --s2-case-credits-inset: 65.9722%;
+  --s2-case-credits-width: 27.7778%;
+  --s2-case-exit-inset: 8.9583%;
+}
+
 
 
 @theme inline {
@@ -54,7 +69,6 @@
 }
 
 html {
-  min-width: var(--s2-page);
   scroll-behavior: smooth;
 }
 
@@ -65,20 +79,20 @@ html {
 }
 
 body {
-  min-width: var(--s2-page);
   background: var(--S2-Frame);
   color: var(--foreground);
   font-family: var(--font-archivo), Arial, Helvetica, sans-serif;
+  overflow-x: clip;
 }
 
 /* ---------------------------------------------------------------------------
-   Grilla de página: 1440px, 12 columnas de 100px, gutter 20px, margen 10px.
-   El canvas permanece fijo y permite desplazamiento horizontal bajo 1440px.
+   Grilla de página: max 1440px, 12 columnas fluidas, gutter 20px, margen 10px.
+   Bajo 1440px el canvas se estrecha con el viewport (sin scroll horizontal).
 --------------------------------------------------------------------------- */
 
 @utility s2-page {
-  width: var(--s2-page);
-  max-width: none;
+  width: 100%;
+  max-width: var(--s2-page);
   margin-inline: auto;
   padding-inline: var(--s2-margin);
   display: grid;

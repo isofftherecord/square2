@@ -12,12 +12,14 @@ type BeforeAfterSliderProps = {
   before: SlideImage;
   after: SlideImage;
   sizes?: string;
+  className?: string;
 };
 
 export function BeforeAfterSlider({
   before,
   after,
   sizes = "580px",
+  className = "aspect-[4/3]",
 }: BeforeAfterSliderProps) {
   const frameRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState(50);
@@ -40,7 +42,7 @@ export function BeforeAfterSlider({
       aria-valuemax={100}
       aria-valuenow={Math.round(position)}
       tabIndex={0}
-      className="relative aspect-[4/3] w-full cursor-ew-resize touch-none select-none outline-none"
+      className={`relative w-full cursor-ew-resize touch-none select-none outline-none ${className}`}
       onPointerDown={(event) => {
         event.currentTarget.setPointerCapture(event.pointerId);
         moveTo(event.clientX);

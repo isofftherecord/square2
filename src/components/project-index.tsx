@@ -45,6 +45,7 @@ export type ProjectExit = {
   acquired?: ProjectExitSide;
   sold?: ProjectExitSide;
   metrics?: ProjectMetric[];
+  proceedsNote?: string;
 };
 
 export type ProjectCredit = {
@@ -70,6 +71,7 @@ export type ProjectSummary = {
   dealMetrics?: ProjectMetric[];
   chapters?: ProjectChapter[];
   exit?: ProjectExit;
+  creditsIntro?: string;
   credits?: ProjectCredit[];
 };
 
