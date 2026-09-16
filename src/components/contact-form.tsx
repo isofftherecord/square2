@@ -46,7 +46,7 @@ export function ContactForm() {
               className="size-4 shrink-0 appearance-none border border-s2-black checked:border-s2-orange checked:bg-s2-orange"
             />
             <label htmlFor="interest-capital" className="text-metrics">
-              Capital
+              Investment Opportunity
             </label>
           </div>
 
@@ -59,7 +59,7 @@ export function ContactForm() {
               className="size-4 shrink-0 appearance-none border border-s2-black checked:border-s2-orange checked:bg-s2-orange"
             />
             <label htmlFor="interest-ownership" className="text-metrics">
-              Ownership
+              Property Management
             </label>
           </div>
         </div>
