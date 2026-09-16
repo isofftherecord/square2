@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { SubscribeForm } from "@/components/subscribe-form";
-import { SITE_NAV } from "@/lib/site-nav";
+import { FOOTER_NAV } from "@/lib/site-nav";
 
 const CONNECTIONS = [
   { href: "#", label: "LinkedIn" },
@@ -61,7 +61,7 @@ export function Footer() {
         >
           <p className="text-navigation text-s2-orange">Sitemap</p>
           <ul className="flex flex-col gap-3">
-            {SITE_NAV.map((item) => (
+            {FOOTER_NAV.map((item) => (
               <li key={item.label}>
                 <Link
                   href={item.href}
