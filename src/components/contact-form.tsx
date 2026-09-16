@@ -74,8 +74,8 @@ export function ContactForm() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-x-5">
-          <div className="flex items-center border-b border-s2-black py-10">
-            <label htmlFor="name" className="text-micro w-20 shrink-0">
+          <div className="flex items-center border-b border-s2-black py-6">
+            <label htmlFor="name" className="text-micro w-16 shrink-0">
               Name
             </label>
             <input
@@ -84,12 +84,12 @@ export function ContactForm() {
               type="text"
               autoComplete="name"
               required
-              className="text-body w-full bg-s2-fog outline-none"
+              className="text-body h-15 w-full bg-s2-fog px-3 outline-none"
             />
           </div>
 
-          <div className="flex items-center border-b border-s2-black py-10">
-            <label htmlFor="company" className="text-micro w-20 shrink-0">
+          <div className="flex items-center border-b border-s2-black py-6">
+            <label htmlFor="company" className="text-micro w-16 shrink-0">
               Company
             </label>
             <input
@@ -97,14 +97,14 @@ export function ContactForm() {
               name="company"
               type="text"
               autoComplete="organization"
-              className="text-body w-full bg-s2-fog outline-none"
+              className="text-body h-15 w-full bg-s2-fog px-3 outline-none"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-x-5">
-          <div className="flex items-center border-b border-s2-black py-10">
-            <label htmlFor="email" className="text-micro w-20 shrink-0">
+          <div className="flex items-center border-b border-s2-black py-6">
+            <label htmlFor="email" className="text-micro w-16 shrink-0">
               Email
             </label>
             <input
@@ -113,12 +113,12 @@ export function ContactForm() {
               type="email"
               autoComplete="email"
               required
-              className="text-body w-full bg-s2-fog outline-none"
+              className="text-body h-15 w-full bg-s2-fog px-3 outline-none"
             />
           </div>
 
-          <div className="flex items-center border-b border-s2-black py-10">
-            <label htmlFor="phone" className="text-micro w-20 shrink-0">
+          <div className="flex items-center border-b border-s2-black py-6">
+            <label htmlFor="phone" className="text-micro w-16 shrink-0">
               Phone
             </label>
             <input
@@ -126,13 +126,13 @@ export function ContactForm() {
               name="phone"
               type="tel"
               autoComplete="tel"
-              className="text-body w-full bg-s2-fog outline-none"
+              className="text-body h-15 w-full bg-s2-fog px-3 outline-none"
             />
           </div>
         </div>
 
-        <div className="flex items-center border-b border-s2-black py-10">
-          <label htmlFor="message" className="text-micro w-20 shrink-0">
+        <div className="flex items-start border-b border-s2-black py-6">
+          <label htmlFor="message" className="text-micro w-16 shrink-0 pt-10">
             Message
           </label>
           <textarea
@@ -140,7 +140,7 @@ export function ContactForm() {
             name="message"
             rows={4}
             required
-            className="text-body w-full resize-none bg-s2-fog outline-none"
+            className="text-body h-35 w-full resize-none bg-s2-fog px-3 py-3 outline-none"
           />
         </div>
 
@@ -148,7 +148,7 @@ export function ContactForm() {
           type="submit"
           variant="black"
           disabled={pending}
-          className="mt-16 w-fit disabled:cursor-not-allowed disabled:opacity-50"
+          className="mt-16 w-fit line-height-0 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {pending ? "SENDING" : "SEND"}
         </Button>
