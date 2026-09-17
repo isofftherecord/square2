@@ -1,3 +1,4 @@
+import { CookieConsent } from "@/components/cookie-consent";
 import { Footer } from "@/components/footer";
 import { Navbar } from "@/components/navbar";
 
@@ -13,6 +14,8 @@ export default function SiteLayout({
         {children}
       </div>
       <Footer />
+      {/* Banner de cookies: bloquea Google Analytics hasta el accept. */}
+      <CookieConsent />
     </>
   );
 }

@@ -47,6 +47,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         {children}
         {isSanityConfigured ? <SanityLive /> : null}
       </body>
+      {/* GA se carga solo vía CookieConsent, tras el accept del visitante. */}
     </html>
   );
 }

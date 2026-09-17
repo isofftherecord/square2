@@ -6,7 +6,9 @@ export const metadata: Metadata = {
 
 export default function PrivacyPolicyPage() {
   return (
-    <article className="s2-subgrid pt-32 pb-16 lg:pt-[240px] lg:pb-20">
+    <article className="s2-hero bg-s2-fog">
+      {/* Fondo Fog a todo el canvas (mismo patrón que Investment Criteria en Platform). */}
+      <div className="s2-page pt-32 pb-16 lg:pt-[240px] lg:pb-20">
       <header className="s2-subgrid col-span-12 items-start gap-y-6 border-b border-s2-black pb-[70px] lg:col-span-10 lg:col-start-2">
         <div className="col-span-12 lg:col-span-5">
           <h1 className="text-h1">Privacy policy.</h1>
@@ -98,7 +100,7 @@ export default function PrivacyPolicyPage() {
         </h2>
         <div className="text-body col-span-12 lg:col-span-5">
           <p>
-            Service providers who act on our instructions: Google Analytics for website measurement, Google Maps for the embedded office map, [form and email provider] for delivering inquiries and subscriptions, and [hosting provider] for serving the site and its logs.
+            Service providers who act on our instructions: Google Analytics for website measurement (only with your consent), Google Maps for the embedded office map, Sanity for managing and delivering the site&apos;s content, Resend for delivering inquiries and subscriptions, and Vercel for serving the site and its logs.
           </p>
 
           <p className="mt-6">Professional advisers, and counterparties to a transaction, where a business relationship requires it.</p>
@@ -208,7 +210,7 @@ export default function PrivacyPolicyPage() {
         </div>
       </section>
 
-
+      </div>
     </article>
   );
 }
