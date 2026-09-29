@@ -31,8 +31,7 @@ export default function PrivacyPolicyPage() {
         </h2>
         <div className="text-body col-span-12 lg:col-span-5">
           <p>
-            This policy applies to all personal data processed by SQUARE2
-            Capital, LLC in connection with this website and its visitors.
+          This policy applies to all personal data processed by SQUARE2 Capital, LLC in connection with this website and its visitors.
           </p>
           <address className="mt-6 not-italic">
             <b>SQUARE2 Capital, LLC</b>
@@ -41,14 +40,16 @@ export default function PrivacyPolicyPage() {
             <br />
             Miami, FL 33133
             <br />
-            <a href="mailto:info@S2C.com">info@S2C.com</a>
-            <br />
             <a href="tel:+13053728828">+1.305.372.8828</a>
+            <br />
+            <br />
+            Privacy contact: <a href="mailto:info@S2C.com">info@S2C.com</a>
+            <br />
+           
+          
           </address>
-          <p className="mt-6">Privacy contact: Alexandra Ramirez, Director of Operations</p>
-          <p className="mt-6">
-            We encourage you to read this policy carefully to understand our practices regarding your data and how we will treat it.
-          </p>
+          <p className="mt-6"> We encourage you to read this policy carefully to understand our practices regarding your data and how we will treat it.</p>
+          
         </div>
       </section>
 
