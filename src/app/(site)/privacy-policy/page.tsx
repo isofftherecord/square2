@@ -101,7 +101,7 @@ export default function PrivacyPolicyPage() {
         </h2>
         <div className="text-body col-span-12 lg:col-span-5">
           <p>
-            Service providers who act on our instructions: Google Analytics for website measurement (only with your consent), Google Maps for the embedded office map, Sanity for managing and delivering the site&apos;s content, Resend for delivering inquiries and subscriptions, and Vercel for serving the site and its logs.
+          Service providers who act on our instructions: Google Analytics for website measurement, Google Maps for the embedded office map, Resend for delivering inquiries and subscriptions, and Vercel for serving the site and its logs.
           </p>
 
           <p className="mt-6">Professional advisers, and counterparties to a transaction, where a business relationship requires it.</p>
