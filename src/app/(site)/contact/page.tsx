@@ -28,6 +28,9 @@ export default function ContactPage() {
       />
 
       <ContactForm />
+
+      {/* Banda naranja de cierre: misma franja que en portfolio */}
+      <div className="s2-bleed h-[100px] bg-s2-orange" aria-hidden="true" />
     </>
   );
 }
