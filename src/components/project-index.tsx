@@ -70,6 +70,7 @@ export type ProjectSummary = {
   owner?: string;
   scope?: string;
   status?: string;
+  buildingImage?: ProjectImage;
   buildingHeading?: string;
   buildingSummary?: string;
   dealHeading?: string;

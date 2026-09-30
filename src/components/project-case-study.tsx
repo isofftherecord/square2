@@ -248,6 +248,14 @@ export function ProjectCaseStudy({
   const showExit =
     hasExitContent(project.exit) || credits.length > 0 || Boolean(creditsIntro);
   const isManaged = project.role === "Managed";
+  const managedImage = hasImageAsset(project.buildingImage)
+    ? project.buildingImage
+    : null;
+  const managedSummary = present(project.buildingSummary)
+    ? project.buildingSummary!.trim()
+    : null;
+  const showManagedBuilding =
+    isManaged && (Boolean(managedImage) || Boolean(managedSummary));
   const nextButton =
     nextProject && onOpenNext ? (
       <NextProjectButton
@@ -257,7 +265,7 @@ export function ProjectCaseStudy({
     ) : null;
 
   const panelCount = isManaged
-    ? 1
+    ? 1 + (showManagedBuilding ? 1 : 0)
     : 1 + chapters.length + (showExit ? 1 : 0);
 
   const syncPanel = useCallback(() => {
@@ -352,7 +360,37 @@ export function ProjectCaseStudy({
       >
         <div className="flex h-auto max-lg:flex-col lg:h-full">
           {isManaged ? (
-            <ManagedPanel project={project} nextButton={nextButton} />
+            <>
+              <ManagedCover
+                project={project}
+                nextButton={showManagedBuilding ? null : nextButton}
+              />
+              {showManagedBuilding ? (
+                <ChapterPanel
+                  chapter={{
+                    heading: managedSummary
+                      ? present(project.buildingHeading)
+                        ? project.buildingHeading!.trim()
+                        : "The building."
+                      : undefined,
+                    paragraphs: managedSummary
+                      ? managedSummary
+                          .split(/\n+/)
+                          .map((text) => text.trim())
+                          .filter((text) => text.length > 0)
+                          .map((text) => ({ text }))
+                      : undefined,
+                    image: managedImage ?? undefined,
+                    caption:
+                      managedImage && present(managedImage.caption)
+                        ? managedImage.caption!.trim()
+                        : undefined,
+                  }}
+                  fallbackAlt={project.title}
+                  nextButton={nextButton}
+                />
+              ) : null}
+            </>
           ) : (
             <>
               <CoverPanel
@@ -555,7 +593,7 @@ function CoverPanel({
   );
 }
 
-function ManagedPanel({
+function ManagedCover({
   project,
   nextButton,
 }: {
@@ -578,90 +616,83 @@ function ManagedPanel({
   const addressLines = present(project.address)
     ? project.address!.split("\n").filter((line) => present(line))
     : [];
+  const dealMetrics = filledMetrics(project.dealMetrics);
   const footage =
-    typeof project.squareFootage === "number"
+    dealMetrics.length === 0 && typeof project.squareFootage === "number"
       ? project.squareFootage.toLocaleString("en-US")
       : null;
-  const heading = present(project.buildingHeading)
-    ? project.buildingHeading!.trim()
-    : "The building.";
-  const summary = present(project.buildingSummary)
-    ? project.buildingSummary!.trim()
-    : null;
-  const image = hasImageAsset(project.mainImage) ? project.mainImage : null;
-  const caption =
-    image && present(image.caption) ? image.caption!.trim() : null;
+  const showColumn = Boolean(footage) || dealMetrics.length > 0;
+  const columnHeading = present(project.dealHeading)
+    ? project.dealHeading
+    : "Under management.";
 
   return (
-    <section className="relative h-auto w-full shrink-0 py-10 max-lg:px-[var(--s2-margin)] lg:h-full lg:w-[100cqw] lg:py-0">
-      <div className="flex w-full flex-col gap-10 lg:grid lg:h-full lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.72fr)_minmax(0,1.35fr)] lg:gap-0">
-        <div className="lg:flex lg:flex-col lg:justify-center lg:py-16 lg:pr-8 lg:pl-[var(--s2-case-inset)]">
-          <h1 className="text-h1">{project.title}</h1>
-          {addressLines.length > 0 ? (
-            <p className="text-metrics mt-6">
-              {addressLines.map((line, index) => (
-                <span key={line}>
-                  {index > 0 ? <br /> : null}
-                  {line}
-                </span>
-              ))}
-            </p>
-          ) : null}
-          {facts.length > 0 ? (
-            <dl className="mt-10 border-t-2 border-s2-black lg:mt-16">
-              {facts.map((row) => (
-                <div
-                  key={row.label}
-                  className="flex border-b border-s2-steel/40 py-4"
-                >
-                  <dt className="text-data w-32 shrink-0 text-s2-steel">
-                    {row.label}
-                  </dt>
-                  <dd className="text-body">{row.value}</dd>
+    <section className="relative h-auto w-full shrink-0 py-10 max-lg:px-[var(--s2-margin)] lg:flex lg:h-full lg:w-[100cqw] lg:items-center lg:py-0">
+      <div
+        className={`w-full lg:pl-[var(--s2-case-inset)] ${
+          showColumn
+            ? "lg:pr-[calc(var(--s2-case-deal)+var(--s2-case-deal-gap))]"
+            : "lg:pr-[var(--s2-case-inset)]"
+        }`}
+      >
+        <h1 className="text-h1">{project.title}</h1>
+        {addressLines.length > 0 ? (
+          <p className="text-metrics mt-6">
+            {addressLines.map((line, index) => (
+              <span key={line}>
+                {index > 0 ? <br /> : null}
+                {line}
+              </span>
+            ))}
+          </p>
+        ) : null}
+
+        {facts.length > 0 ? (
+          <dl className="mt-10 border-t-2 border-s2-black lg:mt-16">
+            {facts.map((row) => (
+              <div
+                key={row.label}
+                className="flex border-b border-s2-steel/40 py-4"
+              >
+                <dt className="text-data w-32 shrink-0 text-s2-steel">
+                  {row.label}
+                </dt>
+                <dd className="text-body">{row.value}</dd>
+              </div>
+            ))}
+          </dl>
+        ) : null}
+      </div>
+
+      {showColumn ? (
+        <div className="relative mt-8 max-lg:-mx-[var(--s2-margin)] lg:absolute lg:inset-y-0 lg:right-0 lg:mt-0 lg:w-[var(--s2-case-deal)]">
+          <div
+            aria-hidden
+            className="absolute inset-y-0 left-0 z-[1] hidden w-px bg-s2-steel lg:block"
+          />
+          <div className="flex flex-col justify-top bg-s2-fog px-6 pt-20 pb-8 lg:h-full lg:px-0 lg:pl-[var(--s2-case-deal-pad)]">
+            <h3 className="text-metrics">{columnHeading}</h3>
+            <div aria-hidden className="mt-2 h-px w-[168px] bg-s2-black" />
+            <dl className="mt-8 space-y-7">
+              {footage ? (
+                <div>
+                  <dt className="text-h1">{footage}</dt>
+                  <dd className="text-micro mt-1">square feet</dd>
+                </div>
+              ) : null}
+              {dealMetrics.map((metric, index) => (
+                <div key={metric._key || index}>
+                  <dt className="text-h1">{metric.value}</dt>
+                  {present(metric.label) ? (
+                    <dd className="text-micro mt-1">{metric.label}</dd>
+                  ) : null}
                 </div>
               ))}
             </dl>
-          ) : null}
+          </div>
         </div>
-
-        <div className="lg:flex lg:flex-col lg:justify-center lg:border-l lg:border-s2-steel lg:px-8 lg:py-16">
-          <h2 className="text-metrics">Under management.</h2>
-          {footage ? <p className="text-h1 mt-6">{footage}</p> : null}
-          <p className="text-micro mt-1">square feet</p>
-        </div>
-
-        <div className="flex flex-col lg:py-16 lg:pr-[var(--s2-case-inset)] lg:pl-8">
-          {image ? (
-            <figure>
-              <div className="relative aspect-[716/398]">
-                <Image
-                  src={urlFor(image).width(1432).height(796).url()}
-                  alt={image.alt ?? project.title}
-                  fill
-                  sizes="(min-width: 1024px) 520px, 100vw"
-                  className="object-cover"
-                />
-              </div>
-              {caption ? (
-                <figcaption className="text-micro bg-s2-orange px-4 py-3 text-s2-white">
-                  {caption}
-                </figcaption>
-              ) : null}
-            </figure>
-          ) : null}
-          {summary ? (
-            <div className={image ? "mt-8" : ""}>
-              <h2 className="text-metrics border-b border-s2-black pb-4">
-                {heading}
-              </h2>
-              <p className="text-body mt-8">{summary}</p>
-            </div>
-          ) : null}
-          {nextButton ? (
-            <div className="mt-10 flex justify-end lg:mt-auto">{nextButton}</div>
-          ) : null}
-        </div>
-      </div>
+      ) : null}
+      <PanelNext nextButton={nextButton} />
     </section>
   );
 }

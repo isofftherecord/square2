@@ -57,6 +57,7 @@ export const projectsQuery = defineQuery(`
       owner,
       scope,
       status,
+      buildingImage,
       buildingHeading,
       buildingSummary,
       dealHeading,
