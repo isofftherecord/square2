@@ -7,13 +7,10 @@ export function StoryChapterItem(props: ItemProps) {
   if (!isObjectItemProps(props)) return props.renderDefault(props);
 
   const heading = STORY_HEADINGS[props.index];
-  if (!heading) return props.renderDefault(props);
-
-  const value =
-    props.value && typeof props.value === "object" ? props.value : {};
+  if (!heading || !props.value) return props.renderDefault(props);
 
   return props.renderDefault({
     ...props,
-    value: { ...value, heading },
+    value: { ...props.value, heading },
   });
 }
