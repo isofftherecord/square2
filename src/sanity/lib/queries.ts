@@ -58,7 +58,6 @@ export const projectsQuery = defineQuery(`
       scope,
       status,
       buildingImage,
-      buildingHeading,
       buildingSummary,
       dealMetrics[] { _key, value, label },
       chapters[] {

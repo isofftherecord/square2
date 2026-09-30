@@ -301,15 +301,6 @@ export const project = defineType({
       ],
     }),
     defineField({
-      name: "buildingHeading",
-      title: "Building heading",
-      description: "Defaults to “The building.”",
-      type: "string",
-      group: "managedCover",
-      initialValue: "The building.",
-      hidden: hideManagedOnly,
-    }),
-    defineField({
       name: "buildingSummary",
       title: "The building",
       description:

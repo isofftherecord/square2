@@ -375,11 +375,7 @@ export function ProjectCaseStudy({
               {showManagedBuilding ? (
                 <ChapterPanel
                   chapter={{
-                    heading: managedSummary
-                      ? present(project.buildingHeading)
-                        ? project.buildingHeading!.trim()
-                        : "The building."
-                      : undefined,
+                    heading: "The building.",
                     paragraphs: managedSummary
                       ? managedSummary
                           .split(/\n+/)
