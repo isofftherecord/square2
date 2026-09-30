@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/button";
 import { ProjectCaseStudy } from "@/components/project-case-study";
-import type { ProjectSummary } from "@/components/project-index";
+import { filledYear, type ProjectSummary } from "@/components/project-index";
 import { roleBadgeClass } from "@/lib/project-role";
 import { hasImageAsset, urlFor } from "@/sanity/lib/image";
 
@@ -160,8 +160,8 @@ function LedgerRow({
                 {project.assetClass ? (
                   <p className="text-data text-s2-black">{project.assetClass}</p>
                 ) : null}
-                {project.years ? (
-                  <p className="text-data text-s2-black">{project.years}</p>
+                {filledYear(project.years) ? (
+                  <p className="text-data text-s2-black">{filledYear(project.years)}</p>
                 ) : null}
               </div>
               {project.role ? (

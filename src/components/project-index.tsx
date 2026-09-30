@@ -85,6 +85,13 @@ function formatSquareFootage(value: number) {
   return value.toLocaleString("en-US");
 }
 
+// Un guion suelto cuenta como vacío: se usaba para cumplir el campo obligatorio.
+export function filledYear(value?: string | null) {
+  const text = value?.trim();
+  if (!text || text === "-" || text === "–" || text === "—") return undefined;
+  return text;
+}
+
 export function ProjectIndex({
   projects,
   heading,
@@ -123,7 +130,7 @@ export function ProjectIndex({
                 {project.title}
               </span>
               <span className="text-micro col-span-12 mt-2 text-s2-steel lg:hidden">
-                {[project.market, project.assetClass, project.years]
+                {[project.market, project.assetClass, filledYear(project.years)]
                   .filter(Boolean)
                   .join(" · ")}
               </span>
@@ -139,7 +146,7 @@ export function ProjectIndex({
                   : null}
               </span>
               <span className="text-metrics hidden lg:col-span-2 lg:block">
-                {project.years}
+                {filledYear(project.years)}
               </span>
               <span className="col-span-12 mt-3 lg:col-span-2 lg:mt-0">
                 {project.role ? (

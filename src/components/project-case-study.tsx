@@ -12,15 +12,16 @@ import {
 } from "react";
 import { Arrow } from "@/components/arrow";
 import { BeforeAfterSlider } from "@/components/before-after-slider";
-import type {
-  ProjectChapter,
-  ProjectCredit,
-  ProjectExit,
-  ProjectExitSide,
-  ProjectGalleryItem,
-  ProjectImage,
-  ProjectMetric,
-  ProjectSummary,
+import {
+  filledYear,
+  type ProjectChapter,
+  type ProjectCredit,
+  type ProjectExit,
+  type ProjectExitSide,
+  type ProjectGalleryItem,
+  type ProjectImage,
+  type ProjectMetric,
+  type ProjectSummary,
 } from "@/components/project-index";
 import { hasImageAsset, urlFor } from "@/sanity/lib/image";
 
@@ -298,7 +299,7 @@ export function ProjectCaseStudy({
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  const headerLine = [project.role, project.status, project.years]
+  const headerLine = [project.role, project.status, filledYear(project.years)]
     .filter((part) => present(part))
     .join(" · ");
 

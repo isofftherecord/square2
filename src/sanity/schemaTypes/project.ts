@@ -128,7 +128,7 @@ export const project = defineType({
     },
     {
       name: "exitCredits",
-      title: "Credits",
+      title: "In house.",
     },
   ],
   fields: [
@@ -178,7 +178,6 @@ export const project = defineType({
       group: "listing",
       hidden: hideUntilRole,
       options: { list: [...PROJECT_CLASSES], layout: "radio" },
-      validation: (rule) => rule.required().error("Class is required"),
     }),
     defineField({
       name: "squareFootage",
@@ -197,11 +196,10 @@ export const project = defineType({
     defineField({
       name: "years",
       title: "Year",
-      description: "Year or range. Example: 2016–2022",
+      description: "Year or range. Example: 2016–2022. Leave blank to hide it.",
       type: "string",
       group: "listing",
       hidden: hideUntilRole,
-      validation: (rule) => rule.required().error("Year is required"),
     }),
     defineField({
       name: "mainImage",
@@ -579,9 +577,9 @@ export const project = defineType({
     }),
     defineField({
       name: "creditsIntro",
-      title: "Credits intro",
+      title: "Intro",
       description:
-        "Paragraph above the credits list. Example: Cradle to grave. The people who underwrote the acquisition…",
+        "Paragraph above the list. Example: Cradle to grave. The people who underwrote the acquisition…",
       type: "text",
       rows: 4,
       group: "exit",
@@ -590,7 +588,7 @@ export const project = defineType({
     }),
     defineField({
       name: "credits",
-      title: "Credits",
+      title: "In house.",
       description: "Optional roles shown on the exit panel.",
       type: "array",
       group: "exit",
@@ -600,7 +598,7 @@ export const project = defineType({
         defineArrayMember({
           type: "object",
           name: "credit",
-          title: "Credit",
+          title: "Role",
           fields: [
             defineField({
               name: "label",
