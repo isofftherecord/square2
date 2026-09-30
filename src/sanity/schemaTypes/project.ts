@@ -441,24 +441,33 @@ export const project = defineType({
                       options: { hotspot: true },
                       fields: altImageFields(),
                     }),
+                    defineField({
+                      name: "caption",
+                      title: "Caption",
+                      description: "Orange bar under this extra photo.",
+                      type: "string",
+                    }),
                   ],
                   preview: {
                     select: {
                       media: "image",
                       before: "beforeImage.asset",
                       alt: "image.alt",
+                      caption: "caption",
                     },
                     prepare({
                       media,
                       before,
                       alt,
+                      caption,
                     }: {
                       media?: string;
                       before?: string;
                       alt?: string;
+                      caption?: string;
                     }) {
                       return {
-                        title: alt || "Extra image",
+                        title: caption || alt || "Extra image",
                         subtitle: before ? "Before / After" : "After",
                         media,
                       };

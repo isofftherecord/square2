@@ -73,6 +73,7 @@ export const projectsQuery = defineQuery(`
           _type,
           alt,
           asset,
+          caption,
           image,
           beforeImage
         }

@@ -60,6 +60,7 @@ function filledDetails(details?: string[]) {
 type ChapterSlide = {
   after?: ProjectImage;
   before?: ProjectImage;
+  caption?: string;
 };
 
 function galleryAfter(item: ProjectGalleryItem) {
@@ -77,7 +78,11 @@ function chapterSlides(chapter: ProjectChapter) {
     : undefined;
 
   if (mainAfter || mainBefore) {
-    slides.push({ after: mainAfter, before: mainBefore });
+    slides.push({
+      after: mainAfter,
+      before: mainBefore,
+      caption: chapter.caption,
+    });
   }
 
   for (const item of chapter.gallery ?? []) {
@@ -87,7 +92,7 @@ function chapterSlides(chapter: ProjectChapter) {
       : undefined;
     // Cada extra es un slide propio, aunque reutilice el After del capítulo.
     if (!after && !before) continue;
-    slides.push({ after, before });
+    slides.push({ after, before, caption: item.caption });
   }
 
   return slides;
@@ -738,7 +743,6 @@ function ChapterPanel({
           }
         >
           <ChapterFigure
-            chapter={chapter}
             slides={slides}
             fallbackAlt={fallbackAlt}
             wide={!showText}
@@ -790,12 +794,10 @@ function ChapterPanel({
 }
 
 function ChapterFigure({
-  chapter,
   slides,
   fallbackAlt,
   wide,
 }: {
-  chapter: ProjectChapter;
   slides: ChapterSlide[];
   fallbackAlt: string;
   wide: boolean;
@@ -806,8 +808,8 @@ function ChapterFigure({
   const before = current?.before;
   const showCompare = hasImageAsset(before) && hasImageAsset(after);
   const active = slideImage(current);
-  const caption = present(chapter.caption)
-    ? chapter.caption
+  const caption = present(current?.caption)
+    ? current.caption
     : present(active?.alt)
       ? active?.alt
       : null;
