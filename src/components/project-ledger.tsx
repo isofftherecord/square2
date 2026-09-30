@@ -309,7 +309,7 @@ export function ProjectLedger({ projects }: { projects: ProjectSummary[] }) {
   }, [projects]);
 
   return (
-    <section className="s2-subgrid pb-16 lg:pb-30">
+    <section className="s2-subgrid">
       {projects.map((project, index) => (
         <LedgerRow
           key={project._id}

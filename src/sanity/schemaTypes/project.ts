@@ -217,7 +217,7 @@ export const project = defineType({
     defineField({
       name: "featured",
       title: "Featured project?",
-      description: "Featured projects appear first on the home page.",
+      description: "Only featured projects appear on the home page.",
       type: "boolean",
       group: "listing",
       hidden: hideUntilRole,

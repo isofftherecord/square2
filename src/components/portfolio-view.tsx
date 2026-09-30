@@ -109,6 +109,9 @@ export function PortfolioView({
           )}
         </div>
       </main>
+
+      {/* Banda naranja de cierre: 100px a todo el viewport (Figma 848:1608). */}
+      <div className="s2-bleed h-[100px] bg-s2-orange" aria-hidden="true" />
     </>
   );
 }

@@ -41,9 +41,7 @@ export const firmPartnersQuery = defineQuery(`
   }
 `);
 
-export const projectsQuery = defineQuery(`
-  *[_type == "project" && defined(slug.current)]
-    | order(featured desc, title asc) {
+const projectFields = /* groq */ `{
       _id,
       title,
       "slug": slug.current,
@@ -87,5 +85,15 @@ export const projectsQuery = defineQuery(`
       },
       creditsIntro,
       credits[] { _key, label, detail }
-    }
+    }`;
+
+export const projectsQuery = defineQuery(`
+  *[_type == "project" && defined(slug.current)]
+    | order(featured desc, title asc) ${projectFields}
+`);
+
+// Solo los proyectos marcados como "Featured project?" en el Studio
+export const featuredProjectsQuery = defineQuery(`
+  *[_type == "project" && defined(slug.current) && featured == true]
+    | order(title asc) ${projectFields}
 `);
