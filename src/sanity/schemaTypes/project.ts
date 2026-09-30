@@ -301,6 +301,16 @@ export const project = defineType({
       ],
     }),
     defineField({
+      name: "buildingLegal",
+      title: "Legal",
+      description:
+        "Line under the building photo. Leave blank to use the standard notice: NO RETURNS PUBLISHED. THE CAPITAL IS THE OWNER'S.",
+      type: "string",
+      group: "managedCover",
+      hidden: hideManagedOnly,
+      initialValue: "NO RETURNS PUBLISHED. THE CAPITAL IS THE OWNER'S.",
+    }),
+    defineField({
       name: "buildingSummary",
       title: "The building",
       description:

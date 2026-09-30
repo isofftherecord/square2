@@ -71,6 +71,7 @@ export type ProjectSummary = {
   scope?: string;
   status?: string;
   buildingImage?: ProjectImage;
+  buildingLegal?: string;
   buildingSummary?: string;
   dealMetrics?: ProjectMetric[];
   chapters?: ProjectChapter[];

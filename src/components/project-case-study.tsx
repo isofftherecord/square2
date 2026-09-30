@@ -29,6 +29,10 @@ function present(value?: string | null) {
   return Boolean(value && value.trim());
 }
 
+// Aviso fijo del panel The building. Sanity puede reemplazarlo.
+const MANAGED_BUILDING_LEGAL =
+  "NO RETURNS PUBLISHED. THE CAPITAL IS THE OWNER'S.";
+
 function pad(n: number) {
   return String(n).padStart(2, "0");
 }
@@ -261,6 +265,9 @@ export function ProjectCaseStudy({
   const managedSummary = present(project.buildingSummary)
     ? project.buildingSummary!.trim()
     : null;
+  const managedLegal = present(project.buildingLegal)
+    ? project.buildingLegal!.trim()
+    : MANAGED_BUILDING_LEGAL;
   const showManagedBuilding =
     isManaged && (Boolean(managedImage) || Boolean(managedSummary));
   const nextButton =
@@ -390,6 +397,7 @@ export function ProjectCaseStudy({
                         : undefined,
                   }}
                   fallbackAlt={project.title}
+                  legal={managedImage ? managedLegal : undefined}
                   nextButton={nextButton}
                 />
               ) : null}
@@ -698,10 +706,12 @@ function ManagedCover({
 function ChapterPanel({
   chapter,
   fallbackAlt,
+  legal,
   nextButton,
 }: {
   chapter: ProjectChapter;
   fallbackAlt: string;
+  legal?: string;
   nextButton?: ReactNode;
 }) {
   const paragraphs = filledParagraphs(chapter);
@@ -733,6 +743,11 @@ function ChapterPanel({
             fallbackAlt={fallbackAlt}
             wide={!showText}
           />
+          {legal ? (
+            <p className="text-micro mt-4 pl-2.5 text-s2-steel lg:hidden">
+              {legal}
+            </p>
+          ) : null}
         </div>
       ) : null}
 
@@ -761,7 +776,15 @@ function ChapterPanel({
           </div>
         </div>
       ) : null}
-      <PanelNext nextButton={nextButton} />
+      {legal ? (
+        <div className="mt-10 hidden items-start justify-between gap-6 lg:absolute lg:inset-x-[var(--s2-case-inset)] lg:bottom-10 lg:flex">
+          <p className="text-micro pl-2.5 text-s2-steel">{legal}</p>
+          {nextButton}
+        </div>
+      ) : null}
+      <div className={legal ? "lg:hidden" : undefined}>
+        <PanelNext nextButton={nextButton} />
+      </div>
     </section>
   );
 }
