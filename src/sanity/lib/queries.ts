@@ -60,7 +60,6 @@ export const projectsQuery = defineQuery(`
       buildingImage,
       buildingHeading,
       buildingSummary,
-      dealHeading,
       dealMetrics[] { _key, value, label },
       chapters[] {
         _key,
@@ -79,7 +78,6 @@ export const projectsQuery = defineQuery(`
         }
       },
       exit {
-        heading,
         notes,
         acquired { value, line, details },
         sold { value, line, details },

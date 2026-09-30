@@ -93,12 +93,19 @@ function slideImage(slide: ChapterSlide) {
   return slide.after ?? slide.before;
 }
 
-function hasChapter(chapter: ProjectChapter) {
+const STORY_HEADINGS = ["Out of True.", "The Work.", "Squared."] as const;
+
+function hasChapterBody(chapter: ProjectChapter) {
   return (
-    present(chapter.heading) ||
-    filledParagraphs(chapter).length > 0 ||
-    chapterSlides(chapter).length > 0
+    filledParagraphs(chapter).length > 0 || chapterSlides(chapter).length > 0
   );
+}
+
+function storyChapters(chapters?: ProjectChapter[]) {
+  return (chapters ?? []).slice(0, 3).flatMap((stored, index) => {
+    if (!hasChapterBody(stored)) return [];
+    return [{ ...stored, heading: STORY_HEADINGS[index] }];
+  });
 }
 
 function hasExitSide(side?: ProjectExitSide) {
@@ -136,7 +143,6 @@ function exitBarHeight(value?: string, peerValue?: string) {
 
 function hasExitContent(exit?: ProjectExit) {
   return (
-    present(exit?.heading) ||
     present(exit?.notes) ||
     hasExitSide(exit?.acquired) ||
     hasExitSide(exit?.sold) ||
@@ -236,7 +242,7 @@ export function ProjectCaseStudy({
   useCaseStudyWheel(scrollerRef, rootRef);
 
   const chapters = useMemo(
-    () => (project.chapters ?? []).filter(hasChapter),
+    () => storyChapters(project.chapters),
     [project.chapters],
   );
   const credits = useMemo(
@@ -572,9 +578,7 @@ function CoverPanel({
             className="absolute inset-y-0 left-0 z-[1] hidden w-px bg-s2-steel lg:block"
           />
           <div className="flex flex-col justify-top bg-s2-fog px-6 pt-20 pb-8 lg:h-full lg:px-0 lg:pl-[var(--s2-case-deal-pad)]">
-            <h3 className="text-metrics">
-              {present(project.dealHeading) ? project.dealHeading : "The Deal."}
-            </h3>
+            <h3 className="text-metrics">The Deal.</h3>
             <div aria-hidden className="mt-2 h-px w-[168px] bg-s2-black" />
             <dl className="mt-8 space-y-7">
               {dealMetrics.map((metric, index) => (
@@ -623,9 +627,6 @@ function ManagedCover({
       ? project.squareFootage.toLocaleString("en-US")
       : null;
   const showColumn = Boolean(footage) || dealMetrics.length > 0;
-  const columnHeading = present(project.dealHeading)
-    ? project.dealHeading
-    : "Under management.";
 
   return (
     <section className="relative h-auto w-full shrink-0 py-10 max-lg:px-[var(--s2-margin)] lg:flex lg:h-full lg:w-[100cqw] lg:items-center lg:py-0">
@@ -672,7 +673,7 @@ function ManagedCover({
             className="absolute inset-y-0 left-0 z-[1] hidden w-px bg-s2-steel lg:block"
           />
           <div className="flex flex-col justify-top bg-s2-fog px-6 pt-20 pb-8 lg:h-full lg:px-0 lg:pl-[var(--s2-case-deal-pad)]">
-            <h3 className="text-metrics">{columnHeading}</h3>
+            <h3 className="text-metrics">Under management.</h3>
             <div aria-hidden className="mt-2 h-px w-[168px] bg-s2-black" />
             <dl className="mt-8 space-y-7">
               {footage ? (
@@ -885,11 +886,7 @@ function ExitPanel({
     notes || acquired || sold || metrics.length > 0 || proceedsNote,
   );
   const showCredits = Boolean(creditsIntro) || credits.length > 0;
-  const heading = present(exit?.heading)
-    ? exit!.heading
-    : showStory
-      ? "The exit."
-      : null;
+  const heading = showStory ? "The exit." : null;
 
   return (
     <section className="relative h-auto w-full shrink-0 overflow-visible max-lg:px-[var(--s2-margin)] lg:h-full lg:w-[100cqw] lg:overflow-hidden">

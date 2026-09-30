@@ -73,7 +73,6 @@ export type ProjectSummary = {
   buildingImage?: ProjectImage;
   buildingHeading?: string;
   buildingSummary?: string;
-  dealHeading?: string;
   dealMetrics?: ProjectMetric[];
   chapters?: ProjectChapter[];
   exit?: ProjectExit;

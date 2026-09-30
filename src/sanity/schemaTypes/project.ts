@@ -5,6 +5,7 @@ import {
   defineType,
   type ConditionalPropertyCallbackContext,
 } from "sanity";
+import { StoryChapterItem } from "../components/story-chapter-item";
 
 export const PROJECT_CLASSES = [
   { title: "Office", value: "Office" },
@@ -262,15 +263,6 @@ export const project = defineType({
       options: { list: [...PROJECT_STATUSES], layout: "radio" },
     }),
     defineField({
-      name: "dealHeading",
-      title: "Deal heading",
-      description: "Defaults to “The Deal.” if you add metrics below.",
-      type: "string",
-      group: ["cover", "managedCover"],
-      fieldset: "coverDeal",
-      hidden: hideUntilRole,
-    }),
-    defineField({
       name: "dealMetrics",
       title: "The Deal",
       description:
@@ -331,21 +323,29 @@ export const project = defineType({
       name: "chapters",
       title: "Story chapters",
       description:
-        "One chapter per horizontal panel (02 Out of True, 03 The Work, 04 Squared). Only filled chapters are shown.",
+        "Three panels, in order: Out of True., The Work., Squared. Titles are fixed. Empty chapters stay off the site.",
       type: "array",
       group: "story",
       hidden: hideOwnedStory,
+      initialValue: [
+        { _type: "chapter", heading: "Out of True." },
+        { _type: "chapter", heading: "The Work." },
+        { _type: "chapter", heading: "Squared." },
+      ],
+      validation: (rule) => rule.max(3),
       of: [
         defineArrayMember({
           type: "object",
           name: "chapter",
           title: "Chapter",
+          components: { item: StoryChapterItem },
           fields: [
             defineField({
               name: "heading",
               title: "Heading",
-              description: "Example: Out of True.",
               type: "string",
+              hidden: true,
+              readOnly: true,
             }),
             defineField({
               name: "paragraphs",
@@ -485,12 +485,6 @@ export const project = defineType({
       hidden: hideOwnedStory,
       options: { columns: 1 },
       fields: [
-        defineField({
-          name: "heading",
-          title: "Heading",
-          description: "Defaults to “The exit.” if other exit fields are filled.",
-          type: "string",
-        }),
         defineField({
           name: "notes",
           title: "Notes",
