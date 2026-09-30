@@ -1,5 +1,10 @@
 import { icons } from "@sanity/icons";
-import { defineArrayMember, defineField, defineType } from "sanity";
+import {
+  defineArrayMember,
+  defineField,
+  defineType,
+  type ConditionalPropertyCallbackContext,
+} from "sanity";
 
 export const PROJECT_CLASSES = [
   { title: "Office", value: "Office" },
@@ -17,7 +22,31 @@ export const PROJECT_STATUSES = [
   { title: "Realized", value: "Realized" },
   { title: "Held", value: "Held" },
   { title: "In progress", value: "In progress" },
+  { title: "Under management", value: "Under management" },
 ] as const;
+
+function roleOf(document: ConditionalPropertyCallbackContext["document"]) {
+  if (!document) return undefined;
+  const role = (document as { role?: unknown }).role;
+  return typeof role === "string" ? role : undefined;
+}
+
+// Owned y Owned & Managed comparten el caso práctico completo.
+function isOwnedStory(role?: string) {
+  return role === "Owned" || role === "Owned & Managed";
+}
+
+function hideUntilRole({ document }: ConditionalPropertyCallbackContext) {
+  return !roleOf(document);
+}
+
+function hideOwnedStory({ document }: ConditionalPropertyCallbackContext) {
+  return !isOwnedStory(roleOf(document));
+}
+
+function hideManagedOnly({ document }: ConditionalPropertyCallbackContext) {
+  return roleOf(document) !== "Managed";
+}
 
 function altImageFields() {
   return [
@@ -66,9 +95,21 @@ export const project = defineType({
   icon: icons.case,
   groups: [
     { name: "listing", title: "Listing", default: true },
-    { name: "cover", title: "01 Cover" },
-    { name: "story", title: "02–04 Story" },
-    { name: "exit", title: "05 Exit" },
+    {
+      name: "cover",
+      title: "Property hero + The Deal.",
+      hidden: ({ document }) => !roleOf(document),
+    },
+    {
+      name: "story",
+      title: "02–04 Story",
+      hidden: ({ document }) => !isOwnedStory(roleOf(document)),
+    },
+    {
+      name: "exit",
+      title: "05 Exit",
+      hidden: ({ document }) => !isOwnedStory(roleOf(document)),
+    },
   ],
   fieldsets: [
     {
@@ -87,6 +128,16 @@ export const project = defineType({
   ],
   fields: [
     defineField({
+      name: "role",
+      title: "Role",
+      description:
+        "Choose this first. Owned and Owned & Managed keep the full case study. Managed keeps only the short property details.",
+      type: "string",
+      group: "listing",
+      options: { list: [...PROJECT_ROLES], layout: "radio" },
+      validation: (rule) => rule.required().error("Role is required"),
+    }),
+    defineField({
       name: "title",
       title: "Property",
       description: "Property name shown in the projects table. Example: Las Olas Square.",
@@ -102,6 +153,7 @@ export const project = defineType({
       type: "slug",
       group: "listing",
       options: { source: "title" },
+      hidden: hideUntilRole,
       validation: (rule) =>
         rule.required().error("Press Generate to create the URL"),
     }),
@@ -111,6 +163,7 @@ export const project = defineType({
       description: "City or submarket. Example: Fort Lauderdale.",
       type: "string",
       group: "listing",
+      hidden: hideUntilRole,
       validation: (rule) => rule.required().error("Market is required"),
     }),
     defineField({
@@ -118,6 +171,7 @@ export const project = defineType({
       title: "Class",
       type: "string",
       group: "listing",
+      hidden: hideUntilRole,
       options: { list: [...PROJECT_CLASSES], layout: "radio" },
       validation: (rule) => rule.required().error("Class is required"),
     }),
@@ -127,6 +181,7 @@ export const project = defineType({
       description: "Rentable square footage. Shown with commas, e.g. 267,955.",
       type: "number",
       group: "listing",
+      hidden: hideUntilRole,
       validation: (rule) =>
         rule
           .required()
@@ -140,23 +195,26 @@ export const project = defineType({
       description: "Year or range. Example: 2016–2022",
       type: "string",
       group: "listing",
+      hidden: hideUntilRole,
       validation: (rule) => rule.required().error("Year is required"),
-    }),
-    defineField({
-      name: "role",
-      title: "Role",
-      type: "string",
-      group: "listing",
-      options: { list: [...PROJECT_ROLES], layout: "radio" },
-      validation: (rule) => rule.required().error("Role is required"),
     }),
     defineField({
       name: "mainImage",
       title: "Main image",
       type: "image",
       group: "listing",
+      hidden: hideUntilRole,
       options: { hotspot: true },
-      fields: altImageFields(),
+      fields: [
+        ...altImageFields(),
+        defineField({
+          name: "caption",
+          title: "Caption",
+          description: "Orange bar under the photo on a managed property.",
+          type: "string",
+          hidden: hideManagedOnly,
+        }),
+      ],
       validation: (rule) => rule.required().error("Add a main image"),
     }),
     defineField({
@@ -165,6 +223,7 @@ export const project = defineType({
       description: "Featured projects appear first on the home page.",
       type: "boolean",
       group: "listing",
+      hidden: hideUntilRole,
       initialValue: false,
     }),
 
@@ -177,6 +236,7 @@ export const project = defineType({
       rows: 3,
       group: "cover",
       fieldset: "coverFacts",
+      hidden: hideUntilRole,
     }),
     defineField({
       name: "owner",
@@ -185,14 +245,45 @@ export const project = defineType({
       type: "string",
       group: "cover",
       fieldset: "coverFacts",
+      hidden: hideOwnedStory,
+    }),
+    defineField({
+      name: "scope",
+      title: "Scope",
+      description: "What SQUARE2 runs here. Example: Leasing and operations.",
+      type: "string",
+      group: "cover",
+      fieldset: "coverFacts",
+      hidden: hideManagedOnly,
     }),
     defineField({
       name: "status",
       title: "Status",
+      description: "Managed properties use Under management.",
       type: "string",
       group: "cover",
       fieldset: "coverFacts",
+      hidden: hideUntilRole,
       options: { list: [...PROJECT_STATUSES], layout: "radio" },
+    }),
+    defineField({
+      name: "buildingHeading",
+      title: "Building heading",
+      description: "Defaults to “The building.”",
+      type: "string",
+      group: "cover",
+      initialValue: "The building.",
+      hidden: hideManagedOnly,
+    }),
+    defineField({
+      name: "buildingSummary",
+      title: "The building",
+      description:
+        "Two sentences: what it is, where it sits, and what SQUARE2 runs there.",
+      type: "text",
+      rows: 4,
+      group: "cover",
+      hidden: hideManagedOnly,
     }),
     defineField({
       name: "dealHeading",
@@ -201,6 +292,7 @@ export const project = defineType({
       type: "string",
       group: "cover",
       fieldset: "coverDeal",
+      hidden: hideOwnedStory,
     }),
     defineField({
       name: "dealMetrics",
@@ -210,6 +302,7 @@ export const project = defineType({
       type: "array",
       group: "cover",
       fieldset: "coverDeal",
+      hidden: hideOwnedStory,
       of: [
         defineArrayMember({
           type: "object",
@@ -228,6 +321,7 @@ export const project = defineType({
         "One chapter per horizontal panel (02 Out of True, 03 The Work, 04 Squared). Only filled chapters are shown.",
       type: "array",
       group: "story",
+      hidden: hideOwnedStory,
       of: [
         defineArrayMember({
           type: "object",
@@ -375,6 +469,7 @@ export const project = defineType({
       description: "Optional. Leave blank if this project has no exit story.",
       type: "object",
       group: "exit",
+      hidden: hideOwnedStory,
       options: { columns: 1 },
       fields: [
         defineField({
@@ -382,6 +477,13 @@ export const project = defineType({
           title: "Heading",
           description: "Defaults to “The exit.” if other exit fields are filled.",
           type: "string",
+        }),
+        defineField({
+          name: "notes",
+          title: "Notes",
+          description: "Paragraph under the exit title.",
+          type: "text",
+          rows: 4,
         }),
         defineField({
           name: "acquired",
@@ -469,6 +571,7 @@ export const project = defineType({
       rows: 4,
       group: "exit",
       fieldset: "exitCredits",
+      hidden: hideOwnedStory,
     }),
     defineField({
       name: "credits",
@@ -477,6 +580,7 @@ export const project = defineType({
       type: "array",
       group: "exit",
       fieldset: "exitCredits",
+      hidden: hideOwnedStory,
       of: [
         defineArrayMember({
           type: "object",

@@ -7,6 +7,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type ReactNode,
   type RefObject,
 } from "react";
 import { Arrow } from "@/components/arrow";
@@ -135,6 +136,7 @@ function exitBarHeight(value?: string, peerValue?: string) {
 function hasExitContent(exit?: ProjectExit) {
   return (
     present(exit?.heading) ||
+    present(exit?.notes) ||
     hasExitSide(exit?.acquired) ||
     hasExitSide(exit?.sold) ||
     filledMetrics(exit?.metrics).length > 0 ||
@@ -245,8 +247,18 @@ export function ProjectCaseStudy({
     : null;
   const showExit =
     hasExitContent(project.exit) || credits.length > 0 || Boolean(creditsIntro);
+  const isManaged = project.role === "Managed";
+  const nextButton =
+    nextProject && onOpenNext ? (
+      <NextProjectButton
+        title={nextProject.title}
+        onOpenNext={onOpenNext}
+      />
+    ) : null;
 
-  const panelCount = 1 + chapters.length + (showExit ? 1 : 0);
+  const panelCount = isManaged
+    ? 1
+    : 1 + chapters.length + (showExit ? 1 : 0);
 
   const syncPanel = useCallback(() => {
     const el = scrollerRef.current;
@@ -339,25 +351,38 @@ export function ProjectCaseStudy({
         className="min-h-0 flex-1 max-lg:overflow-visible lg:overflow-x-auto lg:overflow-y-hidden lg:overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         <div className="flex h-auto max-lg:flex-col lg:h-full">
-          <CoverPanel project={project} />
+          {isManaged ? (
+            <ManagedPanel project={project} nextButton={nextButton} />
+          ) : (
+            <>
+              <CoverPanel
+                project={project}
+                nextButton={panelCount === 1 ? nextButton : null}
+              />
 
-          {chapters.map((chapter, index) => (
-            <ChapterPanel
-              key={chapter._key || index}
-              chapter={chapter}
-              fallbackAlt={project.title}
-            />
-          ))}
+              {chapters.map((chapter, index) => (
+                <ChapterPanel
+                  key={chapter._key || index}
+                  chapter={chapter}
+                  fallbackAlt={project.title}
+                  nextButton={
+                    !showExit && index === chapters.length - 1
+                      ? nextButton
+                      : null
+                  }
+                />
+              ))}
 
-          {showExit ? (
-            <ExitPanel
-              exit={project.exit}
-              creditsIntro={creditsIntro}
-              credits={credits}
-              nextProject={nextProject}
-              onOpenNext={onOpenNext}
-            />
-          ) : null}
+              {showExit ? (
+                <ExitPanel
+                  exit={project.exit}
+                  creditsIntro={creditsIntro}
+                  credits={credits}
+                  nextButton={nextButton}
+                />
+              ) : null}
+            </>
+          )}
         </div>
       </div>
 
@@ -403,7 +428,47 @@ export function ProjectCaseStudy({
   );
 }
 
-function CoverPanel({ project }: { project: ProjectSummary }) {
+function NextProjectButton({
+  title,
+  onOpenNext,
+}: {
+  title: string;
+  onOpenNext: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onOpenNext}
+      className="text-data inline-flex cursor-pointer items-center justify-center gap-x-1.5 bg-s2-black px-4 py-3 text-s2-steel"
+    >
+      Next · {title}
+      <img
+        src="/icons/arrow-right.svg"
+        alt=""
+        width={10}
+        height={9}
+        className="shrink-0"
+      />
+    </button>
+  );
+}
+
+function PanelNext({ nextButton }: { nextButton?: ReactNode }) {
+  if (!nextButton) return null;
+  return (
+    <div className="mt-10 flex justify-end lg:absolute lg:right-[var(--s2-case-inset)] lg:bottom-10">
+      {nextButton}
+    </div>
+  );
+}
+
+function CoverPanel({
+  project,
+  nextButton,
+}: {
+  project: ProjectSummary;
+  nextButton?: ReactNode;
+}) {
   const facts = [
     present(project.owner) ? { label: "Owner", value: project.owner! } : null,
     present(project.assetClass)
@@ -485,6 +550,118 @@ function CoverPanel({ project }: { project: ProjectSummary }) {
           </div>
         </div>
       ) : null}
+      <PanelNext nextButton={nextButton} />
+    </section>
+  );
+}
+
+function ManagedPanel({
+  project,
+  nextButton,
+}: {
+  project: ProjectSummary;
+  nextButton?: ReactNode;
+}) {
+  const facts = [
+    present(project.scope) ? { label: "Scope", value: project.scope! } : null,
+    present(project.assetClass)
+      ? { label: "Class", value: project.assetClass! }
+      : null,
+    present(project.role) ? { label: "Role", value: project.role! } : null,
+    present(project.status)
+      ? { label: "Status", value: project.status! }
+      : null,
+    present(project.market)
+      ? { label: "Market", value: project.market! }
+      : null,
+  ].filter((row): row is { label: string; value: string } => row != null);
+  const addressLines = present(project.address)
+    ? project.address!.split("\n").filter((line) => present(line))
+    : [];
+  const footage =
+    typeof project.squareFootage === "number"
+      ? project.squareFootage.toLocaleString("en-US")
+      : null;
+  const heading = present(project.buildingHeading)
+    ? project.buildingHeading!.trim()
+    : "The building.";
+  const summary = present(project.buildingSummary)
+    ? project.buildingSummary!.trim()
+    : null;
+  const image = hasImageAsset(project.mainImage) ? project.mainImage : null;
+  const caption =
+    image && present(image.caption) ? image.caption!.trim() : null;
+
+  return (
+    <section className="relative h-auto w-full shrink-0 py-10 max-lg:px-[var(--s2-margin)] lg:h-full lg:w-[100cqw] lg:py-0">
+      <div className="flex w-full flex-col gap-10 lg:grid lg:h-full lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.72fr)_minmax(0,1.35fr)] lg:gap-0">
+        <div className="lg:flex lg:flex-col lg:justify-center lg:py-16 lg:pr-8 lg:pl-[var(--s2-case-inset)]">
+          <h1 className="text-h1">{project.title}</h1>
+          {addressLines.length > 0 ? (
+            <p className="text-metrics mt-6">
+              {addressLines.map((line, index) => (
+                <span key={line}>
+                  {index > 0 ? <br /> : null}
+                  {line}
+                </span>
+              ))}
+            </p>
+          ) : null}
+          {facts.length > 0 ? (
+            <dl className="mt-10 border-t-2 border-s2-black lg:mt-16">
+              {facts.map((row) => (
+                <div
+                  key={row.label}
+                  className="flex border-b border-s2-steel/40 py-4"
+                >
+                  <dt className="text-data w-32 shrink-0 text-s2-steel">
+                    {row.label}
+                  </dt>
+                  <dd className="text-body">{row.value}</dd>
+                </div>
+              ))}
+            </dl>
+          ) : null}
+        </div>
+
+        <div className="lg:flex lg:flex-col lg:justify-center lg:border-l lg:border-s2-steel lg:px-8 lg:py-16">
+          <h2 className="text-metrics">Under management.</h2>
+          {footage ? <p className="text-h1 mt-6">{footage}</p> : null}
+          <p className="text-micro mt-1">square feet</p>
+        </div>
+
+        <div className="flex flex-col lg:py-16 lg:pr-[var(--s2-case-inset)] lg:pl-8">
+          {image ? (
+            <figure>
+              <div className="relative aspect-[716/398]">
+                <Image
+                  src={urlFor(image).width(1432).height(796).url()}
+                  alt={image.alt ?? project.title}
+                  fill
+                  sizes="(min-width: 1024px) 520px, 100vw"
+                  className="object-cover"
+                />
+              </div>
+              {caption ? (
+                <figcaption className="text-micro bg-s2-orange px-4 py-3 text-s2-white">
+                  {caption}
+                </figcaption>
+              ) : null}
+            </figure>
+          ) : null}
+          {summary ? (
+            <div className={image ? "mt-8" : ""}>
+              <h2 className="text-metrics border-b border-s2-black pb-4">
+                {heading}
+              </h2>
+              <p className="text-body mt-8">{summary}</p>
+            </div>
+          ) : null}
+          {nextButton ? (
+            <div className="mt-10 flex justify-end lg:mt-auto">{nextButton}</div>
+          ) : null}
+        </div>
+      </div>
     </section>
   );
 }
@@ -492,9 +669,11 @@ function CoverPanel({ project }: { project: ProjectSummary }) {
 function ChapterPanel({
   chapter,
   fallbackAlt,
+  nextButton,
 }: {
   chapter: ProjectChapter;
   fallbackAlt: string;
+  nextButton?: ReactNode;
 }) {
   const paragraphs = filledParagraphs(chapter);
   const slides = chapterSlides(chapter);
@@ -553,6 +732,7 @@ function ChapterPanel({
           </div>
         </div>
       ) : null}
+      <PanelNext nextButton={nextButton} />
     </section>
   );
 }
@@ -657,20 +837,21 @@ function ExitPanel({
   exit,
   creditsIntro,
   credits,
-  nextProject,
-  onOpenNext,
+  nextButton,
 }: {
   exit?: ProjectExit;
   creditsIntro?: string | null;
   credits: ProjectCredit[];
-  nextProject?: Pick<ProjectSummary, "slug" | "title"> | null;
-  onOpenNext?: () => void;
+  nextButton?: ReactNode;
 }) {
   const acquired = hasExitSide(exit?.acquired) ? exit!.acquired : null;
   const sold = hasExitSide(exit?.sold) ? exit!.sold : null;
   const metrics = filledMetrics(exit?.metrics);
   const proceedsNote = present(exit?.proceedsNote) ? exit!.proceedsNote : null;
-  const showStory = Boolean(acquired || sold || metrics.length > 0 || proceedsNote);
+  const notes = present(exit?.notes) ? exit!.notes!.trim() : null;
+  const showStory = Boolean(
+    notes || acquired || sold || metrics.length > 0 || proceedsNote,
+  );
   const showCredits = Boolean(creditsIntro) || credits.length > 0;
   const heading = present(exit?.heading)
     ? exit!.heading
@@ -705,6 +886,8 @@ function ExitPanel({
           {heading ? (
             <h2 className="text-metrics border-b border-s2-black pb-4">{heading}</h2>
           ) : null}
+
+          {notes ? <p className="text-body mt-8">{notes}</p> : null}
 
           {acquired || sold ? (
             <div className="mt-10 flex flex-col gap-10 sm:flex-row sm:items-end sm:justify-between sm:gap-x-12 lg:mt-12">
@@ -786,24 +969,13 @@ function ExitPanel({
               ))}
             </dl>
           ) : null}
-          {nextProject && onOpenNext ? (
-            <button
-              type="button"
-              onClick={onOpenNext}
-              className="text-data mt-10 inline-flex cursor-pointer gap-x-1.5 items-center justify-center self-stretch bg-s2-black px-4 py-3 text-s2-steel lg:mt-auto lg:w-auto lg:self-end"
-            >
-              Next · {nextProject.title}
-              <img
-                src="/icons/arrow-right.svg"
-                alt=""
-                width={10}
-                height={9}
-                className="shrink-0"
-              />
-            </button>
+          {nextButton ? (
+            <div className="mt-10 flex justify-end lg:mt-auto">{nextButton}</div>
           ) : null}
         </div>
-      ) : null}
+      ) : (
+        <PanelNext nextButton={nextButton} />
+      )}
     </section>
   );
 }

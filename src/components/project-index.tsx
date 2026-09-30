@@ -2,10 +2,11 @@ import Link from "next/link";
 
 import { roleBadgeClass } from "@/lib/project-role";
 
-export type ProjectImage = { alt?: string; _key?: string } & Record<
-  string,
-  unknown
->;
+export type ProjectImage = {
+  alt?: string;
+  caption?: string;
+  _key?: string;
+} & Record<string, unknown>;
 
 export type ProjectMetric = {
   _key?: string;
@@ -42,6 +43,7 @@ export type ProjectExitSide = {
 
 export type ProjectExit = {
   heading?: string;
+  notes?: string;
   acquired?: ProjectExitSide;
   sold?: ProjectExitSide;
   metrics?: ProjectMetric[];
@@ -66,7 +68,10 @@ export type ProjectSummary = {
   mainImage?: ProjectImage;
   address?: string;
   owner?: string;
+  scope?: string;
   status?: string;
+  buildingHeading?: string;
+  buildingSummary?: string;
   dealHeading?: string;
   dealMetrics?: ProjectMetric[];
   chapters?: ProjectChapter[];
