@@ -18,8 +18,8 @@ export function Cta({
   label = "Get in touch",
 }: CtaProps) {
   return (
-    // Banda naranja enmarcada dentro del canvas de 1440.
-    <section className="s2-hero bg-s2-orange">
+    // Fondo naranja de borde a borde; el texto sigue en la grilla de 1440.
+    <section className="s2-bleed bg-s2-orange">
       <div className="s2-page items-center gap-y-8 py-16 lg:py-20">
         <div className="col-span-12 lg:col-span-5 lg:col-start-2">
           <h2 className="text-h2 text-s2-white">{heading}</h2>

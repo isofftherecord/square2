@@ -222,28 +222,23 @@ function LedgerRow({
           <div className="relative lg:flex lg:h-full lg:flex-col lg:justify-end">
             <div
               aria-hidden
-              className="pointer-events-none absolute inset-0 hidden lg:block"
-            >
-              <div className="absolute inset-x-0 bottom-0 h-[var(--s2-ledger-foot)] bg-s2-fog" />
-              <div className="absolute inset-x-0 bottom-[var(--s2-ledger-foot)] h-px bg-s2-steel" />
-            </div>
+              className="pointer-events-none absolute inset-x-0 bottom-[var(--s2-ledger-foot)] hidden h-px bg-s2-steel lg:block"
+            />
 
-            <div className="relative mt-6 lg:mt-0 lg:flex lg:h-[var(--s2-ledger-foot)] lg:items-center lg:pl-[var(--s2-gutter)]">
-              <Button
-                type="button"
-                variant="text"
-                onClick={onToggle}
-                className="relative z-20 text-navigation"
-              >
-                Details
-              </Button>
-            </div>
+            <Button
+              type="button"
+              variant="text"
+              onClick={onToggle}
+              className="relative z-20 mt-6 justify-start text-navigation hover:opacity-100! lg:mt-0 lg:h-[var(--s2-ledger-foot)] lg:w-full lg:justify-start lg:bg-s2-fog lg:pl-[var(--s2-gutter)] lg:transition-colors lg:duration-200 lg:hover:bg-s2-orange hover:[&_img]:brightness-0 [&_img]:transition-[filter] [&_img]:duration-200"
+            >
+              Details
+            </Button>
           </div>
 
-          {/* Reglas de fila a todo el canvas; la de arriba solo en la primera */}
+          {/* Reglas de fila a todo el canvas; quedan sobre el fondo de Details */}
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 hidden lg:block"
+            className="pointer-events-none absolute inset-0 z-30 hidden lg:block"
           >
             {isFirst ? (
               <div className="absolute inset-x-0 top-0 h-px bg-s2-steel" />

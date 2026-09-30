@@ -35,9 +35,10 @@ Fuera del canvas, el fondo global usa Frame (`#F5F5F5`).
 
 La clase `s2-page` centra ese canvas y activa la grilla CSS. Cada hijo directo usa `col-span-*` (1–12) para ocupar columnas. `s2-subgrid` anida secciones en las mismas 12 pistas. Navbar y contenido del sitio viven dentro de este wrapper.
 
-Los heroes (`MainHero`, `TitleHero`, mapa de Contact), las bandas naranjas y
-Portfolio usan `s2-hero`: cubren el ancho del canvas y no salen al viewport.
-El footer es el único fondo que se extiende de borde a borde.
+Los heroes (`MainHero`, `TitleHero`, mapa de Contact), las bandas naranjas del
+canvas y Portfolio usan `s2-hero`: cubren el ancho del canvas y no salen al
+viewport. El footer y las bandas naranjas de cierre (`s2-bleed`, en la CTA y en Firm)
+se extienden de borde a borde; el texto sigue dentro de `s2-page`.
 
 ### Fila del ledger (Portfolio)
 

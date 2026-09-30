@@ -115,6 +115,15 @@ body {
   justify-self: center;
 }
 
+/* Fondo a todo el viewport desde dentro de la grilla. El texto sigue en s2-page. */
+@utility s2-bleed {
+  grid-column: 1 / -1;
+  width: 100vw;
+  max-width: none;
+  margin-left: calc(50% - 50vw);
+  justify-self: start;
+}
+
 /* ---------------------------------------------------------------------------
    Styleguide tipográfico
    Mismos nombres que la guía de diseño: H1–H5, Micro, Body, Tags,
