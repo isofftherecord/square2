@@ -13,6 +13,7 @@ const FILTERS: { id: RoleFilter; label: string }[] = [
   { id: "all", label: "All" },
   { id: "Owned", label: "Owned" },
   { id: "Managed", label: "Managed" },
+  
 ];
 
 export function PortfolioView({
