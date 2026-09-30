@@ -24,6 +24,7 @@ export const PROJECT_STATUSES = [
   { title: "Held", value: "Held" },
   { title: "In progress", value: "In progress" },
   { title: "Under management", value: "Under management" },
+  { title: "Sold and reinvested", value: "Sold and reinvested" },
 ] as const;
 
 function roleOf(document: ConditionalPropertyCallbackContext["document"]) {
