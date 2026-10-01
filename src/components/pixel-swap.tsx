@@ -169,8 +169,9 @@ const buildGrid = ({
 
   const stride = size + gap;
   // Centra la grilla respecto al contenedor.
-  const originX = (width - (columns * stride - gap)) / 2;
-  const originY = (height - (rows * stride - gap)) / 2;
+  // En px enteros para que los bordes no queden a medio pixel.
+  const originX = Math.floor((width - (columns * stride - gap)) / 2);
+  const originY = Math.floor((height - (rows * stride - gap)) / 2);
   const order = PATTERNS[pattern] ?? PATTERNS.random;
   const mix = clamp(randomness, 0, 1);
   const pixels: GridPixel[] = [];
@@ -234,6 +235,53 @@ const buildKeyframes = ({
   return { window: windowFrames, content };
 };
 
+// Recorte de un cuadrado que crece desde el centro, sin transformar la foto.
+const clipStyle = ({
+  eased,
+  fromScale,
+  fade,
+  boxSize,
+}: {
+  eased: number;
+  fromScale: number;
+  fade: boolean;
+  boxSize: number;
+}) => {
+  const start = clamp(fromScale, 0.05, 1);
+  const visible = start + (1 - start) * eased;
+  // Redondeado a 0.1px: cambios menores no se ven y Safari repinta igual.
+  const inset = Math.round(((1 - visible) / 2) * boxSize * 10) / 10;
+  return {
+    opacity: String(fade ? Math.min(1, eased * 1.6) : 1),
+    clipPath: `inset(${inset}px ${inset}px ${inset}px ${inset}px)`,
+  };
+};
+
+// El delay de WAAPI en Safari muestra un frame el estado final (un salto).
+// El arranque va dentro de los keyframes, no en `delay`.
+const holdStart = (frames: Keyframe[], delay: number, activeMs: number) => {
+  const full = delay + activeMs;
+  if (delay <= 0 || full <= 0) return frames;
+  const shifted = frames.map((frame) => ({
+    ...frame,
+    offset: Math.min(1, delay / full + Number(frame.offset) * (activeMs / full)),
+  }));
+  return [{ ...frames[0], offset: 0 }, ...shifted];
+};
+
+// Tamaño final del cuadrado. Sin giro el cuadro ya nace grande y el clip lo abre.
+const tileBox = (
+  grid: PixelGrid,
+  radius: number,
+  spin: number
+) => {
+  const endScale = coverScale(grid.size, grid.gap, radius);
+  // Mínimo 1px de solape: Safari deja líneas entre cuadrados contiguos.
+  const bleed =
+    spin === 0 ? Math.max(1, Math.ceil((grid.size * (endScale - 1)) / 2)) : 0;
+  return { endScale, bleed, boxSize: grid.size + bleed * 2 };
+};
+
 /**
  * Intercambia dos capas con una grilla de “píxeles” que revelan el contenido
  * entrante. El estado `active` elige firstContent (false) o secondContent (true).
@@ -277,6 +325,7 @@ export function PixelSwap({
   const pixelRefs = useRef<(HTMLDivElement | null)[]>([]);
   const animationsRef = useRef<Animation[]>([]);
   const timerRef = useRef(0);
+  const frameRef = useRef(0);
 
   const desiredActive = active ?? internalActive;
   const incomingIndex = transition?.to ? 1 : 0;
@@ -334,7 +383,8 @@ export function PixelSwap({
   const stopAnimations = useCallback(() => {
     animationsRef.current.forEach((animation) => animation.cancel());
     animationsRef.current = [];
-    pixelRefs.current.forEach((pixel) => pixel?.replaceChildren());
+    if (frameRef.current) cancelAnimationFrame(frameRef.current);
+    frameRef.current = 0;
     if (timerRef.current) window.clearTimeout(timerRef.current);
     timerRef.current = 0;
   }, []);
@@ -352,13 +402,6 @@ export function PixelSwap({
     const settings = configRef.current;
     const { grid: frozenGrid, to } = transition;
 
-    const finish = () => {
-      stopAnimations();
-      setShownActive(to);
-      setTransition(null);
-      settings.onComplete?.(to);
-    };
-
     const source = layerRefs.current[to ? 1 : 0];
     // Sin DOM, sin celdas o con motion reducido: saltamos al estado final.
     if (
@@ -366,26 +409,103 @@ export function PixelSwap({
       !frozenGrid.pixels.length ||
       window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ) {
-      finish();
+      stopAnimations();
+      setShownActive(to);
+      setTransition(null);
+      settings.onComplete?.(to);
       return;
     }
 
+    source.querySelectorAll("img").forEach((img) => {
+      void img.decode().catch(() => undefined);
+    });
+
     const total = Math.max(200, settings.duration);
     const pixelMs = clamp(settings.pixelDuration, 60, total);
-    // Tiempo que queda para escalonar el delay de cada celda.
+    // Tiempo que queda para escalonar el inicio de cada celda.
     const spread = Math.max(0, total - pixelMs);
-    const endScale = coverScale(
-      frozenGrid.size,
-      frozenGrid.gap,
-      settings.pixelRadius
+    const { endScale, bleed, boxSize } = tileBox(
+      frozenGrid,
+      settings.pixelRadius,
+      settings.pixelSpin
     );
-    const keyframes = buildKeyframes({
-      ease: makeEasing(settings.easing),
-      startScale: clamp(settings.pixelScale, 0.05, 1) * endScale,
-      endScale,
-      spin: settings.pixelSpin,
-      fade: settings.fade,
-    });
+    // Safari desincroniza el scale del cuadrado y el scale inverso de la foto,
+    // y la imagen pega un salto. Sin giro, el clip crece y la foto no se mueve.
+    const clipReveal = settings.pixelSpin === 0;
+    const ease = makeEasing(settings.easing);
+    const keyframes = clipReveal
+      ? null
+      : buildKeyframes({
+          ease,
+          startScale: clamp(settings.pixelScale, 0.05, 1) * endScale,
+          endScale,
+          spin: settings.pixelSpin,
+          fade: settings.fade,
+        });
+    const clipAt = (progress: number) =>
+      clipStyle({
+        eased: ease(progress),
+        fromScale: settings.pixelScale,
+        fade: settings.fade,
+        boxSize,
+      });
+    const clipTiles: { element: HTMLDivElement; delay: number }[] = [];
+
+    let cancelled = false;
+    let settled = false;
+
+    const finish = () => {
+      if (cancelled || settled) return;
+      settled = true;
+
+      // La capa entrante queda visible antes de quitar la grilla. Si Safari
+      // pinta al cancelar la animación, debajo ya está la foto correcta.
+      const incoming = layerRefs.current[to ? 1 : 0];
+      const outgoing = layerRefs.current[to ? 0 : 1];
+      if (incoming) {
+        incoming.dataset.visible = "true";
+        incoming.style.zIndex = "2";
+        incoming.removeAttribute("aria-hidden");
+      }
+      if (outgoing) {
+        outgoing.dataset.visible = "false";
+        outgoing.style.zIndex = "1";
+        outgoing.setAttribute("aria-hidden", "true");
+      }
+
+      pixelRefs.current.forEach((pixelElement) => {
+        if (!pixelElement) return;
+        pixelElement.style.opacity = "1";
+        if (clipReveal) {
+          pixelElement.style.clipPath = "inset(0px 0px 0px 0px)";
+        }
+      });
+
+      let unmounted = false;
+      const unmount = () => {
+        if (cancelled || unmounted) return;
+        unmounted = true;
+        stopAnimations();
+        setShownActive(to);
+        setTransition(null);
+        settings.onComplete?.(to);
+      };
+
+      // Safari no decodifica la imagen de una capa oculta. Si se quita la
+      // grilla antes de que la pinte, el final se queda trabado un momento.
+      // Con tope de tiempo: rAF no corre en pestañas en segundo plano.
+      const images = incoming ? [...incoming.querySelectorAll("img")] : [];
+      const decoded = Promise.all(
+        images.map((img) => img.decode().catch(() => undefined))
+      );
+      const limit = new Promise((resolve) => window.setTimeout(resolve, 120));
+      void Promise.race([decoded, limit]).then(() => {
+        requestAnimationFrame(unmount);
+        window.setTimeout(unmount, 50);
+      });
+    };
+
+    const startAnimations: Array<() => void> = [];
 
     frozenGrid.pixels.forEach((pixel, index) => {
       const pixelElement = pixelRefs.current[index];
@@ -394,34 +514,117 @@ export function PixelSwap({
       // Recorte: copia del contenido entrante posicionada bajo esta celda.
       const content = document.createElement("div");
       content.className = "pixel-swap__pixel-content";
-      content.style.left = `${-pixel.left}px`;
-      content.style.top = `${-pixel.top}px`;
+      content.style.left = `${-pixel.left + bleed}px`;
+      content.style.top = `${-pixel.top + bleed}px`;
       content.style.width = `${frozenGrid.width}px`;
       content.style.height = `${frozenGrid.height}px`;
-      const originX = pixel.left + frozenGrid.size / 2;
-      const originY = pixel.top + frozenGrid.size / 2;
-      content.style.transformOrigin = `${originX}px ${originY}px`;
 
       const clone = source.cloneNode(true) as HTMLElement;
       clone.dataset.visible = "true";
       clone.removeAttribute("aria-hidden");
+      // Tamaño en px: en Safari el % de la imagen clonada se resuelve un frame tarde y salta.
+      clone.style.width = `${frozenGrid.width}px`;
+      clone.style.height = `${frozenGrid.height}px`;
+      clone.querySelectorAll("img").forEach((img) => {
+        img.style.width = `${frozenGrid.width}px`;
+        img.style.height = `${frozenGrid.height}px`;
+        img.style.maxWidth = "none";
+        img.style.objectFit = "cover";
+        // Safari vuelve a elegir el srcset del clon y la foto salta al decodificar.
+        if (navigator.vendor !== "Apple Computer, Inc.") return;
+        const current = img.currentSrc;
+        if (!current || !img.complete) return;
+        img.decoding = "sync";
+        img.removeAttribute("srcset");
+        img.removeAttribute("sizes");
+        img.src = current;
+      });
       content.appendChild(clone);
+
+      const delay = pixel.offset * spread;
+      const timing: KeyframeAnimationOptions = {
+        duration: delay + pixelMs,
+        easing: "linear",
+        fill: "forwards",
+      };
+
+      if (clipReveal) {
+        const first = clipAt(0);
+        pixelElement.style.opacity = first.opacity;
+        pixelElement.style.clipPath = first.clipPath;
+        pixelElement.replaceChildren(content);
+        clipTiles.push({ element: pixelElement, delay });
+        return;
+      }
+
       pixelElement.replaceChildren(content);
 
-      const timing: KeyframeAnimationOptions = {
-        duration: pixelMs,
-        delay: pixel.offset * spread,
-        easing: "linear",
-        fill: "both",
-      };
-      animationsRef.current.push(
-        pixelElement.animate(keyframes.window, timing),
-        content.animate(keyframes.content, timing)
-      );
+      if (!keyframes) return;
+
+      const originX = pixel.left + frozenGrid.size / 2;
+      const originY = pixel.top + frozenGrid.size / 2;
+      content.style.transformOrigin = `${originX}px ${originY}px`;
+      const contentFrames = keyframes.content.map((frame) => ({
+        ...frame,
+        transformOrigin: `${originX}px ${originY}px`,
+      }));
+      const windowFrames = holdStart(keyframes.window, delay, pixelMs);
+      const contentFramesHeld = holdStart(contentFrames, delay, pixelMs);
+      startAnimations.push(() => {
+        animationsRef.current.push(
+          pixelElement.animate(windowFrames, timing),
+          content.animate(contentFramesHeld, timing)
+        );
+      });
     });
 
-    timerRef.current = window.setTimeout(finish, total);
-    return stopAnimations;
+    // Un solo reflow con el primer frame ya puesto. Si no, Safari pinta el final un instante.
+    void containerRef.current?.offsetWidth;
+
+    if (clipReveal) {
+      // Estilos inline por frame en vez de WAAPI: Safari deja cuadrados
+      // a medio abrir al no repintar clip-path animado.
+      const startTime = performance.now();
+      const tick = () => {
+        if (cancelled || settled) return;
+        const elapsed = performance.now() - startTime;
+        let running = false;
+        clipTiles.forEach(({ element, delay }) => {
+          const progress = clamp((elapsed - delay) / pixelMs, 0, 1);
+          if (progress < 1) running = true;
+          const next = clipAt(progress);
+          if (element.style.opacity !== next.opacity) {
+            element.style.opacity = next.opacity;
+          }
+          if (element.style.clipPath !== next.clipPath) {
+            element.style.clipPath = next.clipPath;
+          }
+        });
+        if (!running) {
+          finish();
+          return;
+        }
+        frameRef.current = requestAnimationFrame(tick);
+      };
+      frameRef.current = requestAnimationFrame(tick);
+    } else {
+      startAnimations.forEach((start) => start());
+      const pending = animationsRef.current.map((animation) =>
+        animation.finished.then(
+          () => undefined,
+          () => undefined
+        )
+      );
+      void Promise.all(pending).then(finish);
+    }
+
+    // Respaldo si rAF se pausa (pestaña en segundo plano). Va después del último cuadrado.
+    timerRef.current = window.setTimeout(finish, total + 120);
+
+    return () => {
+      cancelled = true;
+      stopAnimations();
+    };
   }, [stopAnimations, transition]);
 
   const requestActive = useCallback(
@@ -493,22 +696,29 @@ export function PixelSwap({
 
       {transition ? (
         <div className="pixel-swap__grid" aria-hidden="true">
-          {transition.grid.pixels.map((pixel, index) => (
-            <div
-              key={pixel.id}
-              ref={(element) => {
-                pixelRefs.current[index] = element;
-              }}
-              className="pixel-swap__pixel"
-              style={{
-                left: pixel.left,
-                top: pixel.top,
-                width: transition.grid.size,
-                height: transition.grid.size,
-                borderRadius: `${clamp(pixelRadius, 0, 50)}%`,
-              }}
-            />
-          ))}
+          {transition.grid.pixels.map((pixel, index) => {
+            const { bleed, boxSize } = tileBox(
+              transition.grid,
+              pixelRadius,
+              pixelSpin
+            );
+            return (
+              <div
+                key={pixel.id}
+                ref={(element) => {
+                  pixelRefs.current[index] = element;
+                }}
+                className="pixel-swap__pixel"
+                style={{
+                  left: pixel.left - bleed,
+                  top: pixel.top - bleed,
+                  width: boxSize,
+                  height: boxSize,
+                  borderRadius: `${clamp(pixelRadius, 0, 50)}%`,
+                }}
+              />
+            );
+          })}
         </div>
       ) : null}
     </div>

@@ -28,7 +28,6 @@
   position: absolute;
   overflow: hidden;
   opacity: 0;
-  contain: paint;
 }
 
 .pixel-swap__pixel-content {
