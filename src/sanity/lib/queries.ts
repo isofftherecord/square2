@@ -87,13 +87,16 @@ const projectFields = /* groq */ `{
       credits[] { _key, label, detail }
     }`;
 
+// Los buckets de lexorank son 0–2; sin rango van al final y se desempata por título.
+const projectOrder = /* groq */ `| order(coalesce(orderRank, "3") asc, title asc)`;
+
 export const projectsQuery = defineQuery(`
   *[_type == "project" && defined(slug.current)]
-    | order(featured desc, title asc) ${projectFields}
+    ${projectOrder} ${projectFields}
 `);
 
 // Solo los proyectos marcados como "Featured project?" en el Studio
 export const featuredProjectsQuery = defineQuery(`
   *[_type == "project" && defined(slug.current) && featured == true]
-    | order(title asc) ${projectFields}
+    ${projectOrder} ${projectFields}
 `);

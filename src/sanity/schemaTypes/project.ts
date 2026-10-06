@@ -1,5 +1,9 @@
 import { icons } from "@sanity/icons";
 import {
+  orderRankField,
+  orderRankOrdering,
+} from "@sanity/orderable-document-list";
+import {
   defineArrayMember,
   defineField,
   defineType,
@@ -95,6 +99,8 @@ export const project = defineType({
   title: "Project",
   type: "document",
   icon: icons.case,
+  description:
+    "Drag projects in the Projects list to set their order on the site. Featured projects keep that same order on the home page.",
   groups: [
     { name: "listing", title: "Listing", default: true },
     {
@@ -134,6 +140,8 @@ export const project = defineType({
     },
   ],
   fields: [
+    // Rango lexicográfico; lo escribe la lista arrastrable del Studio.
+    orderRankField({ type: "project" }),
     defineField({
       name: "role",
       title: "Role",
@@ -217,7 +225,8 @@ export const project = defineType({
     defineField({
       name: "featured",
       title: "Featured project?",
-      description: "Only featured projects appear on the home page.",
+      description:
+        "Only featured projects appear on the home page, in the same order as the Projects list.",
       type: "boolean",
       group: "listing",
       hidden: hideUntilRole,
@@ -625,16 +634,7 @@ export const project = defineType({
       ],
     }),
   ],
-  orderings: [
-    {
-      title: "Featured first",
-      name: "featuredDesc",
-      by: [
-        { field: "featured", direction: "desc" },
-        { field: "title", direction: "asc" },
-      ],
-    },
-  ],
+  orderings: [orderRankOrdering],
   preview: {
     select: {
       title: "title",

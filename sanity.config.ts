@@ -1,6 +1,7 @@
 "use client";
 
 import { icons } from "@sanity/icons";
+import { orderableDocumentListDeskItem } from "@sanity/orderable-document-list";
 import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
 
@@ -33,7 +34,7 @@ export default defineConfig({
   },
   plugins: [
     structureTool({
-      structure: (S) =>
+      structure: (S, context) =>
         S.list()
           .title("Content")
           .items([
@@ -72,7 +73,13 @@ export default defineConfig({
                   .documentId("firmPartners"),
               ),
             S.divider(),
-            S.documentTypeListItem("project").title("Projects"),
+            orderableDocumentListDeskItem({
+              type: "project",
+              title: "Projects",
+              icon: icons.case,
+              S,
+              context,
+            }),
           ]),
     }),
   ],

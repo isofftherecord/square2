@@ -12,6 +12,7 @@
     "@googlemaps/js-api-loader": "^2.1.1",
     "@next/third-parties": "^16.3.5",
     "@sanity/image-url": "^2.1.1",
+    "@sanity/orderable-document-list": "^2.0.25",
     "next": "16.3.4",
     "next-sanity": "^13.3.3",
     "react": "19.2.8",
