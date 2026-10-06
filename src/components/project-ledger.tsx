@@ -132,6 +132,7 @@ function LedgerRow({
         <div className="relative col-span-12 max-lg:py-10 lg:-mx-[var(--s2-margin)] lg:grid lg:h-[var(--s2-ledger-row)] lg:grid-cols-[427fr_520fr_40fr_453fr]">
           <button
             type="button"
+            data-open-case=""
             aria-expanded={false}
             aria-controls={`case-${project.slug}`}
             onClick={onToggle}
@@ -227,6 +228,7 @@ function LedgerRow({
 
             <Button
               type="button"
+              data-open-case=""
               variant="text"
               onClick={onToggle}
               className="relative z-20 mt-6 justify-start text-navigation hover:opacity-100! lg:mt-0 lg:h-[var(--s2-ledger-foot)] lg:w-full lg:justify-start lg:bg-s2-fog lg:pl-[var(--s2-gutter)] lg:transition-colors lg:duration-200 lg:hover:bg-s2-orange hover:[&_img]:brightness-0 [&_img]:transition-[filter] [&_img]:duration-200"
@@ -292,6 +294,25 @@ export function ProjectLedger({ projects }: { projects: ProjectSummary[] }) {
       setOpenSlug(null);
     }
   }, [openSlug, projects]);
+
+  useEffect(() => {
+    if (!openSlug) return;
+
+    // Un click fuera del panel lo cierra. Abrir otro case lo reemplaza.
+    const onClick = (event: MouseEvent) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+
+      const panel = document.getElementById(`case-${openSlug}`);
+      if (panel?.contains(target)) return;
+      if (target.closest("[data-open-case]")) return;
+
+      setOpen(null);
+    };
+
+    document.addEventListener("click", onClick, true);
+    return () => document.removeEventListener("click", onClick, true);
+  }, [openSlug, setOpen]);
 
   useEffect(() => {
     const fromHash = window.location.hash.replace(/^#/, "");

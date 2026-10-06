@@ -68,11 +68,7 @@ export type ProjectSummary = {
   mainImage?: ProjectImage;
   address?: string;
   owner?: string;
-  scope?: string;
   status?: string;
-  buildingImage?: ProjectImage;
-  buildingLegal?: string;
-  buildingSummary?: string;
   dealMetrics?: ProjectMetric[];
   chapters?: ProjectChapter[];
   exit?: ProjectExit;

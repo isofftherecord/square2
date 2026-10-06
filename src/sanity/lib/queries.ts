@@ -53,11 +53,7 @@ const projectFields = /* groq */ `{
       mainImage,
       address,
       owner,
-      scope,
       status,
-      buildingImage,
-      buildingLegal,
-      buildingSummary,
       dealMetrics[] { _key, value, label },
       chapters[] {
         _key,

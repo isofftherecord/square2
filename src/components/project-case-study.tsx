@@ -4,6 +4,7 @@ import Image from "next/image";
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -29,16 +30,99 @@ function present(value?: string | null) {
   return Boolean(value && value.trim());
 }
 
-// Aviso fijo del panel The building. Sanity puede reemplazarlo.
-const MANAGED_BUILDING_LEGAL =
-  "NO RETURNS PUBLISHED. THE CAPITAL IS THE OWNER'S.";
-
 function pad(n: number) {
   return String(n).padStart(2, "0");
 }
 
 function filledMetrics(metrics?: ProjectMetric[]) {
   return (metrics ?? []).filter((metric) => present(metric.value));
+}
+
+const useIsoLayoutEffect =
+  typeof window === "undefined" ? useEffect : useLayoutEffect;
+
+function DealMetrics({
+  items,
+  className = "mt-8 min-w-0 space-y-7",
+  shrink = true,
+}: {
+  items: { key: string; value: string; label?: string | null }[];
+  className?: string;
+  // En la franja Managed el ancho crece con la cifra; no se reduce el tipo.
+  shrink?: boolean;
+}) {
+  const ref = useRef<HTMLDListElement>(null);
+  const signature = items.map((item) => item.value).join("\n");
+
+  useIsoLayoutEffect(() => {
+    if (!shrink) return;
+    const list = ref.current;
+    if (!list) return;
+
+    let lastWidth = -1;
+    let cancelled = false;
+
+    const figures = () =>
+      [...list.querySelectorAll<HTMLElement>("[data-deal-figure]")];
+
+    // El H1 queda en 64px desde 1024, pero la columna es un % del canvas.
+    // Si una cifra no cabe, todas bajan al mismo tamaño para no recortarse.
+    const fit = (force = false) => {
+      if (cancelled) return;
+      const nodes = figures();
+      const sample = nodes[0];
+      if (!sample) return;
+      const available = sample.clientWidth;
+      if (available <= 0) return;
+      if (!force && available === lastWidth) return;
+      lastWidth = available;
+
+      let next = Number.POSITIVE_INFINITY;
+      let max = 0;
+      for (const node of nodes) {
+        node.style.fontSize = "";
+        const current = parseFloat(getComputedStyle(node).fontSize);
+        const needed = node.scrollWidth;
+        if (!current) continue;
+        max = current;
+        if (needed > available + 0.5) {
+          next = Math.min(next, (current * available) / needed);
+        }
+      }
+      if (!max || next >= max - 0.5) return;
+      const size = `${next}px`;
+      for (const node of nodes) node.style.fontSize = size;
+    };
+
+    fit(true);
+    document.fonts?.ready.then(() => fit(true));
+    const observer = new ResizeObserver(() => fit());
+    observer.observe(list);
+
+    return () => {
+      cancelled = true;
+      observer.disconnect();
+      for (const node of figures()) node.style.fontSize = "";
+    };
+  }, [signature, shrink]);
+
+  return (
+    <dl ref={ref} className={className}>
+      {items.map((item) => (
+        <div key={item.key} className={shrink ? "min-w-0" : undefined}>
+          <dt
+            data-deal-figure=""
+            className={`text-h1 whitespace-nowrap ${shrink ? "min-w-0" : ""}`}
+          >
+            {item.value}
+          </dt>
+          {present(item.label) ? (
+            <dd className="text-micro mt-1">{item.label}</dd>
+          ) : null}
+        </div>
+      ))}
+    </dl>
+  );
 }
 
 function filledParagraphs(chapter: ProjectChapter) {
@@ -264,17 +348,6 @@ export function ProjectCaseStudy({
   const showExit =
     hasExitContent(project.exit) || credits.length > 0 || Boolean(creditsIntro);
   const isManaged = project.role === "Managed";
-  const managedImage = hasImageAsset(project.buildingImage)
-    ? project.buildingImage
-    : null;
-  const managedSummary = present(project.buildingSummary)
-    ? project.buildingSummary!.trim()
-    : null;
-  const managedLegal = present(project.buildingLegal)
-    ? project.buildingLegal!.trim()
-    : MANAGED_BUILDING_LEGAL;
-  const showManagedBuilding =
-    isManaged && (Boolean(managedImage) || Boolean(managedSummary));
   const nextButton =
     nextProject && onOpenNext ? (
       <NextProjectButton
@@ -284,7 +357,7 @@ export function ProjectCaseStudy({
     ) : null;
 
   const panelCount = isManaged
-    ? 1 + (showManagedBuilding ? 1 : 0)
+    ? 1
     : 1 + chapters.length + (showExit ? 1 : 0);
 
   const syncPanel = useCallback(() => {
@@ -379,34 +452,7 @@ export function ProjectCaseStudy({
       >
         <div className="flex h-auto max-lg:flex-col lg:h-full">
           {isManaged ? (
-            <>
-              <ManagedCover
-                project={project}
-                nextButton={showManagedBuilding ? null : nextButton}
-              />
-              {showManagedBuilding ? (
-                <ChapterPanel
-                  chapter={{
-                    heading: "The building.",
-                    paragraphs: managedSummary
-                      ? managedSummary
-                          .split(/\n+/)
-                          .map((text) => text.trim())
-                          .filter((text) => text.length > 0)
-                          .map((text) => ({ text }))
-                      : undefined,
-                    image: managedImage ?? undefined,
-                    caption:
-                      managedImage && present(managedImage.caption)
-                        ? managedImage.caption!.trim()
-                        : undefined,
-                  }}
-                  fallbackAlt={project.title}
-                  legal={managedImage ? managedLegal : undefined}
-                  nextButton={nextButton}
-                />
-              ) : null}
-            </>
+            <ManagedCover project={project} nextButton={nextButton} />
           ) : (
             <>
               <CoverPanel
@@ -493,7 +539,7 @@ function NextProjectButton({
     <button
       type="button"
       onClick={onOpenNext}
-      className="text-data inline-flex cursor-pointer items-center justify-center gap-x-1.5 bg-s2-black px-4 py-3 text-s2-steel"
+      className="text-data inline-flex w-fit cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap bg-s2-black px-5 py-4 text-s2-steel"
     >
       Next · {title}
       <img
@@ -586,19 +632,16 @@ function CoverPanel({
             aria-hidden
             className="absolute inset-y-0 left-0 z-[1] hidden w-px bg-s2-steel lg:block"
           />
-          <div className="flex flex-col justify-top bg-s2-fog px-6 pt-20 pb-8 lg:h-full lg:px-0 lg:pl-[var(--s2-case-deal-pad)]">
+          <div className="flex w-full min-w-0 flex-col justify-top bg-s2-fog px-6 pt-20 pb-8 lg:h-full lg:px-0 lg:pl-[var(--s2-case-deal-pad)]">
             <h3 className="text-metrics">The Deal.</h3>
             <div aria-hidden className="mt-2 h-px w-[168px] bg-s2-black" />
-            <dl className="mt-8 space-y-7">
-              {dealMetrics.map((metric, index) => (
-                <div key={metric._key || index}>
-                  <dt className="text-h1">{metric.value}</dt>
-                  {present(metric.label) ? (
-                    <dd className="text-micro mt-1">{metric.label}</dd>
-                  ) : null}
-                </div>
-              ))}
-            </dl>
+            <DealMetrics
+              items={dealMetrics.map((metric, index) => ({
+                key: metric._key || String(index),
+                value: metric.value!,
+                label: metric.label,
+              }))}
+            />
           </div>
         </div>
       ) : null}
@@ -615,11 +658,10 @@ function ManagedCover({
   nextButton?: ReactNode;
 }) {
   const facts = [
-    present(project.scope) ? { label: "Scope", value: project.scope! } : null,
     present(project.assetClass)
       ? { label: "Class", value: project.assetClass! }
       : null,
-    present(project.role) ? { label: "Role", value: project.role! } : null,
+    { label: "Role", value: "Property management services" },
     present(project.status)
       ? { label: "Status", value: project.status! }
       : null,
@@ -638,11 +680,11 @@ function ManagedCover({
   const showColumn = Boolean(footage) || dealMetrics.length > 0;
 
   return (
-    <section className="relative h-auto w-full shrink-0 py-10 max-lg:px-[var(--s2-margin)] lg:flex lg:h-full lg:w-[100cqw] lg:items-center lg:py-0">
+    <section className="relative h-auto w-full shrink-0 py-10 max-lg:px-[var(--s2-margin)] lg:flex lg:h-full lg:w-[100cqw] lg:items-stretch lg:py-0">
       <div
-        className={`w-full lg:pl-[var(--s2-case-inset)] ${
+        className={`flex min-w-0 flex-1 flex-col justify-center lg:pl-[var(--s2-case-inset)] ${
           showColumn
-            ? "lg:pr-[calc(var(--s2-case-deal)+var(--s2-case-deal-gap))]"
+            ? "lg:pr-[var(--s2-case-deal-gap)]"
             : "lg:pr-[var(--s2-case-inset)]"
         }`}
       >
@@ -676,34 +718,35 @@ function ManagedCover({
       </div>
 
       {showColumn ? (
-        <div className="relative mt-8 max-lg:-mx-[var(--s2-margin)] lg:absolute lg:inset-y-0 lg:right-0 lg:mt-0 lg:w-[var(--s2-case-deal)]">
-          <div
-            aria-hidden
-            className="absolute inset-y-0 left-0 z-[1] hidden w-px bg-s2-steel lg:block"
+        <div className="relative mt-8 flex w-full shrink-0 flex-col bg-s2-fog px-6 pt-20 pb-8 max-lg:-mx-[var(--s2-margin)] max-lg:overflow-x-auto lg:mt-0 lg:h-full lg:w-max lg:overflow-visible lg:px-0 lg:pt-[90px] lg:pr-[53px] lg:pb-4 lg:pl-8">
+          <h3 className="text-metrics">Under management.</h3>
+          <div aria-hidden className="mt-2 h-px w-[168px] bg-s2-black" />
+          {/* 90 + título 24 + 8 + regla 1 + 30 = 153 hasta la cifra. */}
+          <DealMetrics
+            shrink={false}
+            className="mt-8 w-max space-y-7 lg:mt-[30px]"
+            items={[
+              ...(footage
+                ? [{ key: "footage", value: footage, label: "square feet" }]
+                : []),
+              ...dealMetrics.map((metric, index) => ({
+                key: metric._key || String(index),
+                value: metric.value!,
+                label: metric.label,
+              })),
+            ]}
           />
-          <div className="flex flex-col justify-top bg-s2-fog px-6 pt-20 pb-8 lg:h-full lg:px-0 lg:pl-[var(--s2-case-deal-pad)]">
-            <h3 className="text-metrics">Under management.</h3>
-            <div aria-hidden className="mt-2 h-px w-[168px] bg-s2-black" />
-            <dl className="mt-8 space-y-7">
-              {footage ? (
-                <div>
-                  <dt className="text-h1">{footage}</dt>
-                  <dd className="text-micro mt-1">square feet</dd>
-                </div>
-              ) : null}
-              {dealMetrics.map((metric, index) => (
-                <div key={metric._key || index}>
-                  <dt className="text-h1">{metric.value}</dt>
-                  {present(metric.label) ? (
-                    <dd className="text-micro mt-1">{metric.label}</dd>
-                  ) : null}
-                </div>
-              ))}
-            </dl>
-          </div>
+          {nextButton ? (
+            <div className="mt-10 flex justify-end lg:mt-auto">{nextButton}</div>
+          ) : null}
         </div>
+      ) : nextButton ? (
+        <div className="mt-6 flex justify-end">{nextButton}</div>
       ) : null}
-      <PanelNext nextButton={nextButton} />
+      {/* Figma 766:734 — alineada con las etiquetas (104px) y sobre el pie. */}
+      <p className="text-micro mt-10 text-s2-steel lg:absolute lg:bottom-[62px] lg:left-[7.222%] lg:mt-0">
+        No returns published. The capital is the owner&apos;s.
+      </p>
     </section>
   );
 }
@@ -711,12 +754,10 @@ function ManagedCover({
 function ChapterPanel({
   chapter,
   fallbackAlt,
-  legal,
   nextButton,
 }: {
   chapter: ProjectChapter;
   fallbackAlt: string;
-  legal?: string;
   nextButton?: ReactNode;
 }) {
   const paragraphs = filledParagraphs(chapter);
@@ -747,11 +788,6 @@ function ChapterPanel({
             fallbackAlt={fallbackAlt}
             wide={!showText}
           />
-          {legal ? (
-            <p className="text-micro mt-4 pl-2.5 text-s2-steel lg:hidden">
-              {legal}
-            </p>
-          ) : null}
         </div>
       ) : null}
 
@@ -780,15 +816,7 @@ function ChapterPanel({
           </div>
         </div>
       ) : null}
-      {legal ? (
-        <div className="mt-10 hidden items-start justify-between gap-6 lg:absolute lg:inset-x-[var(--s2-case-inset)] lg:bottom-10 lg:flex">
-          <p className="text-micro pl-2.5 text-s2-steel">{legal}</p>
-          {nextButton}
-        </div>
-      ) : null}
-      <div className={legal ? "lg:hidden" : undefined}>
-        <PanelNext nextButton={nextButton} />
-      </div>
+      <PanelNext nextButton={nextButton} />
     </section>
   );
 }

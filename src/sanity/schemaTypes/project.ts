@@ -50,10 +50,6 @@ function hideOwnedStory({ document }: ConditionalPropertyCallbackContext) {
   return !isOwnedStory(roleOf(document));
 }
 
-function hideManagedOnly({ document }: ConditionalPropertyCallbackContext) {
-  return roleOf(document) !== "Managed";
-}
-
 function altImageFields() {
   return [
     defineField({
@@ -146,7 +142,7 @@ export const project = defineType({
       name: "role",
       title: "Role",
       description:
-        "Choose this first. Owned and Owned & Managed keep the full case study. Managed keeps only the short property details.",
+        "Choose this first. Owned and Owned & Managed keep the full case study. Managed keeps a single panel: the property hero and Under management. No second panel and no link out to the property.",
       type: "string",
       group: "listing",
       options: { list: [...PROJECT_ROLES], layout: "radio" },
@@ -254,15 +250,6 @@ export const project = defineType({
       hidden: hideOwnedStory,
     }),
     defineField({
-      name: "scope",
-      title: "Scope",
-      description: "What SQUARE2 runs here. Example: Leasing and operations.",
-      type: "string",
-      group: "managedCover",
-      fieldset: "coverFacts",
-      hidden: hideManagedOnly,
-    }),
-    defineField({
       name: "status",
       title: "Status",
       description: "Managed properties use Under management.",
@@ -291,45 +278,6 @@ export const project = defineType({
         }),
       ],
     }),
-    defineField({
-      name: "buildingImage",
-      title: "Building image",
-      description: "Photo on The building panel. The caption is the orange bar.",
-      type: "image",
-      group: "managedCover",
-      hidden: hideManagedOnly,
-      options: { hotspot: true },
-      fields: [
-        ...altImageFields(),
-        defineField({
-          name: "caption",
-          title: "Caption",
-          description: "Orange bar under the photo.",
-          type: "string",
-        }),
-      ],
-    }),
-    defineField({
-      name: "buildingLegal",
-      title: "Legal",
-      description:
-        "Line under the building photo. Leave blank to use the standard notice: NO RETURNS PUBLISHED. THE CAPITAL IS THE OWNER'S.",
-      type: "string",
-      group: "managedCover",
-      hidden: hideManagedOnly,
-      initialValue: "NO RETURNS PUBLISHED. THE CAPITAL IS THE OWNER'S.",
-    }),
-    defineField({
-      name: "buildingSummary",
-      title: "The building",
-      description:
-        "Two sentences: what it is, where it sits, and what SQUARE2 runs there.",
-      type: "text",
-      rows: 4,
-      group: "managedCover",
-      hidden: hideManagedOnly,
-    }),
-
     defineField({
       name: "chapters",
       title: "Story chapters",

@@ -15,3 +15,9 @@ export function matchesRoleFilter(
   // Owned & Managed cuenta en los dos filtros de rol
   return role === OWNED_AND_MANAGED_ROLE;
 }
+
+// En Managed, las solo Managed van primero y Owned & Managed al final.
+// El orden relativo del Studio se conserva dentro de cada grupo.
+export function managedListRank(role?: string) {
+  return role === OWNED_AND_MANAGED_ROLE ? 1 : 0;
+}
