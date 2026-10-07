@@ -4,7 +4,7 @@ import { SubscribeForm } from "@/components/subscribe-form";
 import { FOOTER_NAV } from "@/lib/site-nav";
 
 const CONNECTIONS = [
-  { href: "#", label: "LinkedIn" },
+  { href: "https://www.linkedin.com/company/square2/", label: "LinkedIn" },
 ] as const;
 
 export function Footer() {
@@ -46,6 +46,8 @@ export function Footer() {
               <li key={item.label}>
                 <a
                   href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="text-data text-s2-steel hover:text-s2-white"
                 >
                   {item.label}
