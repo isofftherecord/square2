@@ -35,42 +35,43 @@ export function ContactForm() {
           />
         </div>
 
-        {/* Tipo de interés */}
-        <div className="grid grid-cols-2 gap-x-5">
-          <div className="flex items-center gap-x-3 border-b border-s2-black pb-4">
-            <input
-              type="checkbox"
-              id="interest-capital"
-              name="interest"
-              value="capital"
-              className="size-4 shrink-0 appearance-none border border-s2-black checked:border-s2-orange checked:bg-s2-orange"
-            />
-            <label htmlFor="interest-capital" className="text-metrics">
-              Investment Opportunity
-            </label>
+        {/* Tipo de interés: cada opción va con su texto para que en móvil se lea junto */}
+        <div className="grid grid-cols-1 gap-y-10 border-b border-s2-black pb-10 lg:grid-cols-2 lg:gap-x-5">
+          <div>
+            <div className="flex items-center gap-x-3 border-b border-s2-black pb-4">
+              <input
+                type="checkbox"
+                id="interest-capital"
+                name="interest"
+                value="capital"
+                className="size-4 shrink-0 appearance-none border border-s2-black checked:border-s2-orange checked:bg-s2-orange"
+              />
+              <label htmlFor="interest-capital" className="text-metrics">
+                Investment Opportunity
+              </label>
+            </div>
+            <p className="text-body pt-6">
+              For limited partners, joint-venture partners, and allocators evaluating SQUARE2 as a sponsor.
+            </p>
           </div>
 
-          <div className="flex items-center gap-x-3 border-b border-s2-black pb-4">
-            <input
-              type="checkbox"
-              id="interest-ownership"
-              name="interest"
-              value="ownership"
-              className="size-4 shrink-0 appearance-none border border-s2-black checked:border-s2-orange checked:bg-s2-orange"
-            />
-            <label htmlFor="interest-ownership" className="text-metrics">
-              Property Management
-            </label>
+          <div>
+            <div className="flex items-center gap-x-3 border-b border-s2-black pb-4">
+              <input
+                type="checkbox"
+                id="interest-ownership"
+                name="interest"
+                value="ownership"
+                className="size-4 shrink-0 appearance-none border border-s2-black checked:border-s2-orange checked:bg-s2-orange"
+              />
+              <label htmlFor="interest-ownership" className="text-metrics">
+                Property Management
+              </label>
+            </div>
+            <p className="text-body pt-6">
+              For owners considering SQUARE2 to operate an asset they hold.
+            </p>
           </div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-x-5 gap-y-6 border-b border-s2-black py-10 lg:grid-cols-2">
-          <p className="text-body">
-          For limited partners, joint-venture partners, and allocators evaluating SQUARE2 as a sponsor.
-          </p>
-          <p className="text-body">
-          For owners considering SQUARE2 to operate an asset they hold.
-          </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-x-5">

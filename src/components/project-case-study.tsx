@@ -556,7 +556,7 @@ function NextProjectButton({
 function PanelNext({ nextButton }: { nextButton?: ReactNode }) {
   if (!nextButton) return null;
   return (
-    <div className="mt-10 flex justify-end lg:absolute lg:right-[var(--s2-case-inset)] lg:bottom-10">
+    <div className="mt-10 flex justify-start lg:absolute lg:right-[var(--s2-case-inset)] lg:bottom-10">
       {nextButton}
     </div>
   );
@@ -737,11 +737,11 @@ function ManagedCover({
             ]}
           />
           {nextButton ? (
-            <div className="mt-10 flex justify-end lg:mt-auto">{nextButton}</div>
+            <div className="mt-10 flex justify-start lg:mt-auto lg:justify-end">{nextButton}</div>
           ) : null}
         </div>
       ) : nextButton ? (
-        <div className="mt-6 flex justify-end">{nextButton}</div>
+        <div className="mt-6 flex justify-start lg:justify-end">{nextButton}</div>
       ) : null}
       {/* Figma 766:734 — alineada con las etiquetas (104px) y sobre el pie. */}
       <p className="text-micro mt-10 text-s2-steel lg:absolute lg:bottom-[62px] lg:left-[7.222%] lg:mt-0">
@@ -1048,7 +1048,7 @@ function ExitPanel({
             </dl>
           ) : null}
           {nextButton ? (
-            <div className="mt-10 flex justify-end lg:mt-auto">{nextButton}</div>
+            <div className="mt-10 flex justify-start lg:mt-auto lg:justify-end">{nextButton}</div>
           ) : null}
         </div>
       ) : (

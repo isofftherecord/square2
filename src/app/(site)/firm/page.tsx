@@ -236,7 +236,7 @@ export default async function FirmPage() {
         </div>
       </section>
 
-      <section className="s2-subgrid items-center py-36 pb-36 lg:pb-36">
+      <section className="s2-subgrid items-center py-16 lg:py-36">
         <div className="col-span-12 lg:col-start-2 lg:col-span-12">
           <p className="text-h1">One team with one <span className="italic">standard</span>.</p>
         </div>

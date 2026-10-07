@@ -127,7 +127,10 @@ function LedgerRow({
   }, [isOpen]);
 
   return (
-    <article id={`project-${project.slug}`} className="s2-subgrid">
+    <article
+      id={`project-${project.slug}`}
+      className="s2-subgrid max-lg:border-b max-lg:border-s2-steel"
+    >
       {!isOpen ? (
         <div className="relative col-span-12 max-lg:py-10 lg:-mx-[var(--s2-margin)] lg:grid lg:h-[var(--s2-ledger-row)] lg:grid-cols-[427fr_520fr_40fr_453fr]">
           <button
