@@ -26,6 +26,132 @@ function scrollCaseStudyIntoView(
   });
 }
 
+const OPEN_MS = 500;
+const CLOSE_FADE_MS = 150;
+const CLOSE_FOLD_MS = 320;
+const CLOSE_MS = CLOSE_FADE_MS + CLOSE_FOLD_MS;
+
+function cubicBezier(x1: number, y1: number, x2: number, y2: number) {
+  const axis = (a: number, b: number, t: number) =>
+    3 * (1 - t) * (1 - t) * t * a + 3 * (1 - t) * t * t * b + t * t * t;
+
+  return (x: number) => {
+    if (x <= 0) return 0;
+    if (x >= 1) return 1;
+    // Bisección: suficiente precisión para 60fps sin Newton.
+    let low = 0;
+    let high = 1;
+    let t = x;
+    for (let i = 0; i < 20; i++) {
+      const value = axis(x1, x2, t);
+      if (Math.abs(value - x) < 1e-4) break;
+      if (value < x) low = t;
+      else high = t;
+      t = (low + high) / 2;
+    }
+    return axis(y1, y2, t);
+  };
+}
+
+const easeOut = cubicBezier(0.22, 1, 0.36, 1);
+const easeFold = cubicBezier(0.4, 0, 0.2, 1);
+
+function isDesktop() {
+  return window.matchMedia("(min-width: 1024px)").matches;
+}
+
+function prefersReducedMotion() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+// Scroll de ventana en paralelo a una transición de layout. El destino se
+// recalcula cada frame porque el alto de los paneles cambia mientras tanto.
+function animateScroll(
+  target: () => number,
+  { duration, delay = 0, ease }: {
+    duration: number;
+    delay?: number;
+    ease: (x: number) => number;
+  },
+) {
+  if (prefersReducedMotion()) {
+    window.scrollTo({ top: target(), behavior: "instant" });
+    return () => {};
+  }
+
+  let startY = 0;
+  let startTime = 0;
+  let frame = 0;
+
+  const step = (now: number) => {
+    if (!startTime) {
+      startTime = now;
+      startY = window.scrollY;
+    }
+    const progress = Math.min(1, (now - startTime) / duration);
+    const top = startY + (target() - startY) * ease(progress);
+    window.scrollTo({ top, behavior: "instant" });
+    if (progress < 1) frame = requestAnimationFrame(step);
+  };
+
+  const timer = window.setTimeout(() => {
+    frame = requestAnimationFrame(step);
+  }, delay);
+
+  return () => {
+    window.clearTimeout(timer);
+    cancelAnimationFrame(frame);
+  };
+}
+
+function navClearance() {
+  const nav = document.querySelector<HTMLElement>('nav[aria-label="Main"]');
+  return (nav?.getBoundingClientRect().bottom ?? 100) + 24;
+}
+
+// Abrir: el borde inferior del panel termina en el borde inferior de la ventana.
+function scrollWithPanel(panel: HTMLElement, finalHeight: () => number) {
+  return animateScroll(
+    () =>
+      Math.max(
+        0,
+        panel.getBoundingClientRect().top +
+          window.scrollY +
+          finalHeight() -
+          window.innerHeight,
+      ),
+    { duration: OPEN_MS, ease: easeOut },
+  );
+}
+
+// Cerrar: la fila de la propiedad vuelve bajo el navbar mientras se pliega.
+function scrollBackToRow(row: HTMLElement) {
+  // Si el tope de la fila ya está bajo el navbar, la página no se mueve.
+  if (row.getBoundingClientRect().top >= navClearance()) return () => {};
+  return animateScroll(
+    () =>
+      Math.max(
+        0,
+        row.getBoundingClientRect().top + window.scrollY - navClearance(),
+      ),
+    { duration: CLOSE_FOLD_MS, delay: CLOSE_FADE_MS, ease: easeFold },
+  );
+}
+
+// Ignora la rueda mientras el panel abre o cierra; captura en window para
+// adelantarse al handler de scroll lateral del case study.
+let wheelLockUntil = 0;
+
+function lockWheel(ms: number) {
+  wheelLockUntil = Math.max(wheelLockUntil, performance.now() + ms);
+}
+
+function onLockedWheel(event: WheelEvent) {
+  if (performance.now() >= wheelLockUntil || !isDesktop()) return;
+  event.preventDefault();
+  event.stopPropagation();
+}
+
 function projectImageSrc(image?: ProjectSummary["mainImage"]) {
   if (!hasImageAsset(image)) return null;
   return urlFor(image).width(600).height(600).url();
@@ -65,7 +191,7 @@ function useExpand(open: boolean) {
     }
 
     setHeight("0px");
-    const timer = window.setTimeout(() => setRender(false), 500);
+    const timer = window.setTimeout(() => setRender(false), CLOSE_MS);
     return () => window.clearTimeout(timer);
   }, [open, measure]);
 
@@ -86,6 +212,7 @@ function LedgerRow({
   nextProject,
   isFirst,
   isOpen,
+  anyOpen,
   onToggle,
   onOpen,
 }: {
@@ -93,20 +220,56 @@ function LedgerRow({
   nextProject?: ProjectSummary | null;
   isFirst: boolean;
   isOpen: boolean;
+  anyOpen: boolean;
   onToggle: () => void;
   onOpen: (slug: string) => void;
 }) {
   const expand = useExpand(isOpen);
   const panelRef = useRef<HTMLDivElement>(null);
+  const rowRef = useRef<HTMLDivElement>(null);
+  const detailsRef = useRef<HTMLButtonElement>(null);
   const imageSrc = projectImageSrc(project.mainImage);
   const alt =
     project.mainImage?.alt ??
     [project.title, project.market].filter(Boolean).join(", ");
 
+  const wasOpen = useRef(isOpen);
+
+  useEffect(() => {
+    const changed = wasOpen.current !== isOpen;
+    wasOpen.current = isOpen;
+    if (!changed) return;
+    lockWheel(isOpen ? OPEN_MS : CLOSE_MS);
+    // Si se cerró porque se abre otro proyecto, el scroll y el foco son del nuevo.
+    if (isOpen || anyOpen) return;
+
+    const details = detailsRef.current;
+    const active = document.activeElement;
+    const focusIsOurs =
+      !active ||
+      active === document.body ||
+      Boolean(details?.closest("article")?.contains(active));
+    if (focusIsOurs) details?.focus({ preventScroll: isDesktop() });
+
+    const row = rowRef.current;
+    if (!row || !isDesktop()) return;
+    return scrollBackToRow(row);
+    // anyOpen se lee en el mismo render en que cambia isOpen.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
+
   useEffect(() => {
     if (!isOpen) return;
     const panel = panelRef.current;
     if (!panel) return;
+
+    if (isDesktop()) {
+      const inner = expand.innerRef;
+      return scrollWithPanel(
+        panel,
+        () => inner.current?.offsetHeight ?? panel.offsetHeight,
+      );
+    }
 
     let done = false;
     const reveal = () => {
@@ -126,13 +289,21 @@ function LedgerRow({
     };
   }, [isOpen]);
 
+  const detailsButtonClass = `relative z-20 mt-6 justify-start text-navigation hover:opacity-100! lg:mt-0 lg:h-[var(--s2-ledger-foot)] lg:w-full lg:justify-start lg:pl-[var(--s2-gutter)] lg:transition-colors lg:duration-200 lg:ease-[cubic-bezier(0.22,1,0.36,1)] [&_img]:transition-[filter,transform] [&_img]:duration-200 [&_img]:ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none motion-reduce:[&_img]:transition-none ${
+    isOpen
+      ? "bg-s2-orange max-lg:h-12 max-lg:w-full max-lg:px-4 [&_img]:rotate-90 [&_img]:brightness-0"
+      : "lg:bg-s2-fog lg:hover:bg-s2-orange hover:[&_img]:brightness-0"
+  }`;
+
   return (
     <article
       id={`project-${project.slug}`}
       className="s2-subgrid max-lg:border-b max-lg:border-s2-steel"
     >
-      {!isOpen ? (
-        <div className="relative col-span-12 max-lg:py-10 lg:-mx-[var(--s2-margin)] lg:grid lg:h-[var(--s2-ledger-row)] lg:grid-cols-[427fr_520fr_40fr_453fr]">
+      <div
+        ref={rowRef}
+        className="relative col-span-12 max-lg:py-10 lg:-mx-[var(--s2-margin)] lg:grid lg:h-[var(--s2-ledger-row)] lg:grid-cols-[427fr_520fr_40fr_453fr]">
+        {!isOpen ? (
           <button
             type="button"
             data-open-case=""
@@ -143,6 +314,7 @@ function LedgerRow({
           >
             <span className="sr-only">Open {project.title}</span>
           </button>
+        ) : null}
 
           {/* Celda 1 (427): fog y regla solo hasta el alto del texto */}
           <div className="relative lg:pt-[84px] lg:pl-[clamp(92px,9.0278vw,130px)]">
@@ -222,24 +394,6 @@ function LedgerRow({
             />
           </div>
 
-          {/* Celda 4 (453): fog y regla solo en la franja de Details */}
-          <div className="relative lg:flex lg:h-full lg:flex-col lg:justify-end">
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-x-0 bottom-[var(--s2-ledger-foot)] hidden h-px bg-s2-steel lg:block"
-            />
-
-            <Button
-              type="button"
-              data-open-case=""
-              variant="text"
-              onClick={onToggle}
-              className="relative z-20 mt-6 justify-start text-navigation hover:opacity-100! lg:mt-0 lg:h-[var(--s2-ledger-foot)] lg:w-full lg:justify-start lg:bg-s2-fog lg:pl-[var(--s2-gutter)] lg:transition-colors lg:duration-200 lg:hover:bg-s2-orange hover:[&_img]:brightness-0 [&_img]:transition-[filter] [&_img]:duration-200"
-            >
-              Details
-            </Button>
-          </div>
-
           {/* Reglas de fila a todo el canvas; quedan sobre el fondo de Details */}
           <div
             aria-hidden
@@ -250,17 +404,49 @@ function LedgerRow({
             ) : null}
             <div className="absolute inset-x-0 bottom-0 h-px bg-s2-steel" />
           </div>
+
+        {/* Celda 4: Details pasa a Close sin desmontar el botón */}
+        <div className="relative lg:flex lg:h-full lg:flex-col lg:justify-end">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 bottom-[var(--s2-ledger-foot)] hidden h-px bg-s2-steel lg:block"
+          />
+
+          <Button
+            ref={detailsRef}
+            type="button"
+            data-open-case=""
+            variant="text"
+            aria-expanded={isOpen}
+            aria-controls={`case-${project.slug}`}
+            onClick={onToggle}
+            className={detailsButtonClass}
+          >
+            {isOpen ? "Close" : "Details"}
+          </Button>
         </div>
-      ) : null}
+      </div>
 
       <div
         ref={panelRef}
         id={`case-${project.slug}`}
-        className="s2-hero overflow-hidden transition-[height] duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] motion-reduce:transition-none"
+        className={`s2-hero overflow-hidden transition-[height] motion-reduce:transition-none ${
+          isOpen
+            ? "duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+            : "delay-150 duration-[320ms] ease-[cubic-bezier(0.4,0,0.2,1)]"
+        }`}
         style={{ height: expand.height }}
         aria-hidden={!isOpen}
       >
-        <div ref={expand.innerRef} className="lg:h-[var(--s2-case-study)]">
+        {/* Al cerrar, el contenido se apaga antes de que el panel se pliegue */}
+        <div
+          ref={expand.innerRef}
+          className={`lg:h-[var(--s2-case-study)] ${
+            isOpen
+              ? "opacity-100"
+              : "opacity-0 transition-opacity duration-150 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
+          }`}
+        >
           {expand.render ? (
             <ProjectCaseStudy
               project={project}
@@ -290,6 +476,43 @@ export function ProjectLedger({ projects }: { projects: ProjectSummary[] }) {
       ? `${window.location.pathname}#${slug}`
       : window.location.pathname;
     window.history.replaceState(null, "", url);
+  }, []);
+
+  // Next: primero se cierra el panel actual y, al terminar, se abre el siguiente.
+  const [pendingSlug, setPendingSlug] = useState<string | null>(null);
+
+  const openNext = useCallback(
+    (slug: string) => {
+      if (pendingSlug) return;
+      setPendingSlug(slug);
+      setOpen(null);
+    },
+    [pendingSlug, setOpen],
+  );
+
+  useEffect(() => {
+    if (!pendingSlug) return;
+    const timer = window.setTimeout(
+      () => {
+        setPendingSlug(null);
+        setOpen(pendingSlug);
+        requestAnimationFrame(() => {
+          document
+            .querySelector<HTMLElement>(
+              `#project-${CSS.escape(pendingSlug)} button[aria-expanded="true"]`,
+            )
+            ?.focus({ preventScroll: true });
+        });
+      },
+      prefersReducedMotion() ? 0 : CLOSE_MS,
+    );
+    return () => window.clearTimeout(timer);
+  }, [pendingSlug, setOpen]);
+
+  useEffect(() => {
+    const options = { capture: true, passive: false } as const;
+    window.addEventListener("wheel", onLockedWheel, options);
+    return () => window.removeEventListener("wheel", onLockedWheel, options);
   }, []);
 
   useEffect(() => {
@@ -341,10 +564,12 @@ export function ProjectLedger({ projects }: { projects: ProjectSummary[] }) {
           nextProject={projects[index + 1] ?? null}
           isFirst={index === 0}
           isOpen={openSlug === project.slug}
-          onToggle={() =>
-            setOpen(openSlug === project.slug ? null : project.slug)
-          }
-          onOpen={(slug) => setOpen(slug)}
+          anyOpen={openSlug !== null || pendingSlug !== null}
+          onToggle={() => {
+            setPendingSlug(null);
+            setOpen(openSlug === project.slug ? null : project.slug);
+          }}
+          onOpen={openNext}
         />
       ))}
     </section>

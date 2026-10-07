@@ -539,15 +539,20 @@ function NextProjectButton({
     <button
       type="button"
       onClick={onOpenNext}
-      className="text-data inline-flex w-fit cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap bg-s2-black px-5 py-4 text-s2-steel"
+      className="group text-data relative isolate inline-flex w-fit cursor-pointer items-center justify-center gap-1.5 overflow-hidden whitespace-nowrap bg-s2-black px-5 py-4 text-s2-steel transition-colors duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] outline-none hover:text-s2-black focus-visible:text-s2-black motion-reduce:transition-none"
     >
+      {/* Barrido naranja de izquierda a derecha en hover y foco de teclado */}
+      <span
+        aria-hidden
+        className="absolute inset-0 -z-10 origin-left scale-x-0 bg-s2-orange transition-transform duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-x-100 group-focus-visible:scale-x-100 motion-reduce:transition-none"
+      />
       Next · {title}
       <img
         src="/icons/arrow-right.svg"
         alt=""
         width={10}
         height={9}
-        className="shrink-0"
+        className="shrink-0 transition-[translate,filter] duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-1 group-hover:brightness-0 group-focus-visible:translate-x-1 group-focus-visible:brightness-0 motion-reduce:transition-none"
       />
     </button>
   );
