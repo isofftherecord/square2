@@ -33,7 +33,7 @@ export function Navbar() {
   return (
     <header className="col-span-12 z-50">
       <nav
-        className="bg-s2-white fixed inset-x-5 top-4 z-50 mx-auto flex max-w-[600px] flex-col px-5 py-3.5 lg:inset-x-0 lg:top-[44px] lg:flex-row lg:items-center lg:justify-between"
+        className="bg-[#f9f9f9] fixed inset-x-5 top-4 z-50 mx-auto flex max-w-[600px] flex-col px-5 py-3.5 lg:inset-x-0 lg:top-[44px] lg:flex-row lg:items-center lg:justify-between"
         aria-label="Main"
       >
         <div className="flex w-full items-center justify-between">
