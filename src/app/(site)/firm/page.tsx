@@ -1,118 +1,48 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { Button } from "@/components/button";
 import { DoubleBlock } from "@/components/double-block";
-import { TitleHero } from "@/components/second-hero";
+import {
+  Leadership,
+  toLeaders,
+  type FirmLeadershipDoc,
+} from "@/components/leadership";
 import {
   Partners,
   toPartners,
   type FirmPartnersDoc,
-  type Partner,
 } from "@/components/partners";
-import { Team, toTeamMembers, type FirmTeamDoc, type TeamMember } from "@/components/team";
+import { TitleHero } from "@/components/second-hero";
+import { Team, toTeamMembers, type FirmTeamDoc } from "@/components/team";
 import { isSanityConfigured } from "@/sanity/env";
 import { fetchPublished } from "@/sanity/lib/live";
 import {
   firmHeroQuery,
+  firmLeadershipQuery,
   firmPartnersQuery,
   firmTeamQuery,
 } from "@/sanity/lib/queries";
 import { toTitleHeroSlides, type TitleHeroDoc } from "@/sanity/lib/title-hero";
-
-// Filas de Figma mientras el documento Firm — Team no está publicado.
-const FALLBACK_TEAM: TeamMember[] = [
-  { _key: "alexandra-ramirez", name: "Alexandra Ramirez", title: "Operations" },
-  { _key: "name-surname", name: "Name Surname", title: "Title" },
-];
-
-const FALLBACK_PARTNERS: {
-  intro: string;
-  partners: Partner[];
-} = {
-  intro:
-    "Capital partners, lenders, and advisors SQUARE2 has worked with across the portfolio.",
-  partners: [
-    { _key: "apollo", name: "Apollo Global Management" },
-    { _key: "blackstone", name: "Blackstone" },
-    { _key: "lone-star", name: "Lone Star Funds" },
-    { _key: "ascentris", name: "Ascentris" },
-    { _key: "dra", name: "DRA Advisors" },
-    { _key: "gresham", name: "Gresham Partners" },
-  ],
-};
-
-// Sin `photo` la tarjeta muestra el placeholder del wireframe.
-const LEADERSHIP: {
-  name: string;
-  role: string;
-  photo?: string;
-  email?: string;
-  linkedin?: string;
-}[] = [
-  {
-    name: "Jay Caplin",
-    role: "Co-Founder & PRINCIPAL",
-  },
-  {
-    name: "Michael Manno",
-    role: "Co-Founder & PRINCIPAL",
-  },
-];
-
-function LeadershipChip({
-  href,
-  icon,
-  iconWidth,
-  label,
-  className,
-}: {
-  href?: string;
-  icon: string;
-  iconWidth: number;
-  label: string;
-  className: string;
-}) {
-  const classes = `inline-flex h-5 items-center gap-1.5 px-3 text-navigation text-s2-white ${className}`;
-  const content = (
-    <>
-      <img src={icon} alt="" width={iconWidth} height={7} className="shrink-0" />
-      {label}
-    </>
-  );
-
-  if (href) {
-    const external = href.startsWith("http");
-    return (
-      <a
-        href={href}
-        className={classes}
-        {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-      >
-        {content}
-      </a>
-    );
-  }
-
-  return <span className={classes}>{content}</span>;
-}
 
 export const metadata: Metadata = {
   title: "Firm — Square2",
 };
 
 export default async function FirmPage() {
-  const [slides, teamMembers, partnersDoc] = isSanityConfigured
+  const [slides, leaders, teamMembers, partnersDoc] = isSanityConfigured
     ? await Promise.all([
       fetchPublished<TitleHeroDoc | null>(firmHeroQuery).then(toTitleHeroSlides),
+      fetchPublished<FirmLeadershipDoc | null>(firmLeadershipQuery).then(toLeaders),
       fetchPublished<FirmTeamDoc | null>(firmTeamQuery).then(toTeamMembers),
       fetchPublished<FirmPartnersDoc | null>(firmPartnersQuery).then(
         toPartners,
       ),
     ])
-    : [[], undefined, undefined];
+    : [[], undefined, undefined, undefined];
 
-  const members = teamMembers ?? FALLBACK_TEAM;
-  const { intro, partners } = partnersDoc ?? FALLBACK_PARTNERS;
+  const people = leaders ?? [];
+  const members = teamMembers ?? [];
+  const intro = partnersDoc?.intro;
+  const partners = partnersDoc?.partners ?? [];
 
   return (
     <>
@@ -146,70 +76,7 @@ export default async function FirmPage() {
       </section>
 
 
-      {/* Leadership: 2 tarjetas de 3 columnas, con una columna de aire */}
-      <section className="s2-subgrid pt-20">
-        <div className="col-span-12 lg:col-span-10 lg:col-start-2">
-          <h2 className="text-h2">Leadership.</h2>
-          <hr className="mt-4 border-t border-s2-black" />
-
-          <ul className="mt-[59px] grid grid-cols-1 gap-x-5 gap-y-14 lg:grid-cols-10">
-            {LEADERSHIP.map((person, index) => (
-              <li
-                key={person.name}
-                className={
-                  index === 1 ? "lg:col-span-3 lg:col-start-5" : "lg:col-span-3"
-                }
-              >
-                <h3 className="text-h4">{person.name}</h3>
-                <p className="text-body">{person.role}</p>
-                <div className="relative mt-[35px] aspect-[345/316] max-w-[345px] border border-s2-black">
-                  {person.photo ? (
-                    <Image
-                      src={person.photo}
-                      alt={person.name}
-                      fill
-                      sizes="345px"
-                      className="object-cover"
-                    />
-                  ) : (
-                    // Placeholder del wireframe mientras no hay retrato
-                    <svg
-                      className="absolute inset-0 h-full w-full"
-                      viewBox="0 0 100 100"
-                      preserveAspectRatio="none"
-                      aria-hidden="true"
-                    >
-                      <path
-                        d="M0 0 L100 100 M100 0 L0 100"
-                        fill="none"
-                        stroke="currentColor"
-                        vectorEffect="non-scaling-stroke"
-                      />
-                    </svg>
-                  )}
-                </div>
-                <div className="mt-4 flex gap-2.5">
-                  <LeadershipChip
-                    href={person.email ? `mailto:${person.email}` : undefined}
-                    icon="/icons/mail.svg"
-                    iconWidth={9}
-                    label="Mail"
-                    className="bg-s2-orange cursor-pointer"
-                  />
-                  <LeadershipChip
-                    href={person.linkedin}
-                    icon="/icons/linkedin.svg"
-                    iconWidth={10}
-                    label="LinkedIn"
-                    className="bg-s2-linkedin cursor-pointer"
-                  />
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
+      <Leadership people={people} />
       <Team members={members} />
       <Partners intro={intro} partners={partners} />
 

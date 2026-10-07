@@ -33,9 +33,6 @@ export function toPartners(doc: FirmPartnersDoc | null):
 
 const COLUMN_COUNT = 3;
 
-const DEFAULT_INTRO =
-  "Capital partners, lenders, and advisors SQUARE2 has worked with across the portfolio.";
-
 /**
  * Reparte N ítems en `columnCount` columnas lo más parejas posible.
  * El resto (N % columnas) se suma de izquierda a derecha, como en Figma:
@@ -64,7 +61,7 @@ type PartnersProps = {
 export function Partners({ intro, partners }: PartnersProps) {
   if (partners.length === 0) return null;
 
-  const description = intro?.trim() || DEFAULT_INTRO;
+  const description = intro?.trim();
   const columns = splitIntoColumns(partners, COLUMN_COUNT);
 
   return (
@@ -74,9 +71,11 @@ export function Partners({ intro, partners }: PartnersProps) {
         {/* 30px bajo el H2, igual que Team y Figma */}
         <hr className="mt-[30px] border-t border-s2-black" />
 
-        <div className="mt-9 grid grid-cols-1 lg:grid-cols-10 lg:gap-x-5">
-          <p className="text-body lg:col-span-6">{description}</p>
-        </div>
+        {description ? (
+          <div className="mt-9 grid grid-cols-1 lg:grid-cols-10 lg:gap-x-5">
+            <p className="text-body lg:col-span-6">{description}</p>
+          </div>
+        ) : null}
 
         {/* Móvil: una sola columna, en el orden de Sanity */}
         <ul className="mt-9 flex flex-col gap-5 lg:hidden">

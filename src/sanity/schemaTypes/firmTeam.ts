@@ -34,10 +34,17 @@ export const firmTeam = defineType({
               validation: (rule) => rule.required().error("Title is required"),
             }),
             defineField({
+              name: "email",
+              title: "Email",
+              description:
+                "Address shown as the Mail button, before LinkedIn. Example: name@s2c.com",
+              type: "email",
+            }),
+            defineField({
               name: "linkedin",
               title: "LinkedIn",
               description:
-                "Profile URL shown as the third column. Example: https://www.linkedin.com/in/name",
+                "Profile URL shown as the LinkedIn button, after Mail. Example: https://www.linkedin.com/in/name",
               type: "url",
               validation: (rule) =>
                 rule
@@ -49,10 +56,6 @@ export const firmTeam = defineType({
             select: { title: "name", subtitle: "title" },
           },
         }),
-      ],
-      initialValue: [
-        { _type: "teamMember", name: "Alexandra Ramirez", title: "Operations" },
-        { _type: "teamMember", name: "Name Surname", title: "Title" },
       ],
     }),
   ],

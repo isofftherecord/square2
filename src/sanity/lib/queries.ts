@@ -21,12 +21,26 @@ export const firmHeroQuery = defineQuery(`
   }
 `);
 
+export const firmLeadershipQuery = defineQuery(`
+  *[_id == "firmLeadership"][0] {
+    people[] {
+      _key,
+      name,
+      role,
+      email,
+      linkedin,
+      photo
+    }
+  }
+`);
+
 export const firmTeamQuery = defineQuery(`
   *[_id == "firmTeam"][0] {
     members[] {
       _key,
       name,
       title,
+      email,
       linkedin
     }
   }

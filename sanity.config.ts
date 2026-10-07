@@ -23,6 +23,7 @@ export default defineConfig({
         (template) =>
           template.schemaType !== "homeHero" &&
           template.schemaType !== "firmHero" &&
+          template.schemaType !== "firmLeadership" &&
           template.schemaType !== "firmTeam" &&
           template.schemaType !== "firmPartners",
       ),
@@ -53,6 +54,16 @@ export default defineConfig({
               .schemaType("firmHero")
               .child(
                 S.document().schemaType("firmHero").documentId("firmHero"),
+              ),
+            S.listItem()
+              .title("Firm — Leadership")
+              .id("firmLeadership")
+              .icon(icons.user)
+              .schemaType("firmLeadership")
+              .child(
+                S.document()
+                  .schemaType("firmLeadership")
+                  .documentId("firmLeadership"),
               ),
             S.listItem()
               .title("Firm — Team")

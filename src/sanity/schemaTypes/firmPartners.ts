@@ -48,16 +48,4 @@ export const firmPartners = defineType({
       return { title: "Firm — Partners" };
     },
   },
-  initialValue: {
-    intro:
-      "Capital partners, lenders, and advisors SQUARE2 has worked with across the portfolio.",
-    partners: [
-      { _type: "partner", name: "Apollo Global Management" },
-      { _type: "partner", name: "Blackstone" },
-      { _type: "partner", name: "Lone Star Funds" },
-      { _type: "partner", name: "Ascentris" },
-      { _type: "partner", name: "DRA Advisors" },
-      { _type: "partner", name: "Gresham Partners" },
-    ],
-  },
 });

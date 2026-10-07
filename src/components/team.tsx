@@ -2,6 +2,7 @@ export type TeamMember = {
   _key: string;
   name: string;
   title: string;
+  email?: string;
   linkedin?: string;
 };
 
@@ -10,6 +11,7 @@ export type FirmTeamDoc = {
     _key: string;
     name?: string;
     title?: string;
+    email?: string;
     linkedin?: string;
   }[];
 };
@@ -27,6 +29,7 @@ export function toTeamMembers(doc: FirmTeamDoc | null): TeamMember[] | undefined
         _key: member._key,
         name: member.name,
         title: member.title,
+        email: member.email?.trim() || undefined,
         linkedin: member.linkedin?.trim() || undefined,
       })) ?? []
   );
@@ -35,6 +38,42 @@ export function toTeamMembers(doc: FirmTeamDoc | null): TeamMember[] | undefined
 type TeamProps = {
   members: TeamMember[];
 };
+
+function TeamChip({
+  href,
+  icon,
+  iconWidth,
+  label,
+  className,
+  external = false,
+}: {
+  href?: string;
+  icon: string;
+  iconWidth: number;
+  label: string;
+  className: string;
+  external?: boolean;
+}) {
+  const classes = `inline-flex h-5 w-fit cursor-pointer items-center gap-1.5 px-3 text-navigation text-s2-white ${className}`;
+  const content = (
+    <>
+      <img src={icon} alt="" width={iconWidth} height={7} className="shrink-0" />
+      {label}
+    </>
+  );
+
+  if (!href) return <span className={classes}>{content}</span>;
+
+  return (
+    <a
+      href={href}
+      className={classes}
+      {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+    >
+      {content}
+    </a>
+  );
+}
 
 export function Team({ members }: TeamProps) {
   if (members.length === 0) return null;
@@ -52,22 +91,28 @@ export function Team({ members }: TeamProps) {
               <div className="grid grid-cols-1 gap-y-2 pt-[22px] pb-[14px] lg:grid-cols-10 lg:items-center lg:gap-x-5">
                 <p className="text-h5 min-w-0 lg:col-span-4">{member.name}</p>
                 <p className="text-body lg:col-span-3">{member.title}</p>
-                {member.linkedin ? (
-                  <a
-                    href={member.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex h-5 w-fit cursor-pointer items-center gap-1.5 bg-s2-linkedin px-3 text-navigation text-s2-white lg:col-span-3"
-                  >
-                    <img
-                      src="/icons/linkedin.svg"
-                      alt=""
-                      width={10}
-                      height={7}
-                      className="shrink-0"
-                    />
-                    LinkedIn
-                  </a>
+                {member.email || member.linkedin ? (
+                  <div className="flex flex-wrap items-center gap-2.5 lg:col-span-3">
+                    {member.email ? (
+                      <TeamChip
+                        href={`mailto:${member.email}`}
+                        icon="/icons/mail.svg"
+                        iconWidth={9}
+                        label="Mail"
+                        className="bg-s2-orange"
+                      />
+                    ) : null}
+                    {member.linkedin ? (
+                      <TeamChip
+                        href={member.linkedin}
+                        icon="/icons/linkedin.svg"
+                        iconWidth={10}
+                        label="LinkedIn"
+                        className="bg-s2-linkedin"
+                        external
+                      />
+                    ) : null}
+                  </div>
                 ) : (
                   // Reserva la tercera columna para que el cargo no se corra.
                   <span className="hidden lg:col-span-3 lg:block" />
