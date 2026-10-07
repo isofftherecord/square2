@@ -33,6 +33,17 @@ export const firmTeam = defineType({
               type: "string",
               validation: (rule) => rule.required().error("Title is required"),
             }),
+            defineField({
+              name: "linkedin",
+              title: "LinkedIn",
+              description:
+                "Profile URL shown as the third column. Example: https://www.linkedin.com/in/name",
+              type: "url",
+              validation: (rule) =>
+                rule
+                  .uri({ scheme: ["http", "https"] })
+                  .error("Enter a full LinkedIn URL, including https://"),
+            }),
           ],
           preview: {
             select: { title: "name", subtitle: "title" },

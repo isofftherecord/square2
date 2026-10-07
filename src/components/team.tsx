@@ -2,6 +2,7 @@ export type TeamMember = {
   _key: string;
   name: string;
   title: string;
+  linkedin?: string;
 };
 
 export type FirmTeamDoc = {
@@ -9,6 +10,7 @@ export type FirmTeamDoc = {
     _key: string;
     name?: string;
     title?: string;
+    linkedin?: string;
   }[];
 };
 
@@ -25,6 +27,7 @@ export function toTeamMembers(doc: FirmTeamDoc | null): TeamMember[] | undefined
         _key: member._key,
         name: member.name,
         title: member.title,
+        linkedin: member.linkedin?.trim() || undefined,
       })) ?? []
   );
 }
@@ -46,11 +49,31 @@ export function Team({ members }: TeamProps) {
         <ul>
           {members.map((member) => (
             <li key={member._key}>
-              <div className="flex items-baseline justify-between gap-5 pt-[22px] pb-[14px] lg:grid lg:grid-cols-10 lg:gap-x-5">
-                <p className="text-h5 min-w-0 lg:col-span-7">{member.name}</p>
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-5 gap-y-3 pt-[22px] pb-[14px] lg:grid-cols-10">
+                <p className="text-h5 min-w-0 lg:col-span-4">{member.name}</p>
                 <p className="text-body text-right lg:col-span-3 lg:text-left">
                   {member.title}
                 </p>
+                {member.linkedin ? (
+                  <a
+                    href={member.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="col-span-2 inline-flex h-5 w-fit cursor-pointer items-center gap-1.5 bg-s2-linkedin px-3 text-navigation text-s2-white lg:col-span-3"
+                  >
+                    <img
+                      src="/icons/linkedin.svg"
+                      alt=""
+                      width={10}
+                      height={7}
+                      className="shrink-0"
+                    />
+                    LinkedIn
+                  </a>
+                ) : (
+                  // Reserva la tercera columna para que el cargo no se corra.
+                  <span className="hidden lg:col-span-3 lg:block" />
+                )}
               </div>
               <hr className="border-t border-s2-black" />
             </li>

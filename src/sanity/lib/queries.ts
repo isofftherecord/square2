@@ -26,7 +26,8 @@ export const firmTeamQuery = defineQuery(`
     members[] {
       _key,
       name,
-      title
+      title,
+      linkedin
     }
   }
 `);

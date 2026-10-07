@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Button } from "@/components/button";
+import { Cta } from "@/components/cta";
 import { DoubleBlock } from "@/components/double-block";
 import { TitleHero, type TitleHeroSlide } from "@/components/second-hero";
-import { Cta } from "@/components/cta";
 export const metadata: Metadata = {
   title: "Platform — Square2",
 };
@@ -36,6 +36,26 @@ The arrangement has a practical consequence. What the operating team learns abou
       }
 
     />
+
+    <section className="s2-subgrid items-start gap-y-12 pb-12 lg:pb-24">
+      <div className="col-span-12 lg:col-span-4 lg:col-start-2 lg:pt-8">
+        <h2 className="text-h2">
+          Square, <span className="italic">squared.</span>
+        </h2>
+        <p className="text-body mt-4">
+          Four corners. Two squares. One standard.
+        </p>
+      </div>
+      <div className="col-span-12 lg:col-span-4 lg:col-start-8">
+        <img
+          src="/platform/square-squared.svg"
+          alt="Owned square in front of a managed square. One team. No handoffs."
+          width={398}
+          height={346}
+          className="block h-auto w-full max-w-[398px]"
+        />
+      </div>
+    </section>
 
     <section className="s2-subgrid items-start gap-y-12 py-10">
 

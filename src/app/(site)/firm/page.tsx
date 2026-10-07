@@ -213,7 +213,30 @@ export default async function FirmPage() {
       <Team members={members} />
       <Partners intro={intro} partners={partners} />
 
-      <section className="s2-subgrid items-center pt-5 pb-16 lg:pb-35">
+      <section className="s2-hero bg-s2-fog pt-25 pb-10 lg:pb-30  ">
+        <div className="s2-page">
+          <div className="col-span-12 lg:col-span-10 lg:col-start-2">
+            <h2 className="text-h2">The long view.</h2>
+            <hr className="mt-[30px] border-t border-s2-black" />
+            <p className="text-body mt-4">One standard, as far as we can see.</p>
+            <img
+
+
+
+
+
+
+              src="/platform/Thelongview.svg"
+              alt="Squares receding from a 2008 value square to a point labeled The Standard. The foreground square reads Every building after it."
+              width={951}
+              height={472}
+              className="mx-auto mt-16 block h-auto w-full max-w-[951px] lg:mt-24"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section className="s2-subgrid items-center py-36 pb-36 lg:pb-36">
         <div className="col-span-12 lg:col-start-2 lg:col-span-12">
           <p className="text-h1">One team with one <span className="italic">standard</span>.</p>
         </div>

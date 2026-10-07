@@ -68,7 +68,7 @@ export function Partners({ intro, partners }: PartnersProps) {
   const columns = splitIntoColumns(partners, COLUMN_COUNT);
 
   return (
-    <section className="s2-subgrid pt-40 pb-40">
+    <section className="s2-subgrid pt-30 pb-25">
       <div className="col-span-12 lg:col-span-10 lg:col-start-2">
         <h2 className="text-h2">Partners.</h2>
         {/* 30px bajo el H2, igual que Team y Figma */}
